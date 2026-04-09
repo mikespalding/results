@@ -22,21 +22,12 @@
       --green:     #18924d;
       --red:       #e74c3c;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--off-white); color: var(--navy); font-family: var(--font); min-height: 100vh; }
 
-    body {
-      background: var(--off-white);
-      color: var(--navy);
-      font-family: var(--font);
-      min-height: 100vh;
-    }
-
-    /* ── HEADER ─────────────────────────────────────── */
+    /* ── HEADER ── */
     .site-header {
-      background: var(--navy);
-      height: 72px;
-      padding: 0 32px;
+      background: var(--navy); height: 72px; padding: 0 32px;
       display: flex; align-items: center; justify-content: space-between;
       position: sticky; top: 0; z-index: 100;
       box-shadow: 0 2px 20px rgba(0,0,0,0.22);
@@ -45,32 +36,51 @@
     .header-logo-svg { height: 34px; width: auto; }
     .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.15); }
     .header-title { display: flex; flex-direction: column; gap: 1px; }
-    .header-title-main {
-      font-size: 15px; font-weight: 800; color: white;
-      letter-spacing: 0.01em; line-height: 1;
-    }
-    .header-title-sub {
-      font-size: 10px; font-weight: 600;
-      color: rgba(255,255,255,0.40);
-      letter-spacing: 0.12em; text-transform: uppercase; line-height: 1;
-    }
+    .header-title-main { font-size: 15px; font-weight: 800; color: white; letter-spacing: 0.01em; line-height: 1; }
+    .header-title-sub  { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.40); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; }
     .header-right { display: flex; align-items: center; gap: 14px; }
     #last-updated { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.30); }
     .header-nav-link {
-      font-size: 11px; font-weight: 600;
-      color: rgba(255,255,255,0.45);
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.45);
       text-decoration: none; padding: 5px 10px; border-radius: 5px;
       transition: color 0.18s, background 0.18s; letter-spacing: 0.04em;
     }
     .header-nav-link:hover { color: white; background: rgba(255,255,255,0.08); }
 
+    /* ── TABS ── */
+    .tab-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; gap: 0;
+      max-width: 1100px; margin: 0 auto;
+    }
+    /* full-width wrapper so border spans edge to edge */
+    .tab-bar-wrap {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      font-family: var(--font); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); background: none; border: none;
+      padding: 14px 20px; cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--navy); }
+    .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
 
-    /* ── MAIN ───────────────────────────────────────── */
+    /* ── MAIN ── */
     .main {
       max-width: 1100px; margin: 0 auto;
       padding: 28px 24px 60px;
       display: grid; grid-template-columns: 1fr; gap: 28px;
     }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: contents; }
+
     .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
     .section-label {
       font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
@@ -78,7 +88,7 @@
     }
     .section-line { flex: 1; height: 1px; background: var(--border); }
 
-    /* ── CHART ──────────────────────────────────────── */
+    /* ── CHART ── */
     .chart-panel {
       background: var(--white); border: 1px solid var(--border);
       border-radius: 10px; padding: 20px 24px 18px;
@@ -91,14 +101,12 @@
     .chart-legend { display: flex; gap: 16px; flex-wrap: wrap; }
     .legend-item {
       display: flex; align-items: center; gap: 6px;
-      font-size: 10px; font-weight: 600; color: var(--muted);
-      cursor: pointer; transition: color 0.15s;
+      font-size: 10px; font-weight: 600; color: var(--muted); cursor: default;
     }
-    .legend-item:hover { color: var(--navy); }
     .legend-pip { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
     .chart-wrap { position: relative; height: 280px; }
 
-    /* ── TABLE ──────────────────────────────────────── */
+    /* ── TABLE ── */
     .table-panel {
       background: var(--white); border: 1px solid var(--border);
       border-radius: 10px; overflow: hidden;
@@ -107,9 +115,8 @@
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: rgba(31,53,64,0.03); }
     th {
-      font-size: 9px; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--muted);
-      padding: 10px 16px; text-align: right; white-space: nowrap;
+      font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); padding: 10px 16px; text-align: right; white-space: nowrap;
       border-bottom: 1px solid var(--border);
     }
     th:first-child { text-align: left; }
@@ -117,10 +124,8 @@
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover     { background: rgba(33,169,225,0.03); }
     tbody tr.today-row { background: rgba(33,169,225,0.06); }
-    td {
-      font-size: 12px; font-weight: 600;
-      padding: 10px 16px; text-align: right; color: var(--muted);
-    }
+    tbody tr.cur-week-row { background: rgba(33,169,225,0.06); }
+    td { font-size: 12px; font-weight: 600; padding: 10px 16px; text-align: right; color: var(--muted); }
     td:first-child { text-align: left; font-size: 11px; }
     .td-itibc     { color: var(--blue) !important; }
     .td-contracts { color: var(--orange) !important; }
@@ -132,8 +137,13 @@
       font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
       padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle;
     }
+    .cur-badge {
+      display: inline-block; background: var(--teal); color: white;
+      font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle;
+    }
 
-    /* ── STATUS ─────────────────────────────────────── */
+    /* ── STATUS ── */
     #status {
       text-align: center; padding: 60px 20px;
       font-size: 12px; font-weight: 500; color: var(--muted);
@@ -147,21 +157,19 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── FOOTER ─────────────────────────────────────── */
+    /* ── FOOTER ── */
     .site-footer {
       text-align: center; padding: 24px;
       font-size: 11px; color: var(--muted);
       border-top: 1px solid var(--border);
     }
 
-    /* ── RESPONSIVE ─────────────────────────────────── */
+    /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       .site-header { padding: 0 16px; height: 60px; }
-      .cards { grid-template-columns: repeat(2, 1fr); }
       .main { padding: 16px 16px 40px; }
-    }
-    @media (max-width: 440px) {
-      .card-value { font-size: 34px; }
+      .tab-bar { padding: 0 12px; }
+      .tab-btn { padding: 12px 14px; font-size: 10px; }
     }
   </style>
 </head>
@@ -180,8 +188,8 @@
     </svg>
     <div class="header-divider"></div>
     <div class="header-title">
-      <span class="header-title-main">ACQ · 7-Day KPIs</span>
-      <span class="header-title-sub">Acquisitions · Daily View</span>
+      <span class="header-title-main">ACQ · KPI Dashboard</span>
+      <span class="header-title-sub">Acquisitions · Daily &amp; Weekly Views</span>
     </div>
   </div>
   <div class="header-right">
@@ -190,50 +198,119 @@
   </div>
 </header>
 
+<!-- TABS -->
+<div class="tab-bar-wrap">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="7day">7 Day</button>
+    <button class="tab-btn" data-tab="14day">14 Day</button>
+    <button class="tab-btn" data-tab="6week">6 Week</button>
+  </div>
+</div>
+
 <div id="status"><span class="spinner"></span>Fetching data…</div>
 
 <div id="app" style="display:none">
   <div class="main">
-    <div>
-      <div class="section-header">
-        <div class="section-label">7-Day Trend</div>
-        <div class="section-line"></div>
-      </div>
-      <div class="chart-panel">
-        <div class="chart-top">
-          <div class="chart-legend">
-            <div class="legend-item"><div class="legend-pip" style="background:#21a9e1"></div>ITIBC</div>
-            <div class="legend-item"><div class="legend-pip" style="background:#f5831f"></div>Contracts</div>
-            <div class="legend-item"><div class="legend-pip" style="background:#64b4b7"></div>C&gt;Mktg</div>
-            <div class="legend-item"><div class="legend-pip" style="background:#0f696e"></div>Pos Spread</div>
-          </div>
+
+    <!-- ── 7-DAY TAB ── -->
+    <div class="tab-panel active" id="panel-7day">
+      <div>
+        <div class="section-header">
+          <div class="section-label">7-Day Trend</div>
+          <div class="section-line"></div>
         </div>
-        <div class="chart-wrap">
-          <canvas id="trendChart"></canvas>
+        <div class="chart-panel">
+          <div class="chart-top">
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-pip" style="background:#21a9e1"></div>ITIBC</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#f5831f"></div>Contracts</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#64b4b7"></div>C&gt;Mktg</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#0f696e"></div>Pos Spread</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart7"></canvas></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header">
+          <div class="section-label">Daily Detail</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="table-panel">
+          <table>
+            <thead><tr><th>Date</th><th>ITIBC</th><th>Contracts</th><th>C&gt;Mktg</th><th>Pos Spread</th></tr></thead>
+            <tbody id="table7"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <div>
-      <div class="section-header">
-        <div class="section-label">Daily Detail</div>
-        <div class="section-line"></div>
+    <!-- ── 14-DAY TAB ── -->
+    <div class="tab-panel" id="panel-14day">
+      <div>
+        <div class="section-header">
+          <div class="section-label">14-Day Trend</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="chart-panel">
+          <div class="chart-top">
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-pip" style="background:#21a9e1"></div>ITIBC</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#f5831f"></div>Contracts</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#64b4b7"></div>C&gt;Mktg</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#0f696e"></div>Pos Spread</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart14"></canvas></div>
+        </div>
       </div>
-      <div class="table-panel">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>ITIBC</th>
-              <th>Contracts</th>
-              <th>C&gt;Mktg</th>
-              <th>Pos Spread</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <div>
+        <div class="section-header">
+          <div class="section-label">Daily Detail</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="table-panel">
+          <table>
+            <thead><tr><th>Date</th><th>ITIBC</th><th>Contracts</th><th>C&gt;Mktg</th><th>Pos Spread</th></tr></thead>
+            <tbody id="table14"></tbody>
+          </table>
+        </div>
       </div>
     </div>
+
+    <!-- ── 6-WEEK TAB ── -->
+    <div class="tab-panel" id="panel-6week">
+      <div>
+        <div class="section-header">
+          <div class="section-label">6-Week Trend</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="chart-panel">
+          <div class="chart-top">
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-pip" style="background:#21a9e1"></div>ITIBC</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#f5831f"></div>Contracts</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#64b4b7"></div>C&gt;Mktg</div>
+              <div class="legend-item"><div class="legend-pip" style="background:#0f696e"></div>Pos Spread</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart6w"></canvas></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header">
+          <div class="section-label">Weekly Detail</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="table-panel">
+          <table>
+            <thead><tr><th>Week</th><th>ITIBC</th><th>Contracts</th><th>C&gt;Mktg</th><th>Pos Spread</th></tr></thead>
+            <tbody id="table6w"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -251,13 +328,42 @@ const METRICS = {
   spread:    '5c - PIPP (Positive Spread Count)',
 };
 
-const COLORS = {
-  itibc:     '#21a9e1',
-  contracts: '#f5831f',
-  cmktg:     '#64b4b7',
-  spread:    '#0f696e',
+const COLORS = { itibc: '#21a9e1', contracts: '#f5831f', cmktg: '#64b4b7', spread: '#0f696e' };
+
+const CHART_OPTS = {
+  responsive: true, maintainAspectRatio: false,
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#1f3540',
+      borderColor: 'rgba(31,53,64,0.2)', borderWidth: 1,
+      titleColor: 'rgba(255,255,255,0.5)', bodyColor: 'rgba(255,255,255,0.85)',
+      titleFont: { family: "'Montserrat', sans-serif", size: 10, weight: '600' },
+      bodyFont:  { family: "'Montserrat', sans-serif", size: 11, weight: '600' },
+      padding: 10,
+      callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y}` },
+    },
+  },
+  scales: {
+    x: {
+      grid: { color: 'rgba(31,53,64,0.06)' },
+      ticks: { color: '#5a7888', font: { family: "'Montserrat', sans-serif", size: 10, weight: '600' } },
+    },
+    y: {
+      position: 'left', grid: { color: 'rgba(31,53,64,0.07)' },
+      ticks: { color: '#21a9e1', font: { family: "'Montserrat', sans-serif", size: 10, weight: '600' } },
+      title: { display: true, text: 'ITIBC', color: 'rgba(33,169,225,0.5)', font: { family: "'Montserrat', sans-serif", size: 9, weight: '800' } },
+    },
+    y2: {
+      position: 'right', grid: { drawOnChartArea: false },
+      ticks: { color: '#5a7888', precision: 0, font: { family: "'Montserrat', sans-serif", size: 10, weight: '600' } },
+      title: { display: true, text: 'Deals', color: '#5a7888', font: { family: "'Montserrat', sans-serif", size: 9, weight: '800' } },
+    },
+  },
 };
 
+// ── PARSE ──────────────────────────────────────────────
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
@@ -270,9 +376,9 @@ function parseCSV(text) {
 function buildDayMap(rows) {
   const map = {};
   for (const row of rows) {
-    const day    = (row.day    || '').trim();
+    const day = (row.day || '').trim();
     const metric = (row.metric || '').trim();
-    const count  = parseFloat(row.count) || 0;
+    const count = parseFloat(row.count) || 0;
     if (!day) continue;
     if (!map[day]) map[day] = { itibc: 0, contracts: 0, cmktg: 0, spread: 0 };
     if (metric === METRICS.itibc)     map[day].itibc     = count;
@@ -283,125 +389,126 @@ function buildDayMap(rows) {
   return map;
 }
 
+// ── DATE HELPERS ───────────────────────────────────────
 function fmtDate(d) {
   const [y,m,dy] = d.split('-');
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const wdays  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const dt = new Date(Number(y), Number(m)-1, Number(dy));
-  return `${days[dt.getDay()]} ${months[Number(m)-1]} ${Number(dy)}`;
+  return `${wdays[dt.getDay()]} ${months[Number(m)-1]} ${Number(dy)}`;
 }
-
 
 function fmtShort(d) {
   const [y,m,dy] = d.split('-');
-  const days = ['Su','M','Tu','W','Th','F','Sa'];
+  const wdays = ['Su','M','Tu','W','Th','F','Sa'];
   const dt = new Date(Number(y), Number(m)-1, Number(dy));
-  return `${days[dt.getDay()]} ${Number(m)}/${Number(dy)}`;
-}
-function deltaHtml(curr, prev) {
-  if (prev == null) return '';
-  const diff = curr - prev;
-  if (diff === 0) return `<span class="card-delta delta-flat">— same</span>`;
-  const sign  = diff > 0 ? '+' : '';
-  const cls   = diff > 0 ? 'delta-up' : 'delta-down';
-  const arrow = diff > 0 ? '▲' : '▼';
-  return `<span class="card-delta ${cls}">${arrow} ${sign}${diff}</span>`;
+  return `${wdays[dt.getDay()]} ${Number(m)}/${Number(dy)}`;
 }
 
-let chartInstance = null;
+// Get Monday of the week containing date string d
+function weekStart(d) {
+  const [y,m,dy] = d.split('-').map(Number);
+  const dt = new Date(y, m-1, dy);
+  const dow = dt.getDay(); // 0=Sun
+  const diff = dow === 0 ? -6 : 1 - dow; // shift to Monday
+  dt.setDate(dt.getDate() + diff);
+  return dt.toISOString().split('T')[0];
+}
 
-function render(dayMap) {
-  const days  = Object.keys(dayMap).sort();
-  const last7 = days.slice(-7);
+function fmtWeek(monDate) {
+  const [y,m,dy] = monDate.split('-').map(Number);
+  const mon = new Date(y, m-1, dy);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[mon.getMonth()]} ${mon.getDate()} – ${months[sun.getMonth()]} ${sun.getDate()}`;
+}
 
-  const labels   = last7.map(d => fmtShort(d));
-  const datasets = [
+// ── BUILD WEEK MAP ─────────────────────────────────────
+function buildWeekMap(dayMap) {
+  const wmap = {};
+  for (const [day, vals] of Object.entries(dayMap)) {
+    const ws = weekStart(day);
+    if (!wmap[ws]) wmap[ws] = { itibc: 0, contracts: 0, cmktg: 0, spread: 0, days: [] };
+    wmap[ws].itibc     += vals.itibc;
+    wmap[ws].contracts += vals.contracts;
+    wmap[ws].cmktg     += vals.cmktg;
+    wmap[ws].spread    += vals.spread;
+    wmap[ws].days.push(day);
+  }
+  return wmap;
+}
+
+// ── CHART DATASETS ─────────────────────────────────────
+function makeDatasets(slice, dayMap) {
+  return [
     {
-      type: 'bar',
-      label: 'ITIBC', data: last7.map(d => dayMap[d].itibc),
-      backgroundColor: COLORS.itibc + '99',
-      borderColor: COLORS.itibc,
-      borderWidth: 1, borderRadius: 4,
-      yAxisID: 'y',
+      type: 'bar', label: 'ITIBC',
+      data: slice.map(d => dayMap[d].itibc),
+      backgroundColor: COLORS.itibc + '99', borderColor: COLORS.itibc,
+      borderWidth: 1, borderRadius: 3, yAxisID: 'y',
     },
     {
-      type: 'line',
-      label: 'Contracts', data: last7.map(d => dayMap[d].contracts),
+      type: 'line', label: 'Contracts',
+      data: slice.map(d => dayMap[d].contracts),
       borderColor: COLORS.contracts, backgroundColor: 'transparent',
       pointBackgroundColor: COLORS.contracts,
       tension: 0.35, fill: false, borderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
       yAxisID: 'y2',
     },
     {
-      type: 'line',
-      label: 'C>Mktg', data: last7.map(d => dayMap[d].cmktg),
+      type: 'line', label: 'C>Mktg',
+      data: slice.map(d => dayMap[d].cmktg),
       borderColor: COLORS.cmktg, backgroundColor: 'transparent',
       pointBackgroundColor: COLORS.cmktg, borderDash: [4,3],
       tension: 0.35, fill: false, borderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
       yAxisID: 'y2',
     },
     {
-      type: 'line',
-      label: 'Pos Spread', data: last7.map(d => dayMap[d].spread),
+      type: 'line', label: 'Pos Spread',
+      data: slice.map(d => dayMap[d].spread),
       borderColor: COLORS.spread, backgroundColor: 'transparent',
       pointBackgroundColor: COLORS.spread, borderDash: [2,4],
       tension: 0.35, fill: false, borderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
       yAxisID: 'y2',
     },
   ];
+}
 
-  const ctx = document.getElementById('trendChart').getContext('2d');
-  if (chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1f3540',
-          borderColor: 'rgba(31,53,64,0.2)', borderWidth: 1,
-          titleColor: 'rgba(255,255,255,0.5)', bodyColor: 'rgba(255,255,255,0.85)',
-          titleFont: { family: "'Montserrat', sans-serif", size: 10, weight: '600' },
-          bodyFont:  { family: "'Montserrat', sans-serif", size: 11, weight: '600' },
-          padding: 10,
-          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}` },
-        },
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(31,53,64,0.06)' },
-          ticks: { color: '#5a7888', font: { family: "'Montserrat', sans-serif", size: 10, weight: '600' } },
-        },
-        y: {
-          position: 'left', grid: { color: 'rgba(31,53,64,0.07)' },
-          ticks: { color: '#21a9e1', font: { family: "'Montserrat', sans-serif", size: 10, weight: '600' } },
-          title: {
-            display: true, text: 'ITIBC', color: 'rgba(33,169,225,0.5)',
-            font: { family: "'Montserrat', sans-serif", size: 9, weight: '800' },
-          },
-        },
-        y2: {
-          position: 'right', grid: { drawOnChartArea: false },
-          ticks: {
-            color: '#5a7888', precision: 0,
-            font: { family: "'Montserrat', sans-serif", size: 10, weight: '600' },
-          },
-          title: {
-            display: true, text: 'Deals', color: '#5a7888',
-            font: { family: "'Montserrat', sans-serif", size: 9, weight: '800' },
-          },
-        },
-      },
+function makeWeekDatasets(weeks, wmap) {
+  return [
+    {
+      type: 'bar', label: 'ITIBC',
+      data: weeks.map(w => wmap[w].itibc),
+      backgroundColor: COLORS.itibc + '99', borderColor: COLORS.itibc,
+      borderWidth: 1, borderRadius: 3, yAxisID: 'y',
     },
-  });
+    {
+      type: 'bar', label: 'Contracts',
+      data: weeks.map(w => wmap[w].contracts),
+      backgroundColor: COLORS.contracts + 'cc', borderColor: COLORS.contracts,
+      borderWidth: 1, borderRadius: 3, yAxisID: 'y2',
+    },
+    {
+      type: 'bar', label: 'C>Mktg',
+      data: weeks.map(w => wmap[w].cmktg),
+      backgroundColor: COLORS.cmktg + 'cc', borderColor: COLORS.cmktg,
+      borderWidth: 1, borderRadius: 3, yAxisID: 'y2',
+    },
+    {
+      type: 'bar', label: 'Pos Spread',
+      data: weeks.map(w => wmap[w].spread),
+      backgroundColor: COLORS.spread + 'cc', borderColor: COLORS.spread,
+      borderWidth: 1, borderRadius: 3, yAxisID: 'y2',
+    },
+  ];
+}
 
-  const tbody = document.getElementById('tableBody');
+// ── DAY TABLE ──────────────────────────────────────────
+function fillDayTable(tbodyId, slice, dayMap) {
+  const tbody = document.getElementById(tbodyId);
   const today = new Date().toISOString().split('T')[0];
   tbody.innerHTML = '';
-  [...last7].reverse().forEach(d => {
+  [...slice].reverse().forEach(d => {
     const row = dayMap[d];
     const isToday = d === today;
     const tr = document.createElement('tr');
@@ -416,12 +523,90 @@ function render(dayMap) {
     `;
     tbody.appendChild(tr);
   });
+}
 
+// ── WEEK TABLE ─────────────────────────────────────────
+function fillWeekTable(weeks, wmap) {
+  const tbody = document.getElementById('table6w');
+  const todayWS = weekStart(new Date().toISOString().split('T')[0]);
+  tbody.innerHTML = '';
+  [...weeks].reverse().forEach(ws => {
+    const row = wmap[ws];
+    const isCur = ws === todayWS;
+    const tr = document.createElement('tr');
+    if (isCur) tr.className = 'cur-week-row';
+    const zc = v => v === 0 ? 'td-zero' : '';
+    tr.innerHTML = `
+      <td>${fmtWeek(ws)}${isCur ? '<span class="cur-badge">current</span>' : ''}</td>
+      <td class="td-itibc ${zc(row.itibc)}">${row.itibc || '—'}</td>
+      <td class="td-contracts ${zc(row.contracts)}">${row.contracts || '—'}</td>
+      <td class="td-cmktg ${zc(row.cmktg)}">${row.cmktg || '—'}</td>
+      <td class="td-spread ${zc(row.spread)}">${row.spread || '—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── RENDER ─────────────────────────────────────────────
+const charts = {};
+
+function render(dayMap) {
+  const days  = Object.keys(dayMap).sort();
+  const last7  = days.slice(-7);
+  const last14 = days.slice(-14);
+
+  // 7-day chart + table
+  const ctx7 = document.getElementById('chart7').getContext('2d');
+  if (charts.c7) charts.c7.destroy();
+  charts.c7 = new Chart(ctx7, {
+    type: 'bar',
+    data: { labels: last7.map(fmtShort), datasets: makeDatasets(last7, dayMap) },
+    options: JSON.parse(JSON.stringify(CHART_OPTS)),
+  });
+  fillDayTable('table7', last7, dayMap);
+
+  // 14-day chart + table
+  const ctx14 = document.getElementById('chart14').getContext('2d');
+  if (charts.c14) charts.c14.destroy();
+  charts.c14 = new Chart(ctx14, {
+    type: 'bar',
+    data: { labels: last14.map(fmtShort), datasets: makeDatasets(last14, dayMap) },
+    options: JSON.parse(JSON.stringify(CHART_OPTS)),
+  });
+  fillDayTable('table14', last14, dayMap);
+
+  // 6-week chart + table
+  const wmap  = buildWeekMap(dayMap);
+  const weeks = Object.keys(wmap).sort().slice(-6);
+  const ctx6w = document.getElementById('chart6w').getContext('2d');
+  if (charts.c6w) charts.c6w.destroy();
+  const weekOpts = JSON.parse(JSON.stringify(CHART_OPTS));
+  // Weekly view: grouped bars — remove tension/line settings, adjust y2 label
+  weekOpts.scales.y2.title.text = 'Deals (weekly total)';
+  charts.c6w = new Chart(ctx6w, {
+    type: 'bar',
+    data: { labels: weeks.map(fmtWeek), datasets: makeWeekDatasets(weeks, wmap) },
+    options: weekOpts,
+  });
+  fillWeekTable(weeks, wmap);
+
+  // Timestamp
   const now = new Date();
   document.getElementById('last-updated').textContent =
     `Updated ${now.toLocaleDateString('en-US',{month:'short',day:'numeric'})} at ${now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
 }
 
+// ── TABS ───────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── FETCH ──────────────────────────────────────────────
 async function load() {
   const status = document.getElementById('status');
   try {
