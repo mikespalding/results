@@ -29,6 +29,9 @@
   .header-name{color:white;font-size:17px;font-weight:600;letter-spacing:-0.3px;line-height:1.2;}
   .header-sub{color:rgba(255,255,255,0.5);font-size:12px;margin-top:2px;}
   .header-meta{color:rgba(255,255,255,0.4);font-size:11px;font-family:'DM Mono',monospace;}
+  .header-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);transition:all .15s;white-space:nowrap;}
+  .header-back:hover{color:white;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.07);}
+  .header-back svg{width:12px;height:12px;flex-shrink:0;}
 
   /* NAV */
   .nav{background:var(--navy);padding:0 32px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.08);}
@@ -207,7 +210,13 @@
       <div class="header-sub">Acquisition Associates · 2026 Cohorts · Jan–Mar</div>
     </div>
   </div>
-  <div class="header-meta">Generated 4/14/2026 · 26 reps</div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="header-meta">Generated 4/14/2026 · 26 reps</div>
+    <a class="header-back" href="https://mikespalding.github.io/results/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Results
+    </a>
+  </div>
 </div>
 
 <div class="nav">
