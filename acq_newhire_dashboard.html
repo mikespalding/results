@@ -463,10 +463,13 @@ document.getElementById('drilldown-modal').addEventListener('click',e=>{if(e.tar
 // ═══════════════════════ PERFORMANCE ═══════════════════════
 function buildPerformance(){
   const active=DATA.reps.filter(r=>r.status==='Active');
+  const all=DATA.reps;
+  // Contracts/RTS: active reps only (operational/coaching metrics)
   const totC=active.reduce((s,r)=>s+cumMetric(r,'contracts'),0);
   const totM=active.reduce((s,r)=>s+cumMetric(r,'contracts_to_mktg'),0);
-  const totA=active.reduce((s,r)=>s+cumMetric(r,'assignments'),0);
-  const totF=active.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0);
+  // Assignments/fees: all 26 reps (realized revenue regardless of status)
+  const totA=all.reduce((s,r)=>s+cumMetric(r,'assignments'),0);
+  const totF=all.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0);
   // For RTS: use 4/6 week (last complete week), not 4/13 which is in progress
   const rtsWeekFor=r=>r.weeks.find(w=>w.week==='4/6/2026')||r.weeks.filter(w=>w.week!=='4/13/2026').slice(-1)[0]||latestWeek(r);
   const rtsVals=active.map(r=>rtsWeekFor(r).rts_hrs).filter(v=>v>0);
@@ -475,10 +478,10 @@ function buildPerformance(){
   document.getElementById('perf-kpi-row').innerHTML=`
     <div class="kpi-card teal"><div class="kpi-label">Active Reps</div><div class="kpi-value">${active.length}</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Total Contracts</div><div class="kpi-value">${totC}</div><div class="kpi-sub">Active reps YTD</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">To Marketing</div><div class="kpi-value">${totM}</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Assignments</div><div class="kpi-value">${totA}</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Assignment Fees</div><div class="kpi-value">$${Math.round(totF/1000)}k</div></div>
-    <div class="kpi-card ${avgRts>=25?'teal':'orange'}"><div class="kpi-label">Avg RTS (4/6 Wk)</div><div class="kpi-value">${avgRts.toFixed(1)}h</div><div class="kpi-sub">Min: 25h</div></div>`;
+    <div class="kpi-card blue"><div class="kpi-label">To Marketing</div><div class="kpi-value">${totM}</div><div class="kpi-sub">Active reps YTD</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Assignments</div><div class="kpi-value">${totA}</div><div class="kpi-sub">All reps YTD</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Assignment Fees</div><div class="kpi-value">$${Math.round(totF/1000)}k</div><div class="kpi-sub">All reps YTD</div></div>
+    <div class="kpi-card ${avgRts>=25?'teal':'orange'}"><div class="kpi-label">Avg RTS (4/6 Wk)</div><div class="kpi-value">${avgRts.toFixed(1)}h</div><div class="kpi-sub">Min: 25h · Active reps</div></div>`;
 
   // Contracts bar
   const sortedC=[...active].sort((a,b)=>cumMetric(b,'contracts')-cumMetric(a,'contracts'));
