@@ -341,18 +341,42 @@ const RCOLS = {
   }
 */
 const KPI_DEFS = [
+  // ── OUTCOME (6 KPIs, equally weighted) ─────────────────
   {
-    id:             'closed_transactions',
-    label:          'Closed Transactions',
-    category:       'outcome',
-    weight:         1.0,
-    csvUrl:         PROXY_URL + '?feed=closed_transactions',
-    emailCol:       'email',
-    valueCol:       'closings_count',
-    aggregate:      'sum',
-    higherIsBetter: true,
-    format:         'number',
-    decimals:       0,
+    id:'contracts', label:'Contracts', category:'outcome', weight:1/6,
+    csvUrl:PROXY_URL+'?feed=contracts',
+    emailCol:'email', valueCol:'contract_count',
+    aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
+  },
+  {
+    id:'contracts_to_mktg', label:'C>Mktg', category:'outcome', weight:1/6,
+    csvUrl:PROXY_URL+'?feed=contracts_to_mktg',
+    emailCol:'email', valueCol:'count',
+    aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
+  },
+  {
+    id:'backouts', label:'Backouts', category:'outcome', weight:1/6,
+    csvUrl:PROXY_URL+'?feed=backouts',
+    emailCol:'email', valueCol:'backout_count',
+    aggregate:'sum', higherIsBetter:false, format:'number', decimals:0,
+  },
+  {
+    id:'assignments', label:'Assignments', category:'outcome', weight:1/6,
+    csvUrl:PROXY_URL+'?feed=assignments_and_fees',
+    emailCol:'email', valueCol:'assigned_count',
+    aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
+  },
+  {
+    id:'assignment_fees', label:'Assignment Fees', category:'outcome', weight:1/6,
+    csvUrl:PROXY_URL+'?feed=assignments_and_fees',
+    emailCol:'email', valueCol:'total_assignment_fee',
+    aggregate:'sum', higherIsBetter:true, format:'currency_k', decimals:1,
+  },
+  {
+    id:'transactions', label:'Transactions', category:'outcome', weight:1/6,
+    csvUrl:PROXY_URL+'?feed=closed_transactions',
+    emailCol:'email', valueCol:'closings_count',
+    aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
 ];
 
