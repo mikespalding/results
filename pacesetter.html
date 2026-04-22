@@ -275,7 +275,7 @@
     <div class="config-grid">
       <div class="config-field">
         <label>Active Associate Roster CSV</label>
-        <input type="text" id="url-roster" value="https://rebuilt.metabaseapp.com/public/question/b7bcb242-37bb-40dd-abbd-09257c2415c0.csv"/>
+        <input type="text" id="url-roster" value="https://rebuilt.metabaseapp.com/api/public/card/b7bcb242-37bb-40dd-abbd-09257c2415c0/query/csv"/>
       </div>
       <div>
         <button class="btn-reload" onclick="loadAll()">↻ Reload All Data</button>
@@ -301,7 +301,7 @@
 
 const CAT_WEIGHTS = { effort:.30, quality:.25, efficiency:.20, outcome:.30 };
 
-const ROSTER_URL = 'https://rebuilt.metabaseapp.com/public/question/b7bcb242-37bb-40dd-abbd-09257c2415c0.csv';
+const ROSTER_URL = 'https://rebuilt.metabaseapp.com/api/public/card/b7bcb242-37bb-40dd-abbd-09257c2415c0/query/csv';
 
 /* Column name candidates — first match wins.
    Open console after first load to see actual column names. */
@@ -334,7 +334,7 @@ const KPI_DEFS = [
     label:          'Closed Transactions',
     category:       'outcome',
     weight:         1.0,
-    csvUrl:         'https://rebuilt.metabaseapp.com/public/question/16bf7baa-9e04-44d7-8a6f-28566c3abbd7.csv',
+    csvUrl:         'https://rebuilt.metabaseapp.com/api/public/card/16bf7baa-9e04-44d7-8a6f-28566c3abbd7/query/csv',
     emailCol:       'email',
     valueCol:       'closings_count',
     aggregate:      'sum',
