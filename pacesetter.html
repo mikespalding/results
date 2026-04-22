@@ -365,33 +365,28 @@ const KPI_DEFS = [
     aggregate:'avg', higherIsBetter:false, format:'minutes', decimals:1,
   },
 
-  // ── QUALITY (2 KPIs, equally weighted) ─────────────────
+  // ── QUALITY (3 KPIs, equally weighted) ─────────────────
   {
-    id:'prospect_creation_rate', label:'Prospect Creation Rate', category:'quality', weight:1/2,
+    id:'prospect_creation_rate', label:'Prospect Creation Rate', category:'quality', weight:1/3,
     csvUrl:PROXY_URL+'?feed=prospect_creation_rate',
     emailCol:'email', valueCol:null, dateCol:null,
     aggregate:'ratio', ratioNumerator:'prospects_created', ratioDenominator:'calls_taken',
     higherIsBetter:true, format:'percent', decimals:1,
   },
   {
-    id:'uw_mao', label:'< UW MAO', category:'quality', weight:1/2,
+    id:'uw_mao', label:'< UW MAO', category:'quality', weight:1/3,
     csvUrl:PROXY_URL+'?feed=uw_mao',
     emailCol:'email', valueCol:'count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
+  {
+    id:'pos_spread_deals', label:'Pos Spread Deals', category:'quality', weight:1/3,
+    csvUrl:PROXY_URL+'?feed=pos_spread_deals',
+    emailCol:'email', valueCol:'count_of_positive_spread', dateCol:'marketing_date',
+    aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
+  },
 
   // ── EFFICIENCY (4 KPIs, equally weighted) ──────────────
-  {
-    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:1/4,
-    csvUrl:PROXY_URL+'?feed=avg_days_hold',
-    emailCol:'email', valueCol:'days_between', dateCol:'marketing_date',
-    aggregate:'avg', higherIsBetter:false, format:'number', decimals:1,
-  },
-  {
-    id:'pct_c_to_mktg', label:'C>Mktg %', category:'efficiency', weight:1/4,
-    csvUrl:null, derived:true,
-    higherIsBetter:true, format:'percent', decimals:1,
-  },
   {
     id:'conversation_rate', label:'Five9 Conv Rate', category:'efficiency', weight:1/4,
     csvUrl:PROXY_URL+'?feed=conversation_rate',
@@ -404,6 +399,17 @@ const KPI_DEFS = [
     csvUrl:PROXY_URL+'?feed=zoom_conversation_rate',
     emailCol:'email', valueCol:null, dateCol:'date',
     aggregate:'ratio', ratioNumerator:'calls_3min_plus', ratioDenominator:'total_calls',
+    higherIsBetter:true, format:'percent', decimals:1,
+  },
+  {
+    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:1/4,
+    csvUrl:PROXY_URL+'?feed=avg_days_hold',
+    emailCol:'email', valueCol:'days_between', dateCol:'marketing_date',
+    aggregate:'avg', higherIsBetter:false, format:'number', decimals:1,
+  },
+  {
+    id:'pct_c_to_mktg', label:'C>Mktg %', category:'efficiency', weight:1/4,
+    csvUrl:null, derived:true,
     higherIsBetter:true, format:'percent', decimals:1,
   },
 
