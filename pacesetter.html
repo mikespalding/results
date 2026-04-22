@@ -361,6 +361,14 @@ const KPI_DEFS = [
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
 
+  // ── EFFICIENCY (1 KPI) ─────────────────────────────────
+  {
+    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:1.0,
+    csvUrl:PROXY_URL+'?feed=avg_days_hold',
+    emailCol:'email', valueCol:'days_between', dateCol:'marketing_date',
+    aggregate:'avg', higherIsBetter:false, format:'number', decimals:1,
+  },
+
   // ── OUTCOME (6 KPIs, equally weighted) ─────────────────
   {
     id:'contracts', label:'Contracts', category:'outcome', weight:1/6,
@@ -510,6 +518,21 @@ async function loadKPIs() {
           Object.keys(numMap).forEach(email => {
             const den = denMap[email] || 0;
             map[email] = den > 0 ? (numMap[email] / den) * 100 : 0;
+          });
+        } else if (kpi.aggregate === 'avg') {
+          // Average: track sum and count per associate, divide at end
+          const sumMap = {}, cntMap = {};
+          rows.forEach(r => {
+            const email = (r[kpi.emailCol]||'').toLowerCase().trim();
+            const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
+            if (!email || isNaN(val)) return;
+            const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
+            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && d < cutoff28) return; }
+            sumMap[email] = (sumMap[email] || 0) + val;
+            cntMap[email] = (cntMap[email] || 0) + 1;
+          });
+          Object.keys(sumMap).forEach(email => {
+            map[email] = sumMap[email] / cntMap[email];
           });
         } else {
           rows.forEach(r => {
