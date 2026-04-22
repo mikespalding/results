@@ -319,7 +319,7 @@ const ROSTER_URL = PROXY_URL + '?feed=roster';
    Open console after first load to see actual column names. */
 const RCOLS = {
   email:  ['Email','email','Email Address','email_address'],
-  name:   ['Full Name','Name','Associate Name','name','full_name'],
+  name:   ['agent_name','Full Name','Name','Associate Name','name','full_name'],
   team:   ['Team','team','Department'],
   status: ['Status','status'],
 };
@@ -440,33 +440,37 @@ async function loadKPIs() {
       const rows = await fetchCSV(url);
       byUrl[url].forEach(kpi => {
         const map = {};
+        // Rolling 4-week window: last 28 days from today
+        const now28    = new Date();
+        const cutoff28 = new Date(now28.getFullYear(), now28.getMonth(), now28.getDate() - 28);
         let minDate = null, maxDate = null;
         rows.forEach(r => {
           const email = (r[kpi.emailCol]||'').toLowerCase().trim();
           const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
           if (!email || isNaN(val)) return;
-          if (kpi.aggregate === 'sum') {
-            map[email] = (map[email] || 0) + val;
-          } else {
-            map[email] = val;
-          }
-          // Track date range if a date column exists
-          const dateVal = r['closing_date'] || r['date'] || r['week'] || r['Date'] || null;
-          if (dateVal) {
-            const d = new Date(dateVal);
+          // Date filter — only include rows within last 28 days
+          const dateCol = r['closing_date'] || r['date'] || r['week'] || r['Date'] || null;
+          if (dateCol) {
+            const d = new Date(dateCol);
+            if (!isNaN(d) && d < cutoff28) return; // skip rows outside window
             if (!isNaN(d)) {
               if (!minDate || d < minDate) minDate = d;
               if (!maxDate || d > maxDate) maxDate = d;
             }
           }
+          if (kpi.aggregate === 'sum') {
+            map[email] = (map[email] || 0) + val;
+          } else {
+            map[email] = val;
+          }
         });
         S.kpiData[kpi.id] = map;
-        // Store date range globally if found
+        // Store date range globally
         if (minDate && maxDate) {
           S.dataMinDate = minDate;
           S.dataMaxDate = maxDate;
         }
-        console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates, aggregate=${kpi.aggregate||'last'}`);
+        console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 28 days`);
       });
       done++;
       txt('lbl-data', `KPI feeds: ${done} of ${urls.length} loaded`);
@@ -547,7 +551,7 @@ function renderOverall() {
            </div></td>`
         : '<td style="color:#b0b8c1;font-size:11px">—</td>';
     }).join('');
-    return `<tr><td>${badge(r)}</td><td><strong>${a.name}</strong></td><td>${pill(a.score)}</td>${catCells}</tr>`;
+    return `<tr><td>${badge(r)}</td><td><strong>${S.nameMap[a.email] || a.email}</strong></td><td>${pill(a.score)}</td>${catCells}</tr>`;
   }).join('')}
   </tbody></table>`;
 }
