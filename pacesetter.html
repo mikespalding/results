@@ -361,12 +361,17 @@ const KPI_DEFS = [
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
 
-  // ── EFFICIENCY (1 KPI) ─────────────────────────────────
+  // ── EFFICIENCY (2 KPIs, equally weighted) ──────────────
   {
-    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:1.0,
+    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:1/2,
     csvUrl:PROXY_URL+'?feed=avg_days_hold',
     emailCol:'email', valueCol:'days_between', dateCol:'marketing_date',
     aggregate:'avg', higherIsBetter:false, format:'number', decimals:1,
+  },
+  {
+    id:'pct_c_to_mktg', label:'C>Mktg %', category:'efficiency', weight:1/2,
+    csvUrl:null, derived:true,   // calculated from contracts + contracts_to_mktg
+    higherIsBetter:true, format:'percent', decimals:1,
   },
 
   // ── OUTCOME (6 KPIs, equally weighted) ─────────────────
@@ -605,7 +610,7 @@ function computeScores() {
   S.roster.forEach(a => {
     const cats = {};
     ['effort','quality','efficiency','outcome'].forEach(cat => {
-      const ks = KPI_DEFS.filter(k => k.category===cat && k.csvUrl);
+      const ks = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
       if (!ks.length) { cats[cat]=null; return; }
       // Score based on KPIs that have data; associates with no data for a KPI
       // get 0 percentile for that KPI (last place) rather than being excluded
@@ -707,7 +712,7 @@ function renderCat(cat) {
   const sorted = rank(cat);
   const wrap = document.getElementById(cat+'-lb');
   if (!sorted.length) return;
-  const catKPIs = KPI_DEFS.filter(k => k.category===cat && k.csvUrl);
+  const catKPIs = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
   wrap.innerHTML = `<table class="lb-table"><thead><tr>
     <th style="width:32px">#</th><th>Associate</th><th>Score</th>
     ${catKPIs.map(k=>`<th>${k.label}</th>`).join('')}
@@ -804,7 +809,24 @@ document.querySelectorAll('.nav-tab').forEach(t => {
 async function loadAll() {
   await loadRoster();
   await loadKPIs();
+  computeDerived();
   renderAll();
+}
+
+function computeDerived() {
+  // pct_c_to_mktg = contracts_to_mktg / contracts (per associate)
+  const contracts    = S.kpiData['contracts']         || {};
+  const cToMktg      = S.kpiData['contracts_to_mktg'] || {};
+  const derived      = {};
+  // Union of all emails across both maps
+  const emails = new Set([...Object.keys(contracts), ...Object.keys(cToMktg)]);
+  emails.forEach(email => {
+    const num = cToMktg[email] ?? 0;
+    const den = contracts[email] ?? 0;
+    if (den > 0) derived[email] = (num / den) * 100;
+  });
+  S.kpiData['pct_c_to_mktg'] = derived;
+  console.log('[Pacesetter] pct_c_to_mktg derived:', Object.keys(derived).length, 'associates');
 }
 
 
