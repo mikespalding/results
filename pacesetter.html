@@ -630,9 +630,13 @@ function pill(score, color) {
 function fmt(v, kpi) {
   if (v===null||v===undefined) return '—';
   const d = kpi.decimals??1;
-  if (kpi.format==='percent')  return v.toFixed(d)+'%';
-  if (kpi.format==='currency') return '$'+v.toLocaleString('en-US',{maximumFractionDigits:d});
-  if (kpi.format==='hours')    return v.toFixed(d)+'h';
+  if (kpi.format==='percent')   return v.toFixed(d)+'%';
+  if (kpi.format==='currency')  return '$'+v.toLocaleString('en-US',{maximumFractionDigits:d});
+  if (kpi.format==='currency_k'){
+    if (Math.abs(v)>=1000) return '$'+(v/1000).toFixed(d)+'k';
+    return '$'+v.toFixed(0);
+  }
+  if (kpi.format==='hours')     return v.toFixed(d)+'h';
   return v.toLocaleString('en-US',{maximumFractionDigits:d});
 }
 function dot(id, s) {
