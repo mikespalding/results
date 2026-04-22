@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acquisition Pacesetter · Rolling 4 Weeks</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --navy:#1f3540;--blue:#21a9e1;--teal:#64b4b7;--dark-teal:#0f696e;--orange:#f5831f;
+    --offwhite:#efedeb;--white:#ffffff;--below:#e05252;--minimum:#f5a623;
+    --border:#d9d4cf;--shadow:0 2px 12px rgba(31,53,64,0.10);--radius:8px;
+    --effort-color:#21a9e1;--quality-color:#64b4b7;
+    --efficiency-color:#f5831f;--outcome-color:#0f696e;
+    --gold:#b8860b;--silver:#7a8a94;--bronze:#8b5a2b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--offwhite);color:var(--navy);min-height:100vh;}
+
+  /* HEADER */
+  .header{background:var(--navy);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+  .header-left{display:flex;align-items:center;gap:16px;}
+  .logo-wrap{height:44px;display:flex;align-items:center;}
+  .header-divider{width:1px;height:36px;background:rgba(255,255,255,0.2);}
+  .header-name{color:white;font-size:17px;font-weight:600;letter-spacing:-0.3px;line-height:1.2;}
+  .header-sub{color:rgba(255,255,255,0.5);font-size:12px;margin-top:2px;}
+  .header-meta{color:rgba(255,255,255,0.4);font-size:11px;font-family:'DM Mono',monospace;text-align:right;line-height:1.8;}
+
+  /* STATUS STRIP */
+  .status-strip{background:rgba(25,45,56,0.98);padding:6px 32px;display:flex;align-items:center;gap:20px;font-size:11px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.06);}
+  .sdot{width:7px;height:7px;border-radius:50%;background:var(--teal);display:inline-block;margin-right:5px;vertical-align:middle;}
+  .sdot.loading{background:var(--orange);animation:pulse 1.4s infinite;}
+  .sdot.error{background:var(--below);animation:none;}
+  .sdot.ok{background:var(--dark-teal);animation:none;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  /* NAV */
+  .nav{background:var(--navy);padding:0 32px;display:flex;gap:4px;border-top:1px solid rgba(255,255,255,0.08);}
+  .nav-tab{padding:11px 20px;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+  .nav-tab:hover{color:rgba(255,255,255,0.85);}
+  .nav-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+  /* MAIN */
+  .main{padding:26px 32px;max-width:1400px;margin:0 auto;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* KPI ROW */
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:24px;}
+  .kpi-card{background:white;border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-top:3px solid var(--border);}
+  .kpi-card.blue{border-top-color:var(--blue);}
+  .kpi-card.orange{border-top-color:var(--orange);}
+  .kpi-card.teal{border-top-color:var(--teal);}
+  .kpi-card.green{border-top-color:var(--dark-teal);}
+  .kpi-card.gold{border-top-color:#d4a017;}
+  .kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a8a94;margin-bottom:5px;}
+  .kpi-value{font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--navy);line-height:1;}
+  .kpi-sub{font-size:11px;color:#7a8a94;margin-top:3px;}
+
+  /* SECTION */
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:14px;font-weight:600;color:var(--navy);}
+  .section-note{font-size:11px;color:#7a8a94;}
+
+  /* CARD */
+  .card{background:white;border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+  @media(max-width:800px){.two-col{grid-template-columns:1fr;}}
+
+  /* TABLES */
+  .lb-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .lb-table th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#7a8a94;border-bottom:2px solid var(--border);white-space:nowrap;}
+  .lb-table td{padding:9px 10px;border-bottom:1px solid #f0ece8;vertical-align:middle;}
+  .lb-table tr:last-child td{border-bottom:none;}
+  .lb-table tr:hover td{background:#fafaf9;}
+
+  /* RANK */
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;background:var(--offwhite);color:#7a8a94;}
+  .rank-badge.r1{background:#fff8e1;color:var(--gold);}
+  .rank-badge.r2{background:#f5f5f5;color:var(--silver);}
+  .rank-badge.r3{background:#fdf3ec;color:var(--bronze);}
+
+  /* SCORE PILL */
+  .score-pill{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;background:var(--offwhite);color:#7a8a94;}
+  .score-pill.s-top{background:#e3f4fc;color:#1785b5;}
+  .score-pill.s-mid{background:#e0f2f1;color:var(--dark-teal);}
+  .score-pill.s-low{background:#fef3e0;color:#c47a10;}
+  .score-pill.s-bot{background:#fde8e8;color:var(--below);}
+
+  /* MINI BAR */
+  .mini-bar-wrap{display:flex;align-items:center;gap:7px;}
+  .mini-bar-track{flex:1;height:5px;background:#f0ece8;border-radius:3px;overflow:hidden;min-width:48px;}
+  .mini-bar-fill{height:100%;border-radius:3px;}
+
+  /* CATEGORY ACCENTS */
+  .cat-effort{border-left:4px solid var(--effort-color);}
+  .cat-quality{border-left:4px solid var(--quality-color);}
+  .cat-efficiency{border-left:4px solid var(--efficiency-color);}
+  .cat-outcome{border-left:4px solid var(--outcome-color);}
+
+  /* WEIGHT CHIPS */
+  .weight-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+  .weight-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:5px;font-size:11px;font-weight:600;background:white;box-shadow:var(--shadow);}
+  .chip-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* KPI STRUCTURE PANEL */
+  .kpi-struct-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:24px;}
+  .kpi-struct-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .kpi-struct-head{padding:11px 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0ece8;}
+  .kpi-struct-title{font-size:13px;font-weight:700;}
+  .kpi-struct-wt{font-size:10px;font-family:'DM Mono',monospace;color:#7a8a94;background:var(--offwhite);padding:2px 7px;border-radius:4px;}
+  .kpi-struct-row{display:flex;align-items:center;justify-content:space-between;padding:7px 15px;border-bottom:1px solid #f9f7f5;font-size:12px;}
+  .kpi-struct-row:last-child{border-bottom:none;}
+  .kpi-struct-meta{display:flex;align-items:center;gap:7px;}
+  .kpi-pct{font-size:10px;font-family:'DM Mono',monospace;color:#7a8a94;}
+  .kpi-status{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;}
+  .kpi-status.pending{background:#fef3e0;color:#c47a10;}
+  .kpi-status.loaded{background:#e0f2f1;color:var(--dark-teal);}
+  .kpi-struct-empty{padding:12px 15px;font-size:11px;color:#b0b8c1;font-style:italic;}
+
+  /* CONFIG */
+  .config-card{background:white;border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px;}
+  .config-card h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a8a94;margin-bottom:14px;}
+  .config-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;align-items:end;}
+  .config-field{display:flex;flex-direction:column;gap:5px;}
+  .config-field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a8a94;}
+  .config-field input{border:1px solid var(--border);border-radius:5px;padding:7px 11px;font-size:12px;font-family:'DM Mono',monospace;color:var(--navy);outline:none;transition:border-color .15s;}
+  .config-field input:focus{border-color:var(--blue);}
+  .btn-reload{padding:8px 18px;background:var(--blue);color:white;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap;}
+  .btn-reload:hover{background:#35baf0;}
+
+  /* EMPTY */
+  .empty-state{padding:40px 20px;text-align:center;color:#b0b8c1;font-size:13px;line-height:1.6;}
+  .empty-icon{font-size:2rem;margin-bottom:10px;opacity:.4;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-wrap" style="height:48px;display:flex;align-items:center;">
+      <svg height="48" viewBox="0 0 1424.9733 1332.6667" xmlns="http://www.w3.org/2000/svg">
+        <g id="g1">
+          <g id="group-R5">
+            <path d="M 0,42.3398 V 1905.12 H 426.895 V 1485.3 c 131.691,317.51 351.593,469.22 659.735,455.1 v -451.58 h -24.69 c -192.877,0 -346.96,-62.95 -462.174,-188.75 C 484.504,1174.22 426.895,991.371 426.895,751.469 V 42.3398 H 0" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 1684.25,1104.26 h 956.1 c -14.12,143.44 -62.35,261.08 -144.67,352.8 -82.34,91.73 -191.71,137.6 -328.08,137.6 -129.4,0 -237.61,-45.31 -324.59,-135.83 -87.04,-90.56 -139.95,-208.76 -158.76,-354.57 z M 2216.99,0 C 1944.11,0 1716.55,89.9609 1534.32,269.891 1352.01,449.82 1260.89,682.059 1260.89,966.672 v 7.058 c 0,270.44 85.83,499.77 257.55,687.96 171.66,188.14 389.23,282.25 652.67,282.25 282.26,0 501.53,-95.87 657.97,-287.54 156.4,-191.73 234.63,-429.86 234.63,-714.42 0,-23.539 -2.38,-63.511 -7.06,-119.96 H 1687.78 c 23.49,-148.168 83.46,-264.051 179.94,-347.5 96.4,-83.52 215.2,-125.239 356.32,-125.239 183.45,0 351.58,74.078 504.51,222.258 L 2979.03,349.281 C 2786.15,116.422 2532.13,0 2216.99,0" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 4386.3,373.969 c 150.5,0 276.95,54.683 379.28,164.062 102.3,109.371 153.46,253.399 153.46,432.168 v 7.063 c 0,176.398 -51.77,319.828 -155.23,430.418 -103.54,110.53 -229.33,165.81 -377.51,165.81 -148.16,0 -275.78,-55.9 -382.78,-167.58 -107.05,-111.74 -160.53,-254.63 -160.53,-428.648 v -7.063 c 0,-174.078 53.48,-316.957 160.53,-428.648 107,-111.742 234.62,-167.582 382.78,-167.582 z M 4485.09,3.53906 c -256.39,0 -466.91,109.35894 -631.51,328.08194 V 42.3398 h -426.9 V 2617.79 h 426.9 V 1594.66 c 164.6,232.84 375.12,349.28 631.51,349.28 235.17,0 438.63,-87.66 610.34,-262.84 171.67,-175.25 257.55,-409.86 257.55,-703.838 v -7.063 c 0,-294.027 -85.88,-528.636 -257.55,-703.828 C 4923.72,91.1211 4720.26,3.53906 4485.09,3.53906" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 6368.34,3.53906 c -207,0 -369.3,64.65234 -486.86,194.03094 -117.65,129.321 -176.41,303.41 -176.41,522.141 V 1905.12 h 426.89 V 846.719 c 0,-145.86 34.67,-258.16 104.08,-336.918 69.33,-78.821 167.57,-118.192 294.6,-118.192 124.62,0 225.78,41.121 303.39,123.481 77.62,82.312 116.42,195.199 116.42,338.68 v 1051.35 h 426.9 V 42.3398 h -426.9 V 331.621 C 6802.29,112.898 6608.23,3.53906 6368.34,3.53906" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="M 7855.37,42.3398 V 1905.12 h 426.89 V 42.3398 Z M 7837.73,2190.89 v 405.72 h 458.64 v -405.72 h -458.64" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="M 8772.3,42.3398 V 2617.79 h 426.87 V 42.3398 H 8772.3" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 10295.7,10.5898 c -357.58,0 -536.3,182.2502 -536.3,546.8402 v 980.78 h -236.36 v 366.91 h 236.36 v 511.56 h 426.9 v -511.56 h 501 v -366.91 h -501 V 624.461 c 0,-155.231 76.4,-232.852 229.3,-232.852 91.7,0 179.9,21.18 264.6,63.512 V 105.84 c -112.9,-63.5002 -241.1,-95.2502 -384.5,-95.2502" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 3337.99,3544.83 1179.79,1076.72 v 1938.1 L 3337.99,5590.6 V 3544.83" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="M 6169.48,9995.01 V 4621.55 l 1179.8,-1076.72 v 5491.29 l -1179.8,958.89" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="M 4753.74,7744.05 V 4836.89 l 589.89,538.37 589.9,-538.37 4.37,3973.72 -1184.16,-1066.56" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 4802.21,3425.19 h 430.69 v 430.68 h -430.69 v -430.68" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 5448.24,3425.19 h 430.7 v 430.68 h -430.7 v -430.68" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 5232.9,4501.91 h -430.69 v -430.69 h 430.69 v 430.69" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+            <path d="m 5448.24,4501.91 v -430.69 h 430.7 v 430.69 h -430.7" style="fill:#4ea9e2;fill-opacity:1;fill-rule:nonzero;stroke:none" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-name">Acquisition Pacesetter</div>
+      <div class="header-sub">Rolling 4-Week Performance Ranking</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div>Rolling 4 Weeks</div>
+    <div id="hdr-refreshed">Last refreshed: —</div>
+  </div>
+</div>
+
+<!-- STATUS STRIP -->
+<div class="status-strip">
+  <span><span class="sdot loading" id="dot-roster"></span><span id="lbl-roster">Roster: loading…</span></span>
+  <span><span class="sdot loading" id="dot-data"></span><span id="lbl-data">KPI feeds: 0 of 0 loaded</span></span>
+  <span style="margin-left:auto" id="lbl-count">— associates</span>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab active" data-tab="overall">Overall Ranking</div>
+  <div class="nav-tab" data-tab="effort">Effort</div>
+  <div class="nav-tab" data-tab="quality">Quality</div>
+  <div class="nav-tab" data-tab="efficiency">Efficiency</div>
+  <div class="nav-tab" data-tab="outcome">Outcome</div>
+  <div class="nav-tab" data-tab="config">⚙ Config</div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════ TAB: OVERALL ═══════════ -->
+<div class="tab-panel active" id="tab-overall">
+  <div class="kpi-row">
+    <div class="kpi-card blue"><div class="kpi-label">Active Associates</div><div class="kpi-value" id="kv-count">—</div><div class="kpi-sub">On roster</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">KPIs Tracked</div><div class="kpi-value" id="kv-kpis">0</div><div class="kpi-sub">Across 4 categories</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Data As Of</div><div class="kpi-value" id="kv-asof" style="font-size:16px;letter-spacing:0">—</div><div class="kpi-sub">Last data refresh</div></div>
+  </div>
+
+  <div class="weight-bar">
+    <span style="font-size:11px;color:#7a8a94;font-weight:600;margin-right:2px">Category weights:</span>
+    <div class="weight-chip"><div class="chip-dot" style="background:var(--effort-color)"></div><span style="color:var(--effort-color)">Effort 30%</span></div>
+    <div class="weight-chip"><div class="chip-dot" style="background:var(--quality-color)"></div><span style="color:var(--quality-color)">Quality 25%</span></div>
+    <div class="weight-chip"><div class="chip-dot" style="background:var(--efficiency-color)"></div><span style="color:var(--efficiency-color)">Efficiency 20%</span></div>
+    <div class="weight-chip"><div class="chip-dot" style="background:var(--outcome-color)"></div><span style="color:var(--outcome-color)">Outcome 30%</span></div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-title">Overall Pacesetter Ranking</div>
+    <div class="section-note">Percentile score · weighted composite of all KPIs</div>
+  </div>
+  <div class="card" id="overall-lb">
+    <div class="empty-state"><div class="empty-icon">🏆</div>Leaderboard will populate once roster and KPI data are connected.</div>
+  </div>
+
+
+
+</div>
+
+<!-- ═══════════ TAB: EFFORT ═══════════ -->
+<div class="tab-panel" id="tab-effort">
+  <div class="section-head">
+    <div class="section-title" style="color:var(--effort-color)">Effort Rankings</div>
+    <div class="section-note">30% of overall Pacesetter score</div>
+  </div>
+  <div class="card cat-effort" id="effort-lb">
+    <div class="empty-state"><div class="empty-icon">📋</div>Awaiting KPI definitions and data.</div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB: QUALITY ═══════════ -->
+<div class="tab-panel" id="tab-quality">
+  <div class="section-head">
+    <div class="section-title" style="color:var(--quality-color)">Quality Rankings</div>
+    <div class="section-note">25% of overall Pacesetter score</div>
+  </div>
+  <div class="card cat-quality" id="quality-lb">
+    <div class="empty-state"><div class="empty-icon">⭐</div>Awaiting KPI definitions and data.</div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB: EFFICIENCY ═══════════ -->
+<div class="tab-panel" id="tab-efficiency">
+  <div class="section-head">
+    <div class="section-title" style="color:var(--efficiency-color)">Efficiency Rankings</div>
+    <div class="section-note">20% of overall Pacesetter score</div>
+  </div>
+  <div class="card cat-efficiency" id="efficiency-lb">
+    <div class="empty-state"><div class="empty-icon">⚡</div>Awaiting KPI definitions and data.</div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB: OUTCOME ═══════════ -->
+<div class="tab-panel" id="tab-outcome">
+  <div class="section-head">
+    <div class="section-title" style="color:var(--outcome-color)">Outcome Rankings</div>
+    <div class="section-note">30% of overall Pacesetter score</div>
+  </div>
+  <div class="card cat-outcome" id="outcome-lb">
+    <div class="empty-state"><div class="empty-icon">🎯</div>Awaiting KPI definitions and data.</div>
+  </div>
+</div>
+
+<!-- ═══════════ TAB: CONFIG ═══════════ -->
+<div class="tab-panel" id="tab-config">
+  <div class="section-head">
+    <div class="section-title">Data Sources</div>
+    <div class="section-note">Metabase public CSV URLs · reloads automatically on page open</div>
+  </div>
+  <div class="config-card">
+    <h3>Roster</h3>
+    <div class="config-grid">
+      <div class="config-field">
+        <label>Active Associate Roster CSV</label>
+        <input type="text" id="url-roster" value="https://rebuilt.metabaseapp.com/public/question/b7bcb242-37bb-40dd-abbd-09257c2415c0.csv"/>
+      </div>
+      <div>
+        <button class="btn-reload" onclick="loadAll()">↻ Reload All Data</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:6px">
+    <div class="section-title">KPI Structure</div>
+    <div class="section-note">KPI data source fields added iteratively as metrics are confirmed</div>
+  </div>
+  <div class="kpi-struct-grid" id="kpi-struct-grid"></div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   PACESETTER ENGINE v0.3
+   Design system: Rebuilt dashboard family
+   Join key: associate email address (lowercased)
+═══════════════════════════════════════════════════════════ */
+
+const CAT_WEIGHTS = { effort:.30, quality:.25, efficiency:.20, outcome:.30 };
+
+const ROSTER_URL = 'https://rebuilt.metabaseapp.com/public/question/b7bcb242-37bb-40dd-abbd-09257c2415c0.csv';
+
+/* Column name candidates — first match wins.
+   Open console after first load to see actual column names. */
+const RCOLS = {
+  email:  ['Email','email','Email Address','email_address'],
+  name:   ['Full Name','Name','Associate Name','name','full_name'],
+  team:   ['Team','team','Department'],
+  status: ['Status','status'],
+};
+
+/*
+  ── KPI DEFINITIONS ──────────────────────────────────────────
+  Add entries here as metrics are confirmed. Shape:
+  {
+    id:             'unique_snake_key',
+    label:          'Display Name',
+    category:       'effort' | 'quality' | 'efficiency' | 'outcome',
+    weight:         0.0–1.0,   // fraction within category (cat total = 1.0)
+    csvUrl:         '',         // Metabase public .csv URL
+    emailCol:       '',         // column name holding associate email
+    valueCol:       '',         // column name holding the metric value
+    higherIsBetter: true,
+    format:         'number' | 'percent' | 'currency' | 'hours',
+    decimals:       1,
+  }
+*/
+const KPI_DEFS = [
+  {
+    id:             'closed_transactions',
+    label:          'Closed Transactions',
+    category:       'outcome',
+    weight:         1.0,
+    csvUrl:         'https://rebuilt.metabaseapp.com/public/question/16bf7baa-9e04-44d7-8a6f-28566c3abbd7.csv',
+    emailCol:       'email',
+    valueCol:       'closings_count',
+    aggregate:      'sum',
+    higherIsBetter: true,
+    format:         'number',
+    decimals:       0,
+  },
+];
+
+/* ── STATE ── */
+const S = { roster:[], kpiData:{}, scores:{} };
+
+/* ── CSV ── */
+async function fetchCSV(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return parseCSV(await r.text());
+}
+function parseCSV(txt) {
+  const lines = txt.trim().split('\n');
+  if (lines.length < 2) return [];
+  const hdrs = csvSplit(lines[0]);
+  return lines.slice(1).map(l => {
+    const v = csvSplit(l), row = {};
+    hdrs.forEach((h,i) => row[h.trim()] = (v[i]||'').trim());
+    return row;
+  });
+}
+function csvSplit(line) {
+  const out=[]; let cur='', q=false;
+  for (const c of line) {
+    if (c==='"'){q=!q;continue;}
+    if (c===','&&!q){out.push(cur);cur='';continue;}
+    cur+=c;
+  }
+  out.push(cur); return out;
+}
+function pick(row, cols) {
+  for (const c of cols) if (row[c]!==undefined) return row[c];
+  return '';
+}
+
+/* ── LOAD ROSTER ── */
+async function loadRoster() {
+  const url = document.getElementById('url-roster').value.trim() || ROSTER_URL;
+  dot('dot-roster','loading'); txt('lbl-roster','Roster: loading…');
+  try {
+    const rows = await fetchCSV(url);
+    if (rows.length) {
+      console.log('[Pacesetter] Roster columns:', Object.keys(rows[0]));
+      console.log('[Pacesetter] Sample:', rows[0]);
+    }
+    const active = rows.filter(r => {
+      const team   = pick(r, RCOLS.team).toLowerCase().trim();
+      const status = pick(r, RCOLS.status).toLowerCase().trim();
+      return team === 'acquisition' && status !== 'exited';
+    });
+    S.roster = active.map(r => ({
+      email: pick(r, RCOLS.email).toLowerCase().trim(),
+      name:  pick(r, RCOLS.name) || pick(r, RCOLS.email),
+    })).filter(a => a.email);
+    S.roster.sort((a,b) => a.name.localeCompare(b.name));
+
+    const excl = rows.length - active.length;
+    dot('dot-roster','ok');
+    txt('lbl-roster', `Roster: ${S.roster.length} active associates (${excl} excluded)`);
+    txt('lbl-count', `${S.roster.length} associates`);
+    txt('kv-count', S.roster.length);
+    txt('hdr-refreshed', 'Last refreshed: ' + new Date().toLocaleString());
+    console.log(`[Pacesetter] ${S.roster.length} active Acquisition associates`);
+  } catch(e) {
+    dot('dot-roster','error');
+    txt('lbl-roster','Roster: error — see console');
+    console.error('[Pacesetter] Roster:', e);
+  }
+}
+
+/* ── LOAD KPI DATA ── */
+async function loadKPIs() {
+  const byUrl = {};
+  KPI_DEFS.forEach(k => { if (!k.csvUrl) return; (byUrl[k.csvUrl]=byUrl[k.csvUrl]||[]).push(k); });
+  const urls = Object.keys(byUrl);
+  dot('dot-data', urls.length?'loading':'ok');
+  txt('lbl-data', `KPI feeds: 0 of ${urls.length} loaded`);
+  let done = 0;
+  for (const url of urls) {
+    try {
+      const rows = await fetchCSV(url);
+      byUrl[url].forEach(kpi => {
+        const map = {};
+        rows.forEach(r => {
+          const email = (r[kpi.emailCol]||'').toLowerCase().trim();
+          const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
+          if (!email || isNaN(val)) return;
+          if (kpi.aggregate === 'sum') {
+            map[email] = (map[email] || 0) + val;
+          } else {
+            map[email] = val;
+          }
+        });
+        S.kpiData[kpi.id] = map;
+        console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates, aggregate=${kpi.aggregate||'last'}`);
+      });
+      done++;
+      txt('lbl-data', `KPI feeds: ${done} of ${urls.length} loaded`);
+    } catch(e) { console.error('[Pacesetter] KPI feed error:', url, e); }
+  }
+  if (urls.length) dot('dot-data','ok');
+  txt('kv-kpis', KPI_DEFS.length);
+}
+
+/* ── SCORING ENGINE ── */
+function computeScores() {
+  if (!S.roster.length || !KPI_DEFS.length) return;
+
+  // Percentile rank per KPI
+  const pct = {};
+  KPI_DEFS.forEach(kpi => {
+    const data = S.kpiData[kpi.id] || {};
+    const vals = S.roster
+      .map(a => ({email:a.email, v:data[a.email]??null}))
+      .filter(x => x.v!==null)
+      .sort((a,b) => kpi.higherIsBetter ? b.v-a.v : a.v-b.v);
+    const map = {};
+    vals.forEach((x,i) => { map[x.email] = vals.length>1 ? Math.round((1-i/(vals.length-1))*100) : 50; });
+    pct[kpi.id] = map;
+  });
+
+  S.roster.forEach(a => {
+    const cats = {};
+    ['effort','quality','efficiency','outcome'].forEach(cat => {
+      const ks = KPI_DEFS.filter(k => k.category===cat && k.csvUrl);
+      if (!ks.length) { cats[cat]=null; return; }
+      let num=0, den=0;
+      ks.forEach(k => { const p=pct[k.id]?.[a.email]; if (p!==undefined){num+=p*k.weight;den+=k.weight;} });
+      cats[cat] = den>0 ? num/den : null;
+    });
+    let num=0, den=0;
+    Object.entries(CAT_WEIGHTS).forEach(([cat,w]) => {
+      if (cats[cat]!==null && cats[cat]!==undefined) { num+=cats[cat]*w; den+=w; }
+    });
+    S.scores[a.email] = { ...cats, overall: den>0 ? num/den : null };
+  });
+}
+
+/* ── RENDER ── */
+function renderAll() {
+  computeScores();
+  renderOverall();
+  ['effort','quality','efficiency','outcome'].forEach(renderCat);
+  renderKPIStruct();
+  updateSummaryKPIs();
+}
+
+function rank(key) {
+  return [...S.roster]
+    .map(a => ({...a, score: S.scores[a.email]?.[key]??null}))
+    .filter(a => a.score!==null)
+    .sort((a,b) => b.score-a.score);
+}
+
+function renderOverall() {
+  const sorted = rank('overall');
+  const wrap = document.getElementById('overall-lb');
+  if (!sorted.length) return;
+  const cats = ['effort','quality','efficiency','outcome'];
+  const cc = {effort:'var(--effort-color)',quality:'var(--quality-color)',efficiency:'var(--efficiency-color)',outcome:'var(--outcome-color)'};
+  wrap.innerHTML = `<table class="lb-table"><thead><tr>
+    <th style="width:32px">#</th><th>Associate</th><th>Overall</th>
+    ${cats.map(c=>`<th style="color:${cc[c]}">${c[0].toUpperCase()+c.slice(1)}</th>`).join('')}
+  </tr></thead><tbody>
+  ${sorted.map((a,i)=>{
+    const r=i+1;
+    const catCells = cats.map(c => {
+      const s = S.scores[a.email]?.[c];
+      return s!==null&&s!==undefined
+        ? `<td><div class="mini-bar-wrap">
+            <span style="font-size:11px;font-family:'DM Mono',monospace;min-width:28px">${s.toFixed(0)}</span>
+            <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${s.toFixed(0)}%;background:${cc[c]}"></div></div>
+           </div></td>`
+        : '<td style="color:#b0b8c1;font-size:11px">—</td>';
+    }).join('');
+    return `<tr><td>${badge(r)}</td><td><strong>${a.name}</strong></td><td>${pill(a.score)}</td>${catCells}</tr>`;
+  }).join('')}
+  </tbody></table>`;
+}
+
+function renderCat(cat) {
+  const sorted = rank(cat);
+  const wrap = document.getElementById(cat+'-lb');
+  if (!sorted.length) return;
+  const catKPIs = KPI_DEFS.filter(k => k.category===cat && k.csvUrl);
+  wrap.innerHTML = `<table class="lb-table"><thead><tr>
+    <th style="width:32px">#</th><th>Associate</th><th>Score</th>
+    ${catKPIs.map(k=>`<th>${k.label}</th>`).join('')}
+  </tr></thead><tbody>
+  ${sorted.map((a,i)=>{
+    const kpiCells = catKPIs.map(k => {
+      const v = S.kpiData[k.id]?.[a.email];
+      return v!==undefined
+        ? `<td style="font-family:'DM Mono',monospace;font-size:12px">${fmt(v,k)}</td>`
+        : '<td style="color:#b0b8c1">—</td>';
+    }).join('');
+    return `<tr><td>${badge(i+1)}</td><td><strong>${a.name}</strong></td><td>${pill(a.score)}</td>${kpiCells}</tr>`;
+  }).join('')}
+  </tbody></table>`;
+}
+
+function updateSummaryKPIs() {
+  txt('kv-asof', new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+}
+
+function renderMinis() {} // removed — no-op kept for safety
+
+
+function renderKPIStruct() {
+  const cats = [
+    {key:'effort',   label:'Effort',     w:'30%', c:'var(--effort-color)'},
+    {key:'quality',  label:'Quality',    w:'25%', c:'var(--quality-color)'},
+    {key:'efficiency',label:'Efficiency',w:'20%', c:'var(--efficiency-color)'},
+    {key:'outcome',  label:'Outcome',    w:'30%', c:'var(--outcome-color)'},
+  ];
+  document.getElementById('kpi-struct-grid').innerHTML = cats.map(cat => {
+    const kpis = KPI_DEFS.filter(k => k.category===cat.key);
+    const rows = kpis.length
+      ? kpis.map(k=>`<div class="kpi-struct-row">
+          <span>${k.label}</span>
+          <div class="kpi-struct-meta">
+            <span class="kpi-pct">${Math.round(k.weight*100)}% of cat</span>
+            <span class="kpi-status ${S.kpiData[k.id]?'loaded':'pending'}">${S.kpiData[k.id]?'loaded':'pending'}</span>
+          </div></div>`).join('')
+      : '<div class="kpi-struct-empty">+ KPIs pending — awaiting metric definitions</div>';
+    return `<div class="kpi-struct-card">
+      <div class="kpi-struct-head" style="border-left:4px solid ${cat.c};padding-left:11px">
+        <span class="kpi-struct-title" style="color:${cat.c}">${cat.label}</span>
+        <span class="kpi-struct-wt">${cat.w} of total</span>
+      </div>
+      <div>${rows}</div></div>`;
+  }).join('');
+}
+
+/* ── HELPERS ── */
+function badge(r) {
+  const cls = r===1?'r1':r===2?'r2':r===3?'r3':'';
+  return `<span class="rank-badge ${cls}">${r}</span>`;
+}
+function pill(score, color) {
+  if (score===null||score===undefined) return '<span class="score-pill">—</span>';
+  const cls = score>=80?'s-top':score>=60?'s-mid':score>=40?'s-low':'s-bot';
+  const st = color ? `style="background:${color}22;color:${color}"` : '';
+  return `<span class="score-pill ${cls}" ${st}>${score.toFixed(1)}</span>`;
+}
+function fmt(v, kpi) {
+  if (v===null||v===undefined) return '—';
+  const d = kpi.decimals??1;
+  if (kpi.format==='percent')  return v.toFixed(d)+'%';
+  if (kpi.format==='currency') return '$'+v.toLocaleString('en-US',{maximumFractionDigits:d});
+  if (kpi.format==='hours')    return v.toFixed(d)+'h';
+  return v.toLocaleString('en-US',{maximumFractionDigits:d});
+}
+function dot(id, s) {
+  document.getElementById(id).className = 'sdot'+(s==='loading'?' loading':s==='error'?' error':s==='ok'?' ok':'');
+}
+function txt(id, v) { const e=document.getElementById(id); if(e) e.textContent=v; }
+
+/* ── TAB NAV ── */
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', function() {
+    document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('tab-'+this.dataset.tab).classList.add('active');
+    if (this.dataset.tab==='config') renderKPIStruct();
+  });
+});
+
+/* ── INIT ── */
+async function loadAll() {
+  await loadRoster();
+  await loadKPIs();
+  renderAll();
+}
+
+window.addEventListener('load', loadAll);
+</script>
+</body>
+</html>
