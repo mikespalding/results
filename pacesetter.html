@@ -26,6 +26,9 @@
   .header-name{color:white;font-size:17px;font-weight:600;letter-spacing:-0.3px;line-height:1.2;}
   .header-sub{color:rgba(255,255,255,0.5);font-size:12px;margin-top:2px;}
   .header-meta{color:rgba(255,255,255,0.4);font-size:11px;font-family:'DM Mono',monospace;text-align:right;line-height:1.8;}
+  .header-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);text-decoration:none;padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);transition:all .15s;white-space:nowrap;}
+  .header-back:hover{color:white;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.07);}
+  .header-back svg{width:12px;height:12px;flex-shrink:0;}
 
   /* STATUS STRIP */
   .status-strip{background:rgba(25,45,56,0.98);padding:6px 32px;display:flex;align-items:center;gap:20px;font-size:11px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.06);}
@@ -168,9 +171,15 @@
       <div class="header-sub">Rolling 4-Week Performance Ranking</div>
     </div>
   </div>
-  <div class="header-meta">
-    <div>Rolling 4 Weeks</div>
-    <div id="hdr-refreshed">Last refreshed: —</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="header-meta">
+      <div>Rolling 4 Weeks</div>
+      <div id="hdr-refreshed">Last refreshed: —</div>
+    </div>
+    <a class="header-back" href="https://mikespalding.github.io/results/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Results
+    </a>
   </div>
 </div>
 
@@ -276,7 +285,7 @@
     <div class="config-grid">
       <div class="config-field">
         <label>Active Associate Roster CSV</label>
-        <input type="text" id="url-roster" value="https://rebuilt.metabaseapp.com/api/public/card/b7bcb242-37bb-40dd-abbd-09257c2415c0/query/csv"/>
+        <input type="text" id="url-roster" value="https://script.google.com/macros/s/AKfycbwXVXMT8n3pYitrU7e2OZ3JLkey-PXXPRfDKeh2sa1DGUc51r39CytWiZkMWPMWUTc3dw/exec?feed=roster"/>
       </div>
       <div>
         <button class="btn-reload" onclick="loadAll()">↻ Reload All Data</button>
@@ -302,7 +311,9 @@
 
 const CAT_WEIGHTS = { effort:.30, quality:.25, efficiency:.20, outcome:.30 };
 
-const ROSTER_URL = 'https://rebuilt.metabaseapp.com/api/public/card/b7bcb242-37bb-40dd-abbd-09257c2415c0/query/csv';
+const PROXY_URL  = 'https://script.google.com/macros/s/AKfycbwXVXMT8n3pYitrU7e2OZ3JLkey-PXXPRfDKeh2sa1DGUc51r39CytWiZkMWPMWUTc3dw/exec';
+
+const ROSTER_URL = PROXY_URL + '?feed=roster';
 
 /* Column name candidates — first match wins.
    Open console after first load to see actual column names. */
@@ -335,7 +346,7 @@ const KPI_DEFS = [
     label:          'Closed Transactions',
     category:       'outcome',
     weight:         1.0,
-    csvUrl:         'https://rebuilt.metabaseapp.com/api/public/card/16bf7baa-9e04-44d7-8a6f-28566c3abbd7/query/csv',
+    csvUrl:         PROXY_URL + '?feed=closed_transactions',
     emailCol:       'email',
     valueCol:       'closings_count',
     aggregate:      'sum',
