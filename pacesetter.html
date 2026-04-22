@@ -187,7 +187,7 @@
 <div class="status-strip">
   <span><span class="sdot loading" id="dot-roster"></span><span id="lbl-roster">Roster: loading…</span></span>
   <span><span class="sdot loading" id="dot-data"></span><span id="lbl-data">KPI feeds: 0 of 0 loaded</span></span>
-  <span style="margin-left:auto" id="lbl-count">— associates</span>
+
 </div>
 
 <!-- NAV -->
@@ -270,18 +270,9 @@
 <div class="tab-panel" id="tab-config">
   <div class="section-head">
     <div class="section-title">Data Sources</div>
-    <div class="section-note">Metabase public CSV URLs · reloads automatically on page open</div>
-  </div>
-  <div class="config-card">
-    <h3>Roster</h3>
-    <div class="config-grid">
-      <div class="config-field">
-        <label>Active Associate Roster CSV</label>
-        <input type="text" id="url-roster" value="https://script.google.com/macros/s/AKfycbwXVXMT8n3pYitrU7e2OZ3JLkey-PXXPRfDKeh2sa1DGUc51r39CytWiZkMWPMWUTc3dw/exec?feed=roster"/>
-      </div>
-      <div>
-        <button class="btn-reload" onclick="loadAll()">↻ Reload All Data</button>
-      </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="section-note">Metabase public CSV URLs · reloads automatically on page open</div>
+      <button class="btn-reload" onclick="loadAll()">↻ Reload All Data</button>
     </div>
   </div>
 
