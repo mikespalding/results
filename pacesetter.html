@@ -207,7 +207,7 @@
   <div class="kpi-row">
     <div class="kpi-card blue"><div class="kpi-label">Active Associates</div><div class="kpi-value" id="kv-count">—</div><div class="kpi-sub">On roster</div></div>
     <div class="kpi-card teal"><div class="kpi-label">KPIs Tracked</div><div class="kpi-value" id="kv-kpis">0</div><div class="kpi-sub">Across 4 categories</div></div>
-    <div class="kpi-card orange"><div class="kpi-label">Data As Of</div><div class="kpi-value" id="kv-asof" style="font-size:16px;letter-spacing:0">—</div><div class="kpi-sub">Last data refresh</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Data Window</div><div class="kpi-value" id="kv-asof" style="font-size:14px;letter-spacing:0;line-height:1.3">—</div><div class="kpi-sub" id="kv-asof-sub">Rolling 4 weeks</div></div>
   </div>
 
   <div class="weight-bar">
@@ -357,7 +357,7 @@ const KPI_DEFS = [
 ];
 
 /* ── STATE ── */
-const S = { roster:[], kpiData:{}, scores:{} };
+const S = { roster:[], kpiData:{}, scores:{}, nameMap:{} }; // nameMap: email→name
 
 /* ── CSV ── */
 async function fetchCSV(url) {
@@ -409,6 +409,9 @@ async function loadRoster() {
       name:  pick(r, RCOLS.name) || pick(r, RCOLS.email),
     })).filter(a => a.email);
     S.roster.sort((a,b) => a.name.localeCompare(b.name));
+    // Build email→name lookup
+    S.nameMap = {};
+    S.roster.forEach(a => { S.nameMap[a.email] = a.name; });
 
     const excl = rows.length - active.length;
     dot('dot-roster','ok');
@@ -437,6 +440,7 @@ async function loadKPIs() {
       const rows = await fetchCSV(url);
       byUrl[url].forEach(kpi => {
         const map = {};
+        let minDate = null, maxDate = null;
         rows.forEach(r => {
           const email = (r[kpi.emailCol]||'').toLowerCase().trim();
           const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
@@ -446,8 +450,22 @@ async function loadKPIs() {
           } else {
             map[email] = val;
           }
+          // Track date range if a date column exists
+          const dateVal = r['closing_date'] || r['date'] || r['week'] || r['Date'] || null;
+          if (dateVal) {
+            const d = new Date(dateVal);
+            if (!isNaN(d)) {
+              if (!minDate || d < minDate) minDate = d;
+              if (!maxDate || d > maxDate) maxDate = d;
+            }
+          }
         });
         S.kpiData[kpi.id] = map;
+        // Store date range globally if found
+        if (minDate && maxDate) {
+          S.dataMinDate = minDate;
+          S.dataMaxDate = maxDate;
+        }
         console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates, aggregate=${kpi.aggregate||'last'}`);
       });
       done++;
@@ -550,13 +568,19 @@ function renderCat(cat) {
         ? `<td style="font-family:'DM Mono',monospace;font-size:12px">${fmt(v,k)}</td>`
         : '<td style="color:#b0b8c1">—</td>';
     }).join('');
-    return `<tr><td>${badge(i+1)}</td><td><strong>${a.name}</strong></td><td>${pill(a.score)}</td>${kpiCells}</tr>`;
+    return `<tr><td>${badge(i+1)}</td><td><strong>${S.nameMap[a.email] || a.name}</strong></td><td>${pill(a.score)}</td>${kpiCells}</tr>`;
   }).join('')}
   </tbody></table>`;
 }
 
 function updateSummaryKPIs() {
-  txt('kv-asof', new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+  if (S.dataMinDate && S.dataMaxDate) {
+    const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    txt('kv-asof', fmt(S.dataMinDate) + ' – ' + fmt(S.dataMaxDate));
+    txt('kv-asof-sub', 'Actual data window');
+  } else {
+    txt('kv-asof', '—');
+  }
 }
 
 function renderMinis() {} // removed — no-op kept for safety
