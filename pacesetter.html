@@ -330,7 +330,7 @@ const KPI_DEFS = [
   {
     id:'rts_time', label:'RTS Time', category:'effort', weight:1/3,
     csvUrl:PROXY_URL+'?feed=rts_time',
-    emailCol:'email', valueCol:'Weekly Total', dateCol:'week_of',
+    emailCol:'Email', valueCol:'Total Hrs', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:1,
   },
   {
@@ -540,7 +540,10 @@ async function loadKPIs() {
 /* ── SCORING ENGINE ── */
 function parseFlexDate(str) {
   if (!str) return null;
-  str = str.trim();
+  str = str.trim().replace(/^"|"$/g, ''); // strip surrounding quotes
+  // Handle "April 22, 2026" or "Jan 5, 2026"
+  const longDate = new Date(str);
+  if (!isNaN(longDate)) return longDate;
   // Handle MM-DD-YYYY
   const mdy = str.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
   if (mdy) return new Date(+mdy[3], +mdy[1]-1, +mdy[2]);
@@ -550,8 +553,7 @@ function parseFlexDate(str) {
     const yr = mdySlash[3].length === 2 ? 2000 + +mdySlash[3] : +mdySlash[3];
     return new Date(yr, +mdySlash[1]-1, +mdySlash[2]);
   }
-  // Default ISO / browser parse
-  return new Date(str);
+  return null;
 }
 
 function computeScores() {
