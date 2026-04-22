@@ -415,6 +415,7 @@ const KPI_DEFS = [
 
 /* ── STATE ── */
 const S = { roster:[], kpiData:{}, scores:{}, nameMap:{} }; // nameMap: email→name
+const SORT = { overall:{col:'score',dir:'desc'}, effort:{col:'score',dir:'desc'}, quality:{col:'score',dir:'desc'}, efficiency:{col:'score',dir:'desc'}, outcome:{col:'score',dir:'desc'} };
 
 /* ── CSV ── */
 async function fetchCSV(url) {
@@ -474,9 +475,8 @@ async function loadRoster() {
     S.nameMap = {};
     S.roster.forEach(a => { S.nameMap[a.email] = a.name; });
 
-    const excl = rows.length - active.length;
     dot('dot-roster','ok');
-    txt('lbl-roster', `Roster: ${S.roster.length} active associates (${excl} excluded)`);
+    txt('lbl-roster', `Roster: ${S.roster.length} active associates`);
     txt('lbl-count', `${S.roster.length} associates`);
     txt('kv-count', S.roster.length);
     txt('hdr-refreshed', 'Last refreshed: ' + new Date().toLocaleString());
@@ -657,6 +657,48 @@ function fmtTenure(hireDateStr) {
   return remMon > 0 ? years + 'y ' + remMon + 'm' : years + 'y';
 }
 
+/* ── SORT HELPER ── */
+function sortedRows(rows, col, dir, catKPIs) {
+  return [...rows].sort((a, b) => {
+    let va, vb;
+    if (col === 'score') {
+      va = a.score ?? -Infinity;
+      vb = b.score ?? -Infinity;
+    } else if (col === 'name') {
+      va = (S.nameMap[a.email] || a.email).toLowerCase();
+      vb = (S.nameMap[b.email] || b.email).toLowerCase();
+      return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    } else if (col === 'tenure') {
+      va = a.hire_date ? new Date(a.hire_date).getTime() : Infinity;
+      vb = b.hire_date ? new Date(b.hire_date).getTime() : Infinity;
+      // older hire = more tenure; asc by date = desc by tenure
+      return dir === 'asc' ? vb - va : va - vb;
+    } else {
+      // KPI column — find by id
+      const kpi = catKPIs ? catKPIs.find(k => k.id === col) : null;
+      va = kpi ? (S.kpiData[kpi.id]?.[a.email] ?? (kpi.higherIsBetter ? -Infinity : Infinity)) : -Infinity;
+      vb = kpi ? (S.kpiData[kpi.id]?.[b.email] ?? (kpi.higherIsBetter ? -Infinity : Infinity)) : -Infinity;
+    }
+    return dir === 'asc' ? va - vb : vb - va;
+  });
+}
+
+function thClick(tab, col) {
+  if (SORT[tab].col === col) {
+    SORT[tab].dir = SORT[tab].dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    SORT[tab].col = col;
+    SORT[tab].dir = col === 'score' ? 'desc' : 'asc';
+  }
+  if (tab === 'overall') renderOverall();
+  else renderCat(tab);
+}
+
+function thArrow(tab, col) {
+  if (SORT[tab].col !== col) return '';
+  return SORT[tab].dir === 'asc' ? ' ↑' : ' ↓';
+}
+
 /* ── RENDER ── */
 function renderAll() {
   computeScores();
@@ -686,11 +728,15 @@ function renderOverall() {
   if (!sorted.length) return;
   const cats = ['effort','quality','efficiency','outcome'];
   const cc = {effort:'var(--effort-color)',quality:'var(--quality-color)',efficiency:'var(--efficiency-color)',outcome:'var(--outcome-color)'};
+  const finalRows = sortedRows(sorted, SORT.overall.col, SORT.overall.dir, null);
   wrap.innerHTML = `<table class="lb-table"><thead><tr>
-    <th style="width:32px">#</th><th>Associate</th><th>Tenure</th><th>Overall</th>
-    ${cats.map(c=>`<th style="color:${cc[c]}">${c[0].toUpperCase()+c.slice(1)}</th>`).join('')}
+    <th style="width:32px">#</th>
+    <th style="cursor:pointer" onclick="thClick('overall','name')">Associate${thArrow('overall','name')}</th>
+    <th style="cursor:pointer" onclick="thClick('overall','tenure')">Tenure${thArrow('overall','tenure')}</th>
+    <th style="cursor:pointer" onclick="thClick('overall','score')">Overall${thArrow('overall','score')}</th>
+    ${cats.map(c=>`<th style="color:${cc[c]};cursor:pointer" onclick="thClick('overall','${c}')">${c[0].toUpperCase()+c.slice(1)}${thArrow('overall',c)}</th>`).join('')}
   </tr></thead><tbody>
-  ${sorted.map((a,i)=>{
+  ${finalRows.map((a,i)=>{
     const r=i+1;
     const catCells = cats.map(c => {
       const s = S.scores[a.email]?.[c];
@@ -701,8 +747,9 @@ function renderOverall() {
            </div></td>`
         : '<td style="color:#b0b8c1;font-size:11px">—</td>';
     }).join('');
+    const origPos  = withScore.findIndex(x => x.email === a.email);
     const rowStyle = a.score === null ? 'opacity:0.45' : '';
-    const rankCell = a.score !== null ? badge(r) : '<span class="rank-badge" style="color:#ccc">—</span>';
+    const rankCell = a.score !== null ? badge(origPos + 1) : '<span class="rank-badge" style="color:#ccc">—</span>';
     return `<tr style="${rowStyle}"><td>${rankCell}</td><td><strong style="cursor:pointer;color:var(--blue)" onclick="openScorecard('${a.email}')">${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
   }).join('')}
   </tbody></table>`;
@@ -713,18 +760,22 @@ function renderCat(cat) {
   const wrap = document.getElementById(cat+'-lb');
   if (!sorted.length) return;
   const catKPIs = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
+  const finalCatRows = sortedRows(sorted, SORT[cat].col, SORT[cat].dir, catKPIs);
   wrap.innerHTML = `<table class="lb-table"><thead><tr>
-    <th style="width:32px">#</th><th>Associate</th><th>Score</th>
-    ${catKPIs.map(k=>`<th>${k.label}</th>`).join('')}
+    <th style="width:32px">#</th>
+    <th style="cursor:pointer" onclick="thClick('${cat}','name')">Associate${thArrow(cat,'name')}</th>
+    <th style="cursor:pointer" onclick="thClick('${cat}','score')">Score${thArrow(cat,'score')}</th>
+    ${catKPIs.map(k=>`<th style="cursor:pointer" onclick="thClick('${cat}','${k.id}')">${k.label}${thArrow(cat,k.id)}</th>`).join('')}
   </tr></thead><tbody>
-  ${sorted.map((a,i)=>{
+  ${finalCatRows.map((a,i)=>{
+    const origCatPos = sorted.findIndex(x => x.email === a.email);
     const kpiCells = catKPIs.map(k => {
       const v = S.kpiData[k.id]?.[a.email];
       return v!==undefined
         ? `<td style="font-family:'DM Mono',monospace;font-size:12px">${fmt(v,k)}</td>`
         : '<td style="color:#b0b8c1">—</td>';
     }).join('');
-    return `<tr><td>${badge(i+1)}</td><td><strong>${S.nameMap[a.email] || a.name}</strong></td><td>${pill(a.score)}</td>${kpiCells}</tr>`;
+    return `<tr><td>${badge(origCatPos+1)}</td><td><strong>${S.nameMap[a.email] || a.name}</strong></td><td>${pill(a.score)}</td>${kpiCells}</tr>`;
   }).join('')}
   </tbody></table>`;
 }
