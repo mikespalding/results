@@ -318,10 +318,11 @@ const ROSTER_URL = PROXY_URL + '?feed=roster';
 /* Column name candidates — first match wins.
    Open console after first load to see actual column names. */
 const RCOLS = {
-  email:  ['Email','email','Email Address','email_address'],
-  name:   ['agent_name','Full Name','Name','Associate Name','name','full_name'],
-  team:   ['Team','team','Department'],
-  status: ['Status','status'],
+  email:     ['Email','email','Email Address','email_address'],
+  name:      ['agent_name','Full Name','Name','Associate Name','name','full_name'],
+  team:      ['Team','team','Department'],
+  status:    ['Status','status'],
+  hire_date: ['hire_date','Hire Date','HireDate','start_date'],
 };
 
 /*
@@ -429,8 +430,9 @@ async function loadRoster() {
       return team === 'acquisition' && status !== 'exited';
     });
     S.roster = active.map(r => ({
-      email: pick(r, RCOLS.email).toLowerCase().trim(),
-      name:  pick(r, RCOLS.name) || pick(r, RCOLS.email),
+      email:     pick(r, RCOLS.email).toLowerCase().trim(),
+      name:      pick(r, RCOLS.name) || pick(r, RCOLS.email),
+      hire_date: pick(r, RCOLS.hire_date) || '',
     })).filter(a => a.email);
     S.roster.sort((a,b) => a.name.localeCompare(b.name));
     // Build email→name lookup
@@ -538,6 +540,26 @@ function computeScores() {
   });
 }
 
+/* ── TENURE HELPER ── */
+function fmtTenure(hireDateStr) {
+  if (!hireDateStr) return '—';
+  const hire = new Date(hireDateStr);
+  if (isNaN(hire)) return '—';
+  const days = Math.floor((new Date() - hire) / (1000 * 60 * 60 * 24));
+  if (days < 0)  return '—';
+  if (days < 14) return days + 'd';
+  const weeks  = Math.floor(days / 7);
+  if (weeks < 8) return weeks + 'w';
+  const months = Math.floor(days / 30.44);
+  if (months < 24) {
+    const remWeeks = Math.floor((days - months * 30.44) / 7);
+    return remWeeks > 0 ? months + 'm ' + remWeeks + 'w' : months + 'm';
+  }
+  const years  = Math.floor(months / 12);
+  const remMon = months % 12;
+  return remMon > 0 ? years + 'y ' + remMon + 'm' : years + 'y';
+}
+
 /* ── RENDER ── */
 function renderAll() {
   computeScores();
@@ -561,7 +583,7 @@ function renderOverall() {
   const cats = ['effort','quality','efficiency','outcome'];
   const cc = {effort:'var(--effort-color)',quality:'var(--quality-color)',efficiency:'var(--efficiency-color)',outcome:'var(--outcome-color)'};
   wrap.innerHTML = `<table class="lb-table"><thead><tr>
-    <th style="width:32px">#</th><th>Associate</th><th>Overall</th>
+    <th style="width:32px">#</th><th>Associate</th><th>Tenure</th><th>Overall</th>
     ${cats.map(c=>`<th style="color:${cc[c]}">${c[0].toUpperCase()+c.slice(1)}</th>`).join('')}
   </tr></thead><tbody>
   ${sorted.map((a,i)=>{
@@ -575,7 +597,7 @@ function renderOverall() {
            </div></td>`
         : '<td style="color:#b0b8c1;font-size:11px">—</td>';
     }).join('');
-    return `<tr><td>${badge(r)}</td><td><strong>${S.nameMap[a.email] || a.email}</strong></td><td>${pill(a.score)}</td>${catCells}</tr>`;
+    return `<tr><td>${badge(r)}</td><td><strong>${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
   }).join('')}
   </tbody></table>`;
 }
@@ -602,13 +624,11 @@ function renderCat(cat) {
 }
 
 function updateSummaryKPIs() {
-  if (S.dataMinDate && S.dataMaxDate) {
-    const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    txt('kv-asof', fmt(S.dataMinDate) + ' – ' + fmt(S.dataMaxDate));
-    txt('kv-asof-sub', 'Actual data window');
-  } else {
-    txt('kv-asof', '—');
-  }
+  const today   = new Date();
+  const start   = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 28);
+  const fmtD    = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  txt('kv-asof', fmtD(start) + ' – ' + fmtD(today));
+  txt('kv-asof-sub', 'Rolling 28-day window');
 }
 
 function renderMinis() {} // removed — no-op kept for safety
