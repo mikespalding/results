@@ -315,6 +315,7 @@ const RCOLS = {
   team:      ['Team','team','Department'],
   status:    ['Status','status'],
   hire_date: ['hire_date','Hire Date','HireDate','start_date'],
+  manager:   ['current_manager','Manager','manager','Current Manager'],
 };
 
 /*
@@ -451,15 +452,18 @@ async function loadRoster() {
       console.log('[Pacesetter] Roster columns:', Object.keys(rows[0]));
       console.log('[Pacesetter] Sample:', rows[0]);
     }
+    const EXCLUDE_EMAILS = ['patrick.solomon@rebuilt.com'];
     const active = rows.filter(r => {
       const team   = pick(r, RCOLS.team).toLowerCase().trim();
       const status = pick(r, RCOLS.status).toLowerCase().trim();
-      return team === 'acquisition' && status !== 'exited';
+      const email  = pick(r, RCOLS.email).toLowerCase().trim();
+      return team === 'acquisition' && status !== 'exited' && !EXCLUDE_EMAILS.includes(email);
     });
     S.roster = active.map(r => ({
       email:     pick(r, RCOLS.email).toLowerCase().trim(),
       name:      pick(r, RCOLS.name) || pick(r, RCOLS.email),
       hire_date: pick(r, RCOLS.hire_date) || '',
+      manager:   pick(r, RCOLS.manager) || '',
     })).filter(a => a.email);
     S.roster.sort((a,b) => a.name.localeCompare(b.name));
     // Build email→name lookup
@@ -678,7 +682,7 @@ function renderOverall() {
     }).join('');
     const rowStyle = a.score === null ? 'opacity:0.45' : '';
     const rankCell = a.score !== null ? badge(r) : '<span class="rank-badge" style="color:#ccc">—</span>';
-    return `<tr style="${rowStyle}"><td>${rankCell}</td><td><strong>${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
+    return `<tr style="${rowStyle}"><td>${rankCell}</td><td><strong style="cursor:pointer;color:var(--blue)" onclick="openScorecard('${a.email}')">${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
   }).join('')}
   </tbody></table>`;
 }
@@ -787,7 +791,113 @@ async function loadAll() {
   renderAll();
 }
 
+
+/* ── SCORECARD MODAL ── */
+function openScorecard(email) {
+  const a = S.roster.find(r => r.email === email);
+  if (!a) return;
+
+  const name    = S.nameMap[email] || email;
+  const scores  = S.scores[email] || {};
+  const overall = scores.overall;
+
+  // Header
+  document.getElementById('sc-name').textContent    = name;
+  document.getElementById('sc-tenure').textContent  = fmtTenure(a.hire_date);
+  document.getElementById('sc-manager').textContent = a.manager || '—';
+  document.getElementById('sc-hire').textContent    = a.hire_date
+    ? new Date(a.hire_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+    : '—';
+
+  // Overall score
+  const overallRanked = rank('overall');
+  const overallPos    = overallRanked.findIndex(r => r.email === email);
+  const totalScored   = overallRanked.length;
+  document.getElementById('sc-overall-score').textContent = overall !== null && overall !== undefined
+    ? overall.toFixed(1) : '—';
+  document.getElementById('sc-overall-rank').textContent  = overallPos >= 0
+    ? `${overallPos+1} of ${S.roster.length}` : 'Unranked';
+
+  // Category cards
+  const cats = [
+    {key:'effort',     label:'Effort',     w:'30%', color:'var(--effort-color)'},
+    {key:'quality',    label:'Quality',    w:'25%', color:'var(--quality-color)'},
+    {key:'efficiency', label:'Efficiency', w:'20%', color:'var(--efficiency-color)'},
+    {key:'outcome',    label:'Outcome',    w:'30%', color:'var(--outcome-color)'},
+  ];
+
+  document.getElementById('sc-cat-cards').innerHTML = cats.map(cat => {
+    const catScore  = scores[cat.key];
+    const catRanked = rank(cat.key);
+    const catPos    = catRanked.findIndex(r => r.email === email);
+    const catKPIs   = KPI_DEFS.filter(k => k.category === cat.key && k.csvUrl);
+
+    const scoreDisplay = catScore !== null && catScore !== undefined
+      ? catScore.toFixed(1) : '—';
+    const rankDisplay  = catPos >= 0
+      ? `${catPos+1} of ${S.roster.length}` : 'No data';
+
+    const kpiRows = catKPIs.map(k => {
+      const val = S.kpiData[k.id]?.[email];
+      return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ece8;font-size:12px;">
+        <span style="color:#7a8a94">${k.label}</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--navy)">${val !== undefined ? fmt(val,k) : '—'}</span>
+      </div>`;
+    }).join('');
+
+    return `<div style="background:white;border-radius:8px;border:1px solid var(--border);border-top:3px solid ${cat.color};padding:16px 18px;box-shadow:var(--shadow);">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+        <div style="font-size:13px;font-weight:700;color:${cat.color}">${cat.label}</div>
+        <div style="font-size:10px;color:#7a8a94;font-family:'DM Mono',monospace">${cat.w} of total</div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;">
+        <div style="font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--navy)">${scoreDisplay}</div>
+        <div style="font-size:11px;color:#7a8a94">${rankDisplay}</div>
+      </div>
+      <div>${kpiRows || '<div style="font-size:11px;color:#b0b8c1;font-style:italic">No KPIs defined</div>'}</div>
+    </div>`;
+  }).join('');
+
+  const modal = document.getElementById('scorecard-modal');
+  modal.style.display = 'flex';
+  modal.onclick = function(e) { if (e.target === modal) closeScorecard(); };
+}
+
+function closeScorecard() {
+  document.getElementById('scorecard-modal').style.display = 'none';
+}
+
 window.addEventListener('load', loadAll);
 </script>
+
+<!-- ── SCORECARD MODAL ── -->
+<div id="scorecard-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(31,53,64,0.55);z-index:200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:12px;max-width:760px;width:100%;max-height:90vh;overflow-y:auto;padding:28px 30px;box-shadow:0 20px 60px rgba(31,53,64,0.3);position:relative;">
+    <button onclick="closeScorecard()" style="position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;color:#7a8a94;cursor:pointer;line-height:1;">×</button>
+
+    <!-- Header -->
+    <div id="sc-header" style="margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+      <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px" id="sc-name"></div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:#7a8a94"><strong>Hired:</strong> <span id="sc-hire"></span></span>
+        <span style="font-size:12px;color:#7a8a94"><strong>Tenure:</strong> <span id="sc-tenure"></span></span>
+        <span style="font-size:12px;color:#7a8a94"><strong>Manager:</strong> <span id="sc-manager"></span></span>
+      </div>
+    </div>
+
+    <!-- Overall score -->
+    <div style="margin-bottom:20px;padding:14px 18px;background:var(--offwhite);border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a8a94;margin-bottom:3px">Overall Pacesetter Score</div>
+        <div style="font-size:11px;color:#7a8a94" id="sc-overall-rank"></div>
+      </div>
+      <div id="sc-overall-score" style="font-size:32px;font-weight:700;letter-spacing:-1px;color:var(--navy)"></div>
+    </div>
+
+    <!-- Category cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" id="sc-cat-cards"></div>
+  </div>
+</div>
+
 </body>
 </html>
