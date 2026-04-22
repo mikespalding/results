@@ -326,24 +326,36 @@ const RCOLS = {
   }
 */
 const KPI_DEFS = [
-  // ── EFFORT (3 KPIs, equally weighted) ──────────────────
+  // ── EFFORT (5 KPIs, equally weighted) ──────────────────
   {
-    id:'rts_time', label:'RTS Time', category:'effort', weight:1/3,
+    id:'rts_time', label:'RTS Time', category:'effort', weight:1/5,
     csvUrl:PROXY_URL+'?feed=rts_time',
     emailCol:'Email', valueCol:'Total Hrs', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:1,
   },
   {
-    id:'ob_dials', label:'OB Dials', category:'effort', weight:1/3,
+    id:'ob_dials', label:'OB Dials', category:'effort', weight:1/5,
     csvUrl:PROXY_URL+'?feed=ob_dials',
     emailCol:'user_email', valueCol:'Calls', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
-    id:'retrades', label:'Retrades', category:'effort', weight:1/3,
+    id:'retrades', label:'Retrades', category:'effort', weight:1/5,
     csvUrl:PROXY_URL+'?feed=retrades',
     emailCol:'Email', valueCol:'retrade_count', dateCol:'retrade_timestamp',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
+  },
+  {
+    id:'avg_talk', label:'Avg Talk', category:'effort', weight:1/5,
+    csvUrl:PROXY_URL+'?feed=avg_talk_acw',
+    emailCol:'agent', valueCol:'on_call_time', dateCol:'date',
+    aggregate:'avg', higherIsBetter:true, format:'minutes', decimals:1,
+  },
+  {
+    id:'avg_acw', label:'Avg ACW', category:'effort', weight:1/5,
+    csvUrl:PROXY_URL+'?feed=avg_talk_acw',
+    emailCol:'agent', valueCol:'on_acw_time', dateCol:'date',
+    aggregate:'avg', higherIsBetter:false, format:'minutes', decimals:1,
   },
 
   // ── QUALITY (2 KPIs, equally weighted) ─────────────────
@@ -837,7 +849,8 @@ function fmt(v, kpi) {
     if (Math.abs(v)>=1000) return '$'+(v/1000).toFixed(d)+'k';
     return '$'+v.toFixed(0);
   }
-  if (kpi.format==='hours')     return v.toFixed(d)+'h';
+  if (kpi.format==='hours')    return v.toFixed(d)+'h';
+  if (kpi.format==='minutes')  return (v/60).toFixed(d)+' min';
   return v.toLocaleString('en-US',{maximumFractionDigits:d});
 }
 function dot(id, s) {
