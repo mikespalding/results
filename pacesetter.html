@@ -435,7 +435,7 @@ function pick(row, cols) {
 
 /* ── LOAD ROSTER ── */
 async function loadRoster() {
-  const url = document.getElementById('url-roster').value.trim() || ROSTER_URL;
+  const url = ROSTER_URL;
   dot('dot-roster','loading'); txt('lbl-roster','Roster: loading…');
   try {
     const rows = await fetchCSV(url);
