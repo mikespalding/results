@@ -210,14 +210,6 @@
     <div class="kpi-card orange"><div class="kpi-label">Data Window</div><div class="kpi-value" id="kv-asof" style="font-size:14px;letter-spacing:0;line-height:1.3">—</div><div class="kpi-sub" id="kv-asof-sub">Rolling 4 weeks</div></div>
   </div>
 
-  <div class="weight-bar">
-    <span style="font-size:11px;color:#7a8a94;font-weight:600;margin-right:2px">Category weights:</span>
-    <div class="weight-chip"><div class="chip-dot" style="background:var(--effort-color)"></div><span style="color:var(--effort-color)">Effort 30%</span></div>
-    <div class="weight-chip"><div class="chip-dot" style="background:var(--quality-color)"></div><span style="color:var(--quality-color)">Quality 25%</span></div>
-    <div class="weight-chip"><div class="chip-dot" style="background:var(--efficiency-color)"></div><span style="color:var(--efficiency-color)">Efficiency 20%</span></div>
-    <div class="weight-chip"><div class="chip-dot" style="background:var(--outcome-color)"></div><span style="color:var(--outcome-color)">Outcome 30%</span></div>
-  </div>
-
   <div class="section-head">
     <div class="section-title">Overall Pacesetter Ranking</div>
     <div class="section-note">Percentile score · weighted composite of all KPIs</div>
@@ -346,19 +338,19 @@ const KPI_DEFS = [
   {
     id:'rts_time', label:'RTS Time', category:'effort', weight:1/3,
     csvUrl:PROXY_URL+'?feed=rts_time',
-    emailCol:'email', valueCol:'weekly_total', dateCol:'week_of',
+    emailCol:'email', valueCol:'Weekly Total', dateCol:'week_of',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:1,
   },
   {
     id:'ob_dials', label:'OB Dials', category:'effort', weight:1/3,
     csvUrl:PROXY_URL+'?feed=ob_dials',
-    emailCol:'user_email', valueCol:'calls', dateCol:null,
+    emailCol:'user_email', valueCol:'Calls', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'retrades', label:'Retrades', category:'effort', weight:1/3,
     csvUrl:PROXY_URL+'?feed=retrades',
-    emailCol:'email', valueCol:'retrade_count', dateCol:null,
+    emailCol:'Email', valueCol:'retrade_count', dateCol:'retrade_timestamp',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
 
@@ -513,7 +505,7 @@ async function loadKPIs() {
             if (!email) return;
             // Date filter
             const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = new Date(dStr); if (!isNaN(d) && d < cutoff28) return; }
+            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && d < cutoff28) return; }
             const num = parseFloat((r[kpi.ratioNumerator]||'').replace(/[$,%\s]/g,''));
             const den = parseFloat((r[kpi.ratioDenominator]||'').replace(/[$,%\s]/g,''));
             if (!isNaN(num)) numMap[email] = (numMap[email]||0) + num;
@@ -531,7 +523,7 @@ async function loadKPIs() {
             if (!email || isNaN(val)) return;
             // Date filter using per-KPI dateCol
             const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = new Date(dStr); if (!isNaN(d) && d < cutoff28) return; }
+            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && d < cutoff28) return; }
             if (kpi.aggregate === 'sum') {
               map[email] = (map[email] || 0) + val;
             } else {
@@ -551,6 +543,22 @@ async function loadKPIs() {
 }
 
 /* ── SCORING ENGINE ── */
+function parseFlexDate(str) {
+  if (!str) return null;
+  str = str.trim();
+  // Handle MM-DD-YYYY
+  const mdy = str.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (mdy) return new Date(+mdy[3], +mdy[1]-1, +mdy[2]);
+  // Handle MM/DD/YY or MM/DD/YYYY
+  const mdySlash = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (mdySlash) {
+    const yr = mdySlash[3].length === 2 ? 2000 + +mdySlash[3] : +mdySlash[3];
+    return new Date(yr, +mdySlash[1]-1, +mdySlash[2]);
+  }
+  // Default ISO / browser parse
+  return new Date(str);
+}
+
 function computeScores() {
   if (!S.roster.length || !KPI_DEFS.length) return;
 
@@ -641,8 +649,15 @@ function rank(key) {
 }
 
 function renderOverall() {
-  const sorted = rank('overall');
   const wrap = document.getElementById('overall-lb');
+  // All active associates — those with scores ranked first, then nulls alphabetically
+  const withScore    = rank('overall');
+  const scoredEmails = new Set(withScore.map(a => a.email));
+  const noScore      = S.roster
+    .filter(a => !scoredEmails.has(a.email))
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .map(a => ({...a, score: null}));
+  const sorted = [...withScore, ...noScore];
   if (!sorted.length) return;
   const cats = ['effort','quality','efficiency','outcome'];
   const cc = {effort:'var(--effort-color)',quality:'var(--quality-color)',efficiency:'var(--efficiency-color)',outcome:'var(--outcome-color)'};
@@ -661,7 +676,9 @@ function renderOverall() {
            </div></td>`
         : '<td style="color:#b0b8c1;font-size:11px">—</td>';
     }).join('');
-    return `<tr><td>${badge(r)}</td><td><strong>${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
+    const rowStyle = a.score === null ? 'opacity:0.45' : '';
+    const rankCell = a.score !== null ? badge(r) : '<span class="rank-badge" style="color:#ccc">—</span>';
+    return `<tr style="${rowStyle}"><td>${rankCell}</td><td><strong>${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
   }).join('')}
   </tbody></table>`;
 }
