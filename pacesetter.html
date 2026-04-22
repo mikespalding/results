@@ -572,9 +572,22 @@ function computeScores() {
     ['effort','quality','efficiency','outcome'].forEach(cat => {
       const ks = KPI_DEFS.filter(k => k.category===cat && k.csvUrl);
       if (!ks.length) { cats[cat]=null; return; }
-      let num=0, den=0;
-      ks.forEach(k => { const p=pct[k.id]?.[a.email]; if (p!==undefined){num+=p*k.weight;den+=k.weight;} });
-      cats[cat] = den>0 ? num/den : null;
+      // Score based on KPIs that have data; associates with no data for a KPI
+      // get 0 percentile for that KPI (last place) rather than being excluded
+      let num=0, den=0, hasAny=false;
+      ks.forEach(k => {
+        const p = pct[k.id]?.[a.email];
+        if (p !== undefined) {
+          num += p * k.weight;
+          den += k.weight;
+          hasAny = true;
+        } else {
+          // No data for this KPI — score 0 (bottom) but still include in denominator
+          num += 0 * k.weight;
+          den += k.weight;
+        }
+      });
+      cats[cat] = hasAny ? num/den : null;
     });
     let num=0, den=0;
     Object.entries(CAT_WEIGHTS).forEach(([cat,w]) => {
