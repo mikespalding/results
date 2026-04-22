@@ -187,7 +187,14 @@
 <div class="status-strip">
   <span><span class="sdot loading" id="dot-roster"></span><span id="lbl-roster">Roster: loading…</span></span>
   <span><span class="sdot loading" id="dot-data"></span><span id="lbl-data">KPI feeds: 0 of 0 loaded</span></span>
-
+  <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <label for="end-date-input" style="color:rgba(255,255,255,0.4)">Window end:</label>
+    <input type="date" id="end-date-input"
+      style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:4px;
+             color:rgba(255,255,255,0.7);font-family:'DM Mono',monospace;font-size:11px;
+             padding:2px 7px;cursor:pointer;outline:none;"
+      onchange="onEndDateChange()" />
+  </span>
 </div>
 
 <!-- NAV -->
@@ -386,7 +393,7 @@ const KPI_DEFS = [
     higherIsBetter:true, format:'percent', decimals:1,
   },
   {
-    id:'conversation_rate', label:'Conversation Rate', category:'efficiency', weight:1/3,
+    id:'conversation_rate', label:'Five9 Conv Rate', category:'efficiency', weight:1/3,
     csvUrl:PROXY_URL+'?feed=conversation_rate',
     emailCol:'agent', valueCol:null, dateCol:'call_date',
     aggregate:'ratio', ratioNumerator:'calls_3min_plus', ratioDenominator:'total_calls',
@@ -520,8 +527,8 @@ async function loadKPIs() {
       const rows = await fetchCSV(url);
       byUrl[url].forEach(kpi => {
         const map = {};
-        // Rolling 4-week window: last 28 days from today
-        const now28    = new Date();
+        // Rolling 4-week window: last 28 days from selected end date
+        const now28    = getEndDate();
         const cutoff28 = new Date(now28.getFullYear(), now28.getMonth(), now28.getDate() - 28);
 
         if (kpi.aggregate === 'ratio') {
@@ -532,7 +539,7 @@ async function loadKPIs() {
             if (!email) return;
             // Date filter
             const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && d < cutoff28) return; }
+            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && (d < cutoff28 || d > now28)) return; }
             const num = parseFloat((r[kpi.ratioNumerator]||'').replace(/[$,%\s]/g,''));
             const den = parseFloat((r[kpi.ratioDenominator]||'').replace(/[$,%\s]/g,''));
             if (!isNaN(num)) numMap[email] = (numMap[email]||0) + num;
@@ -551,7 +558,7 @@ async function loadKPIs() {
             const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
             if (!email || isNaN(val)) return;
             const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && d < cutoff28) return; }
+            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && (d < cutoff28 || d > now28)) return; }
             sumMap[email] = (sumMap[email] || 0) + val;
             cntMap[email] = (cntMap[email] || 0) + 1;
           });
@@ -565,7 +572,7 @@ async function loadKPIs() {
             if (!email || isNaN(val)) return;
             // Date filter using per-KPI dateCol
             const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && d < cutoff28) return; }
+            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && (d < cutoff28 || d > now28)) return; }
             if (kpi.aggregate === 'sum') {
               map[email] = (map[email] || 0) + val;
             } else {
@@ -799,11 +806,25 @@ function renderCat(cat) {
   </tbody></table>`;
 }
 
+function getEndDate() {
+  const input = document.getElementById('end-date-input');
+  if (input && input.value) {
+    const [y,m,d] = input.value.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  return new Date();
+}
+
+function onEndDateChange() {
+  // Reload all data with new date window
+  loadAll();
+}
+
 function updateSummaryKPIs() {
-  const today   = new Date();
-  const start   = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 28);
-  const fmtD    = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  txt('kv-asof', fmtD(start) + ' – ' + fmtD(today));
+  const end   = getEndDate();
+  const start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 28);
+  const fmtD  = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  txt('kv-asof', fmtD(start) + ' – ' + fmtD(end));
   txt('kv-asof-sub', 'Rolling 28-day window');
 }
 
@@ -976,7 +997,16 @@ function closeScorecard() {
   document.getElementById('scorecard-modal').style.display = 'none';
 }
 
-window.addEventListener('load', loadAll);
+window.addEventListener('load', () => {
+  // Set date input to today
+  const today = new Date();
+  const yyyy  = today.getFullYear();
+  const mm    = String(today.getMonth()+1).padStart(2,'0');
+  const dd    = String(today.getDate()).padStart(2,'0');
+  const input = document.getElementById('end-date-input');
+  if (input) input.value = `${yyyy}-${mm}-${dd}`;
+  loadAll();
+});
 </script>
 
 <!-- ── SCORECARD MODAL ── -->
