@@ -833,15 +833,15 @@ function renderDashboard() {
 
   var metrics = [
     { label: 'Closed deals',    value: d.mtdCount,
-      sub: 'of 57 target (' + Math.round(d.mtdCount/57*100) + '%)',
+      sub: 'of 64 target (' + Math.round(d.mtdCount/64*100) + '%)',
       delta: p ? fmtDelta(d.mtdCount - p.mtdCount) : null,
       pos: d.mtdCount >= (p ? p.mtdCount : 0) },
     { label: 'Assignment fees', value: fmt(d.mtdFees),
-      sub: 'of $728.3k target (' + Math.round(d.mtdFees/728300*100) + '%)',
+      sub: 'of $  817.8k target (' + Math.round(d.mtdFees/817800*100) + '%)',
       delta: p ? fmtDelta(d.mtdFees - p.mtdFees, true) : null,
       pos: d.mtdFees >= (p ? p.mtdFees : 0) },
     { label: 'Gross profit',    value: fmt(d.mtdGP),
-      sub: 'of $655.5k target (' + Math.round(d.mtdGP/655500*100) + '%)',
+      sub: 'of $736k target (' + Math.round(d.mtdGP/736000*100) + '%)',
       delta: null },
     { label: 'GP margin',       value: (d.gpRatio*100).toFixed(1) + '%',
       sub: 'vs 90.0% target', delta: null },
@@ -1014,7 +1014,7 @@ function renderForecastChart(d) {
     },
     plugins: [{ id: 'fcLines', afterDraw: function(chart) {
       var ctx = chart.ctx, left = chart.chartArea.left, right = chart.chartArea.right, y = chart.scales.y;
-      [[728.3, C.blue, 'Fee target $728k'], [655.5, C.tealD, 'GP target $656k']].forEach(function(t) {
+      [[817.8, C.blue, 'Fee target $817k'], [736, C.tealD, 'GP target $736k']].forEach(function(t) {
         var yp = y.getPixelForValue(t[0]);
         ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle = t[1]; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.5;
         ctx.beginPath(); ctx.moveTo(left, yp); ctx.lineTo(right, yp); ctx.stroke(); ctx.restore();
@@ -1057,13 +1057,13 @@ function renderWoWChart() {
         yF: { position: 'right', grid: {display: false},   ticks: {color: C.tick, font: {size: 9}, callback: function(v){return '$'+v+'k';}}, min: 0, max: 800 }
       }
     },
-    plugins: [{ id: 'target57', afterDraw: function(chart) {
+    plugins: [{ id: 'target64', afterDraw: function(chart) {
       var ctx = chart.ctx, left = chart.chartArea.left, right = chart.chartArea.right, yT = chart.scales.yT;
-      var yp = yT.getPixelForValue(57);
+      var yp = yT.getPixelForValue(64);
       ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle = C.orange; ctx.lineWidth = 1; ctx.globalAlpha = 0.35;
       ctx.beginPath(); ctx.moveTo(left, yp); ctx.lineTo(right, yp); ctx.stroke(); ctx.restore();
       ctx.save(); ctx.fillStyle = C.orange; ctx.globalAlpha = 0.55; ctx.font = '9px sans-serif';
-      ctx.fillText('Target 57', right - 52, yp - 4); ctx.restore();
+      ctx.fillText('Target 64', right - 52, yp - 4); ctx.restore();
     }}]
   });
 }
@@ -1186,7 +1186,7 @@ function renderSlack() {
     '',
     '*MTD:*',
     '  Closed - ' + d.mtdCount + ' for ' + fmt(d.mtdFees) + ' fees / ' + fmt(d.mtdGP) + ' GP',
-    '  Target - 57 trans, $655.5k GP (~$728.3k fees assuming 10%)',
+    '  Target - 64 trans, $736k GP (~$817.8k fees assuming 10%)',
     '',
     '*Forecasts* (change from last update):',
     '  *MINIMUM CASE* (Status: Current Month, Pending Funding)',
