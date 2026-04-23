@@ -8,7 +8,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── REBUILT BRAND TOKENS ─────────────────────────────── */
 :root {
   --rb-blue:      #21a9e1;
   --rb-teal:      #64b4b7;
@@ -17,8 +16,6 @@
   --rb-sand:      #efedeb;
   --rb-navy:      #1f3540;
   --rb-navy-l:    #2e4a5a;
-
-  /* Semantic UI */
   --bg:           #f5f5f3;
   --surface:      #ffffff;
   --surface2:     #f9f8f6;
@@ -27,8 +24,6 @@
   --text:         #1f3540;
   --muted:        #6b7a82;
   --muted2:       #8e9ea6;
-
-  /* Status colors */
   --green:        #1a9e6e;
   --green-l:      #e8f7f2;
   --red:          #d94040;
@@ -36,345 +31,126 @@
   --amber:        #d97b1a;
   --amber-l:      #fdf2e6;
   --blue-l:       #e8f5fc;
-
   --mono:         'Roboto Mono', monospace;
   --sans:         'Montserrat', sans-serif;
   --radius:       6px;
   --radius-lg:    10px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; }
 body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
-
-/* ── LAYOUT ── */
 .app { display: grid; grid-template-rows: auto 1fr; min-height: 100vh; }
-
-/* ── HEADER ── */
 header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 28px;
-  height: 58px;
-  background: var(--rb-navy);
-  border-bottom: 3px solid var(--rb-blue);
+  padding: 0 28px; height: 58px;
+  background: var(--rb-navy); border-bottom: 3px solid var(--rb-blue);
 }
-
 .logo-wrap { display: flex; align-items: center; gap: 10px; }
-
-/* SVG logo mark inline */
-.logo-mark { width: 28px; height: 28px; flex-shrink: 0; }
-
-.logo-text em {
-  font-style: normal;
-  font-family: var(--sans);
-  color: rgba(255,255,255,0.55);
-  font-weight: 500;
-  font-size: 10px;
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  margin-top: 1px;
-}
-
+.logo-text em { font-style: normal; font-family: var(--sans); color: rgba(255,255,255,0.55); font-weight: 500; font-size: 10px; display: block; text-transform: uppercase; letter-spacing: 0.16em; margin-top: 1px; }
 .header-right { display: flex; align-items: center; gap: 16px; }
-.update-badge {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 0.04em;
-}
+.update-badge { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.04em; }
 .update-badge span { color: var(--rb-blue); font-weight: 500; }
 .header-back { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); text-decoration: none; padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); transition: all .15s; white-space: nowrap; }
 .header-back:hover { color: white; border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.07); }
 .header-back svg { width: 12px; height: 12px; flex-shrink: 0; }
-
-/* ── MAIN ── */
 .main { padding: 24px 28px; max-width: 1240px; margin: 0 auto; width: 100%; }
-
-/* ── DROP ZONE ── */
-.drop-zone {
-  border: 2px dashed var(--border2);
-  border-radius: var(--radius-lg);
-  padding: 28px 32px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  margin-bottom: 22px;
-  background: var(--surface);
-}
-.drop-zone:hover, .drop-zone.drag-over {
-  border-color: var(--rb-blue);
-  background: var(--blue-l);
-}
-.drop-zone.has-file {
-  border-style: solid;
-  border-color: var(--rb-teal);
-  background: #eef8f8;
-}
+.drop-zone { border: 2px dashed var(--border2); border-radius: var(--radius-lg); padding: 28px 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 22px; background: var(--surface); }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--rb-blue); background: var(--blue-l); }
+.drop-zone.has-file { border-style: solid; border-color: var(--rb-teal); background: #eef8f8; }
 .drop-icon { font-size: 26px; margin-bottom: 6px; color: var(--rb-blue); }
 .drop-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
 .drop-sub { font-size: 11px; color: var(--muted); font-weight: 400; }
 .drop-filename { font-family: var(--mono); font-size: 11px; color: var(--rb-teal-d); margin-top: 6px; font-weight: 500; }
 #file-input { display: none; }
-
-/* ── TABS ── */
-.tabs {
-  display: flex; gap: 0;
-  margin-bottom: 22px;
-  border-bottom: 2px solid var(--border);
-}
-.tab {
-  padding: 9px 20px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--muted);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: color 0.15s, border-color 0.15s;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
+.tabs { display: flex; gap: 0; margin-bottom: 22px; border-bottom: 2px solid var(--border); }
+.tab { padding: 9px 20px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; letter-spacing: 0.04em; text-transform: uppercase; }
 .tab:hover { color: var(--rb-navy); }
 .tab.active { color: var(--rb-blue); border-bottom-color: var(--rb-blue); }
-
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
-
-/* ── METRIC CARDS ── */
 .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
-.metric-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  border-top: 3px solid var(--rb-blue);
-  padding: 14px 16px;
-}
-.metric-label {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.metric-value {
-  font-size: 26px;
-  font-weight: 700;
-  font-family: var(--sans);
-  color: var(--rb-navy);
-  line-height: 1;
-}
+.metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); border-top: 3px solid var(--rb-blue); padding: 14px 16px; }
+.metric-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; margin-bottom: 6px; }
+.metric-value { font-size: 26px; font-weight: 700; font-family: var(--sans); color: var(--rb-navy); line-height: 1; }
 .metric-sub { font-size: 10px; color: var(--muted2); margin-top: 4px; font-weight: 400; }
 .metric-delta { font-size: 10px; font-family: var(--mono); margin-top: 4px; font-weight: 600; }
 .pos { color: var(--green); }
 .neg { color: var(--red); }
-
-/* ── CHART CARD ── */
-.chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px 18px;
-  margin-bottom: 14px;
-}
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 14px; }
 .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.chart-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--rb-navy);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
+.chart-title { font-size: 11px; font-weight: 700; color: var(--rb-navy); letter-spacing: 0.07em; text-transform: uppercase; }
 .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 10px; color: var(--muted); font-weight: 500; }
 .leg { display: flex; align-items: center; gap: 5px; }
 .leg-sw { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 .leg-ln { width: 14px; height: 2px; border-radius: 1px; flex-shrink: 0; }
 .leg-dash { width: 14px; border-top: 2px dashed; flex-shrink: 0; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-
-/* ── STATUS TABLE ── */
 .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.data-table th {
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 700;
-  padding: 0 0 8px;
-  border-bottom: 2px solid var(--border);
-  text-align: left;
-}
+.data-table th { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 0 8px; border-bottom: 2px solid var(--border); text-align: left; }
 .data-table th:not(:first-child) { text-align: right; }
-.data-table td {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-  vertical-align: middle;
-  font-weight: 400;
-}
+.data-table td { padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; font-weight: 400; }
 .data-table td:not(:first-child) { text-align: right; font-family: var(--mono); font-size: 11px; font-weight: 500; }
 .data-table tr:last-child td { border-bottom: none; }
 .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
-
-.pill {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 20px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
+.pill { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; letter-spacing: 0.04em; text-transform: uppercase; }
 .pill-red    { background: var(--red-l);   color: var(--red); }
 .pill-amber  { background: var(--amber-l); color: var(--amber); }
 .pill-teal   { background: #e8f7f6;        color: var(--rb-teal-d); }
 .pill-blue   { background: var(--blue-l);  color: #1278a8; }
-
-/* ── MOVEMENT ── */
 .movement-section { margin-bottom: 18px; }
-.movement-header {
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 700;
-  margin-bottom: 8px;
-  padding-bottom: 7px;
-  border-bottom: 2px solid var(--border);
-}
-.move-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-}
+.movement-header { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 8px; padding-bottom: 7px; border-bottom: 2px solid var(--border); }
+.move-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
 .move-row:last-child { border-bottom: none; }
 .move-fee { font-family: var(--mono); font-size: 11px; font-weight: 600; min-width: 64px; }
 .move-name { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; }
 .move-arrow { color: var(--muted2); font-size: 11px; flex-shrink: 0; }
 .move-status { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; letter-spacing: 0.04em; text-transform: uppercase; }
-.move-net {
-  display: flex; justify-content: flex-end; gap: 20px;
-  padding: 10px 0 0;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-/* ── SLACK MESSAGE ── */
-.slack-box {
-  background: var(--rb-navy);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  font-family: var(--mono);
-  font-size: 11px;
-  line-height: 1.8;
-  color: #e0e8ec;
-  white-space: pre-wrap;
-  margin-bottom: 14px;
-}
-.copy-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: var(--radius);
-  background: var(--rb-blue);
-  color: #ffffff;
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  letter-spacing: 0.04em;
-}
+.move-net { display: flex; justify-content: flex-end; gap: 20px; padding: 10px 0 0; font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 500; }
+.slack-box { background: var(--rb-navy); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; font-family: var(--mono); font-size: 11px; line-height: 1.8; color: #e0e8ec; white-space: pre-wrap; margin-bottom: 14px; }
+.copy-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--radius); background: var(--rb-blue); color: #ffffff; font-family: var(--sans); font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; letter-spacing: 0.04em; }
 .copy-btn:hover { background: #1a96cc; }
 .copy-btn:active { transform: scale(0.98); }
 .copy-btn.copied { background: var(--green); }
-
-/* ── EMPTY STATE ── */
 .empty { text-align: center; padding: 64px 20px; color: var(--muted); }
 .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
 .empty-title { font-size: 15px; color: var(--muted2); margin-bottom: 6px; font-weight: 600; }
 .empty-sub { font-size: 12px; font-weight: 400; }
-
-/* ── FOOTER NOTE ── */
 .footer-note { font-size: 10px; color: var(--muted2); padding: 8px 0; font-family: var(--mono); }
-
-/* ── DIVIDER ── */
-.section-divider {
-  height: 1px; background: var(--border); margin: 6px 0 16px;
-}
-
-/* ── ADMIN BAR ── */
-.admin-bar {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  margin-bottom: 14px;
-  padding: 10px 14px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 11px;
-}
-.admin-label {
-  color: var(--muted); font-weight: 700; letter-spacing: 0.07em;
-  text-transform: uppercase; flex-shrink: 0;
-}
+.admin-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); font-size: 11px; }
+.admin-label { color: var(--muted); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; flex-shrink: 0; }
 .admin-divider { width: 1px; height: 18px; background: var(--border2); flex-shrink: 0; }
-.admin-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 5px 12px;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--text);
-  font-family: var(--sans); font-size: 11px; font-weight: 600;
-  cursor: pointer; transition: background 0.15s, border-color 0.15s;
-  letter-spacing: 0.02em;
-}
+.admin-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border: 1px solid var(--border2); border-radius: var(--radius); background: transparent; color: var(--text); font-family: var(--sans); font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s, border-color 0.15s; letter-spacing: 0.02em; }
 .admin-btn:hover { background: var(--surface); border-color: var(--rb-blue); color: var(--rb-blue); }
 .admin-btn.danger:hover { border-color: var(--red); color: var(--red); }
 .admin-btn.confirm { background: var(--green); border-color: var(--green); color: #fff; }
 .wow-weeks-wrap { display: flex; align-items: center; gap: 7px; }
 .wow-weeks-wrap label { color: var(--muted2); font-size: 11px; font-weight: 500; }
-.wow-weeks-input {
-  width: 48px; padding: 4px 8px;
-  border: 1px solid var(--border2); border-radius: var(--radius);
-  background: var(--surface); color: var(--text);
-  font-family: var(--mono); font-size: 12px; font-weight: 500;
-  text-align: center;
-}
+.wow-weeks-input { width: 48px; padding: 4px 8px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface); color: var(--text); font-family: var(--mono); font-size: 12px; font-weight: 500; text-align: center; }
 .wow-weeks-input:focus { outline: none; border-color: var(--rb-blue); }
 .admin-status { font-family: var(--mono); font-size: 10px; color: var(--muted2); flex: 1; text-align: right; }
 </style>
 </head>
 <body>
 <div class="app">
-
-<!-- HEADER -->
 <header>
   <div class="logo-wrap">
     <svg viewBox="0 0 1424.9733 1332.6667" xmlns="http://www.w3.org/2000/svg" style="height:38px;width:auto;">
-  <path d="M 0,42.3398 V 1905.12 H 426.895 V 1485.3 c 131.691,317.51 351.593,469.22 659.735,455.1 v -451.58 h -24.69 c -192.877,0 -346.96,-62.95 -462.174,-188.75 C 484.504,1174.22 426.895,991.371 426.895,751.469 V 42.3398 H 0" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 1684.25,1104.26 h 956.1 c -14.12,143.44 -62.35,261.08 -144.67,352.8 -82.34,91.73 -191.71,137.6 -328.08,137.6 -129.4,0 -237.61,-45.31 -324.59,-135.83 -87.04,-90.56 -139.95,-208.76 -158.76,-354.57 z M 2216.99,0 C 1944.11,0 1716.55,89.9609 1534.32,269.891 1352.01,449.82 1260.89,682.059 1260.89,966.672 v 7.058 c 0,270.44 85.83,499.77 257.55,687.96 171.66,188.14 389.23,282.25 652.67,282.25 282.26,0 501.53,-95.87 657.97,-287.54 156.4,-191.73 234.63,-429.86 234.63,-714.42 0,-23.539 -2.38,-63.511 -7.06,-119.96 H 1687.78 c 23.49,-148.168 83.46,-264.051 179.94,-347.5 96.4,-83.52 215.2,-125.239 356.32,-125.239 183.45,0 351.58,74.078 504.51,222.258 L 2979.03,349.281 C 2786.15,116.422 2532.13,0 2216.99,0" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 4386.3,373.969 c 150.5,0 276.95,54.683 379.28,164.062 102.3,109.371 153.46,253.399 153.46,432.168 v 7.063 c 0,176.398 -51.77,319.828 -155.23,430.418 -103.54,110.53 -229.33,165.81 -377.51,165.81 -148.16,0 -275.78,-55.9 -382.78,-167.58 -107.05,-111.74 -160.53,-254.63 -160.53,-428.648 v -7.063 c 0,-174.078 53.48,-316.957 160.53,-428.648 107,-111.742 234.62,-167.582 382.78,-167.582 z M 4485.09,3.53906 c -256.39,0 -466.91,109.35894 -631.51,328.08194 V 42.3398 h -426.9 V 2617.79 h 426.9 V 1594.66 c 164.6,232.84 375.12,349.28 631.51,349.28 235.17,0 438.63,-87.66 610.34,-262.84 171.67,-175.25 257.55,-409.86 257.55,-703.838 v -7.063 c 0,-294.027 -85.88,-528.636 -257.55,-703.828 C 4923.72,91.1211 4720.26,3.53906 4485.09,3.53906" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 6368.34,3.53906 c -207,0 -369.3,64.65234 -486.86,194.03094 -117.65,129.321 -176.41,303.41 -176.41,522.141 V 1905.12 h 426.89 V 846.719 c 0,-145.86 34.67,-258.16 104.08,-336.918 69.33,-78.821 167.57,-118.192 294.6,-118.192 124.62,0 225.78,41.121 303.39,123.481 77.62,82.312 116.42,195.199 116.42,338.68 v 1051.35 h 426.9 V 42.3398 h -426.9 V 331.621 C 6802.29,112.898 6608.23,3.53906 6368.34,3.53906" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="M 7855.37,42.3398 V 1905.12 h 426.89 V 42.3398 Z M 7837.73,2190.89 v 405.72 h 458.64 v -405.72 h -458.64" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="M 8772.3,42.3398 V 2617.79 h 426.87 V 42.3398 H 8772.3" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 10295.7,10.5898 c -357.58,0 -536.3,182.2502 -536.3,546.8402 v 980.78 h -236.36 v 366.91 h 236.36 v 511.56 h 426.9 v -511.56 h 501 v -366.91 h -501 V 624.461 c 0,-155.231 76.4,-232.852 229.3,-232.852 91.7,0 179.9,21.18 264.6,63.512 V 105.84 c -112.9,-63.5002 -241.1,-95.2502 -384.5,-95.2502" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 3337.99,3544.83 1179.79,1076.72 v 1938.1 L 3337.99,5590.6 V 3544.83" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="M 6169.48,9995.01 V 4621.55 l 1179.8,-1076.72 v 5491.29 l -1179.8,958.89" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="M 4753.74,7744.05 V 4836.89 l 589.89,538.37 589.9,-538.37 4.37,3973.72 -1184.16,-1066.56" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 4802.21,3425.19 h 430.69 v 430.68 h -430.69 v -430.68" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 5448.24,3425.19 h 430.7 v 430.68 h -430.7 v -430.68" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 5232.9,4501.91 h -430.69 v -430.69 h 430.69 v 430.69" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-  <path d="m 5448.24,4501.91 v -430.69 h 430.7 v 430.69 h -430.7" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
-</svg>
-    <div class="logo-text" style="margin-left:2px;">
-      <em>C2C Forecast</em>
-    </div>
+      <path d="M 0,42.3398 V 1905.12 H 426.895 V 1485.3 c 131.691,317.51 351.593,469.22 659.735,455.1 v -451.58 h -24.69 c -192.877,0 -346.96,-62.95 -462.174,-188.75 C 484.504,1174.22 426.895,991.371 426.895,751.469 V 42.3398 H 0" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 1684.25,1104.26 h 956.1 c -14.12,143.44 -62.35,261.08 -144.67,352.8 -82.34,91.73 -191.71,137.6 -328.08,137.6 -129.4,0 -237.61,-45.31 -324.59,-135.83 -87.04,-90.56 -139.95,-208.76 -158.76,-354.57 z M 2216.99,0 C 1944.11,0 1716.55,89.9609 1534.32,269.891 1352.01,449.82 1260.89,682.059 1260.89,966.672 v 7.058 c 0,270.44 85.83,499.77 257.55,687.96 171.66,188.14 389.23,282.25 652.67,282.25 282.26,0 501.53,-95.87 657.97,-287.54 156.4,-191.73 234.63,-429.86 234.63,-714.42 0,-23.539 -2.38,-63.511 -7.06,-119.96 H 1687.78 c 23.49,-148.168 83.46,-264.051 179.94,-347.5 96.4,-83.52 215.2,-125.239 356.32,-125.239 183.45,0 351.58,74.078 504.51,222.258 L 2979.03,349.281 C 2786.15,116.422 2532.13,0 2216.99,0" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 4386.3,373.969 c 150.5,0 276.95,54.683 379.28,164.062 102.3,109.371 153.46,253.399 153.46,432.168 v 7.063 c 0,176.398 -51.77,319.828 -155.23,430.418 -103.54,110.53 -229.33,165.81 -377.51,165.81 -148.16,0 -275.78,-55.9 -382.78,-167.58 -107.05,-111.74 -160.53,-254.63 -160.53,-428.648 v -7.063 c 0,-174.078 53.48,-316.957 160.53,-428.648 107,-111.742 234.62,-167.582 382.78,-167.582 z M 4485.09,3.53906 c -256.39,0 -466.91,109.35894 -631.51,328.08194 V 42.3398 h -426.9 V 2617.79 h 426.9 V 1594.66 c 164.6,232.84 375.12,349.28 631.51,349.28 235.17,0 438.63,-87.66 610.34,-262.84 171.67,-175.25 257.55,-409.86 257.55,-703.838 v -7.063 c 0,-294.027 -85.88,-528.636 -257.55,-703.828 C 4923.72,91.1211 4720.26,3.53906 4485.09,3.53906" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 6368.34,3.53906 c -207,0 -369.3,64.65234 -486.86,194.03094 -117.65,129.321 -176.41,303.41 -176.41,522.141 V 1905.12 h 426.89 V 846.719 c 0,-145.86 34.67,-258.16 104.08,-336.918 69.33,-78.821 167.57,-118.192 294.6,-118.192 124.62,0 225.78,41.121 303.39,123.481 77.62,82.312 116.42,195.199 116.42,338.68 v 1051.35 h 426.9 V 42.3398 h -426.9 V 331.621 C 6802.29,112.898 6608.23,3.53906 6368.34,3.53906" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="M 7855.37,42.3398 V 1905.12 h 426.89 V 42.3398 Z M 7837.73,2190.89 v 405.72 h 458.64 v -405.72 h -458.64" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="M 8772.3,42.3398 V 2617.79 h 426.87 V 42.3398 H 8772.3" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 10295.7,10.5898 c -357.58,0 -536.3,182.2502 -536.3,546.8402 v 980.78 h -236.36 v 366.91 h 236.36 v 511.56 h 426.9 v -511.56 h 501 v -366.91 h -501 V 624.461 c 0,-155.231 76.4,-232.852 229.3,-232.852 91.7,0 179.9,21.18 264.6,63.512 V 105.84 c -112.9,-63.5002 -241.1,-95.2502 -384.5,-95.2502" style="fill:#ffffff;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 3337.99,3544.83 1179.79,1076.72 v 1938.1 L 3337.99,5590.6 V 3544.83" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="M 6169.48,9995.01 V 4621.55 l 1179.8,-1076.72 v 5491.29 l -1179.8,958.89" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="M 4753.74,7744.05 V 4836.89 l 589.89,538.37 589.9,-538.37 4.37,3973.72 -1184.16,-1066.56" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 4802.21,3425.19 h 430.69 v 430.68 h -430.69 v -430.68" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 5448.24,3425.19 h 430.7 v 430.68 h -430.7 v -430.68" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 5232.9,4501.91 h -430.69 v -430.69 h 430.69 v 430.69" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+      <path d="m 5448.24,4501.91 v -430.69 h 430.7 v 430.69 h -430.7" style="fill:#4ea9e2;fill-rule:nonzero;" transform="matrix(0.13333333,0,0,-0.13333333,0,1332.6667)"/>
+    </svg>
+    <div class="logo-text" style="margin-left:2px;"><em>C2C Forecast</em></div>
   </div>
   <div class="header-right">
     <div class="update-badge">Update: <span id="update-date">-</span></div>
@@ -386,52 +162,42 @@ header {
 </header>
 
 <div class="main">
-
-  <!-- DROP ZONE -->
   <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-    <div class="drop-icon">↓</div>
+    <div class="drop-icon">&#8595;</div>
     <div class="drop-title">Drop HubSpot CSV export here</div>
-    <div class="drop-sub">Rebuilt Closings · Buyer Assigned + Wire Confirmed stage export</div>
+    <div class="drop-sub">Rebuilt Closings &middot; Buyer Assigned + Wire Confirmed stage export</div>
     <div class="drop-filename" id="drop-filename"></div>
   </div>
   <input type="file" id="file-input" accept=".csv">
 
-  <!-- ADMIN BAR -->
   <div class="admin-bar">
     <span class="admin-label">Data</span>
-    <button class="admin-btn danger" id="clear-prior-btn" onclick="clearPriorSnapshot()">
-      ✕ Clear prior snapshot
-    </button>
+    <button class="admin-btn danger" id="clear-prior-btn" onclick="clearPriorSnapshot()">&#10005; Clear prior snapshot</button>
     <div class="admin-divider"></div>
-    <button class="admin-btn danger" id="reset-wow-btn" onclick="resetWoWHistory()">
-      ✕ Reset WoW to seed data
-    </button>
+    <button class="admin-btn danger" id="reset-wow-btn" onclick="resetWoWHistory()">&#10005; Reset WoW to seed data</button>
     <div class="admin-divider"></div>
     <div class="wow-weeks-wrap">
-      <label for="wow-weeks">WoW chart — show last</label>
+      <label for="wow-weeks">WoW chart &mdash; show last</label>
       <input type="number" id="wow-weeks" class="wow-weeks-input" min="2" max="52" value="8">
       <label for="wow-weeks">updates</label>
     </div>
     <span class="admin-status" id="admin-status"></span>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
     <div class="tab active" data-tab="dashboard">Dashboard</div>
     <div class="tab" data-tab="movement">Deal movement</div>
     <div class="tab" data-tab="slack">Slack message</div>
   </div>
 
-  <!-- DASHBOARD TAB -->
   <div class="tab-panel active" id="tab-dashboard">
     <div id="dashboard-empty" class="empty">
-      <div class="empty-icon">📊</div>
+      <div class="empty-icon">&#128202;</div>
       <div class="empty-title">No data loaded</div>
       <div class="empty-sub">Drop a CSV above to generate the forecast dashboard</div>
     </div>
     <div id="dashboard-content" style="display:none;">
       <div class="metric-grid" id="metric-grid"></div>
-
       <div class="chart-card">
         <div class="chart-header">
           <div class="chart-title">Day-over-day closings</div>
@@ -444,11 +210,10 @@ header {
         </div>
         <div style="position:relative;width:100%;height:200px;"><canvas id="dodChart"></canvas></div>
       </div>
-
       <div class="two-col">
         <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title">Forecast — fees vs est. GP</div>
+            <div class="chart-title">Forecast &mdash; fees vs est. GP</div>
             <div class="legend">
               <span class="leg"><span class="leg-sw" style="background:#21a9e1"></span>Fees</span>
               <span class="leg"><span class="leg-sw" style="background:#0f696e"></span>Est. GP</span>
@@ -469,7 +234,6 @@ header {
           <div style="position:relative;width:100%;height:200px;"><canvas id="wowChart"></canvas></div>
         </div>
       </div>
-
       <div class="two-col">
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:12px;">Forecast summary</div>
@@ -480,7 +244,6 @@ header {
           <table class="data-table" id="future-table"></table>
         </div>
       </div>
-
       <div class="two-col">
         <div class="chart-card">
           <div class="chart-title" style="margin-bottom:12px;">Pipeline by status</div>
@@ -494,56 +257,45 @@ header {
     </div>
   </div>
 
-  <!-- MOVEMENT TAB -->
   <div class="tab-panel" id="tab-movement">
     <div id="movement-empty" class="empty">
-      <div class="empty-icon">↕</div>
+      <div class="empty-icon">&#8597;</div>
       <div class="empty-title">No prior snapshot</div>
-      <div class="empty-sub">Load a CSV — the first run saves a baseline. On the next run, movement vs the prior update will appear here.</div>
+      <div class="empty-sub">Load a CSV &mdash; the first run saves a baseline. On the next run, movement vs the prior update will appear here.</div>
     </div>
     <div id="movement-content" style="display:none;"></div>
   </div>
 
-  <!-- SLACK TAB -->
   <div class="tab-panel" id="tab-slack">
     <div id="slack-empty" class="empty">
-      <div class="empty-icon">💬</div>
+      <div class="empty-icon">&#128172;</div>
       <div class="empty-title">No data loaded</div>
       <div class="empty-sub">Drop a CSV above to generate the Slack message</div>
     </div>
     <div id="slack-content" style="display:none;">
       <div class="slack-box" id="slack-text"></div>
       <div style="display:flex;gap:10px;align-items:center;margin-top:4px;">
-        <button class="copy-btn" id="copy-btn" onclick="copySlack()">
-          <span>Copy to clipboard</span>
-        </button>
-        <button class="copy-btn" id="draft-btn" onclick="draftToSlack()" style="background:var(--rb-teal-d);">
-          <span>Draft in Slack</span>
-        </button>
+        <button class="copy-btn" id="copy-btn" onclick="copySlack()"><span>Copy to clipboard</span></button>
+        <button class="copy-btn" id="draft-btn" onclick="draftToSlack()" style="background:var(--rb-teal-d);"><span>Draft in Slack</span></button>
         <span id="slack-status" style="font-size:11px;color:var(--muted2);font-family:var(--mono);"></span>
       </div>
-      <div class="footer-note" style="margin-top:10px;">#z-slt-rebuilt · Draft button sends to Slack for review before posting.</div>
+      <div class="footer-note" style="margin-top:10px;">#z-slt-rebuilt &middot; Draft button sends to Slack for review before posting.</div>
     </div>
   </div>
-
-</div><!-- .main -->
-</div><!-- .app -->
+</div>
+</div>
 
 <script>
-// ── STORAGE ───────────────────────────────────────────────────
-const STORAGE_KEY     = 'c2c_prior_snapshot';
-const WOW_HISTORY_KEY = 'c2c_wow_history';
+var STORAGE_KEY     = 'c2c_prior_snapshot';
+var WOW_HISTORY_KEY = 'c2c_wow_history';
+var currentData  = null;
+var priorData    = null;
+var wowHistory   = [];
+var dodChartInst = null;
+var fcChartInst  = null;
+var wowChartInst = null;
 
-// ── STATE ─────────────────────────────────────────────────────
-let currentData  = null;
-let priorData    = null;
-let wowHistory   = [];
-let dodChartInst = null;
-let fcChartInst  = null;
-let wowChartInst = null;
-
-// ── BRAND COLORS ──────────────────────────────────────────────
-const C = {
+var C = {
   blue:   '#21a9e1', blueD:  '#1278a8',
   teal:   '#64b4b7', tealD:  '#0f696e',
   orange: '#f5831f', navy:   '#1f3540',
@@ -552,66 +304,53 @@ const C = {
   grid:   'rgba(31,53,64,0.06)', tick: '#8e9ea6',
 };
 
-// ── UTILS ─────────────────────────────────────────────────────
 function parseFee(v) {
   try { return parseFloat(String(v).replace(/,/g, '').trim()) || 0; } catch(e) { return 0; }
 }
-
 function parseDate(v) {
   if (!v) return null;
-  var s = String(v);
-  var m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+  var m = String(v).match(/(\d{4})-(\d{2})-(\d{2})/);
   if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
   return null;
 }
-
 function fmt(n, dec) {
   dec = dec === undefined ? 1 : dec;
   n = Math.round(n);
   return n >= 1000 ? '$' + (n / 1000).toFixed(dec) + 'k' : '$' + n;
 }
-
 function fmtDelta(n, isAmt) {
   var s = isAmt ? fmt(Math.abs(n)) : String(Math.abs(n));
   return (n >= 0 ? '+' : '-') + s;
 }
-
 function fmtMonth(key) {
-  var parts = key.split('-');
-  return new Date(+parts[0], +parts[1] - 1, 1).toLocaleString('en-US', {month: 'short', year: 'numeric'});
+  var p = key.split('-');
+  return new Date(+p[0], +p[1] - 1, 1).toLocaleString('en-US', {month: 'short', year: 'numeric'});
 }
-
 function shortAddr(name) {
   if (!name) return '';
   return name.split(',').slice(0, 2).join(',').trim().toLowerCase()
     .replace(/\b\w/g, function(c) { return c.toUpperCase(); }).slice(0, 36);
 }
 
-// ── CSV PARSER ────────────────────────────────────────────────
 function parseCSV(text) {
   text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-  var records = [];
-  var i = 0;
-  var len = text.length;
-
+  var records = [], i = 0, len = text.length;
   function field() {
     if (i >= len) return '';
     if (text[i] === '"') {
-      var val = '';
-      i++;
+      var val = ''; i++;
       while (i < len) {
         if (text[i] === '"') {
-          if (i + 1 < len && text[i + 1] === '"') { val += '"'; i += 2; }
+          if (i+1 < len && text[i+1] === '"') { val += '"'; i += 2; }
           else { i++; break; }
         } else { val += text[i++]; }
       }
       return val;
     }
-    var val2 = '';
-    while (i < len && text[i] !== ',' && text[i] !== '\n') val2 += text[i++];
-    return val2;
+    var v = '';
+    while (i < len && text[i] !== ',' && text[i] !== '\n') v += text[i++];
+    return v;
   }
-
   function record() {
     var f = [];
     while (i < len && text[i] !== '\n') {
@@ -621,7 +360,6 @@ function parseCSV(text) {
     if (i < len && text[i] === '\n') i++;
     return f;
   }
-
   var headers = record().map(function(h) { return h.trim(); });
   while (i < len) {
     if (text[i] === '\n') { i++; continue; }
@@ -634,24 +372,19 @@ function parseCSV(text) {
   return records;
 }
 
-// ── PROCESS CSV ───────────────────────────────────────────────
 function processRows(rows, fileDate) {
   var fdm = fileDate ? fileDate.match(/^(\d{4})-(\d{2})-(\d{2})$/) : null;
   var CY = fdm ? +fdm[1] : new Date().getFullYear();
   var CM = fdm ? +fdm[2] : new Date().getMonth() + 1;
-
   var closed   = rows.filter(function(r) { return r['Deal Stage'] === 'BC CLOSED: WIRE CONFIRMED'; });
   var pipeline = rows.filter(function(r) { return r['Deal Stage'] === 'BUYER ASSIGNED'; });
-
-  var mtdFees = closed.reduce(function(s, r) { return s + parseFee(r['Assignment Fee']); }, 0);
-  var mtdGP   = closed.reduce(function(s, r) { return s + parseFee(r['Gross Profit']); }, 0);
+  var mtdFees = closed.reduce(function(s,r) { return s + parseFee(r['Assignment Fee']); }, 0);
+  var mtdGP   = closed.reduce(function(s,r) { return s + parseFee(r['Gross Profit']); }, 0);
   var gpRatio = mtdFees > 0 ? mtdGP / mtdFees : 0.899;
-
   function grp(status) {
     var deals = pipeline.filter(function(r) { return r['Status'] === status; });
-    return { count: deals.length, fees: deals.reduce(function(s, r) { return s + parseFee(r['Assignment Fee']); }, 0), deals: deals };
+    return { count: deals.length, fees: deals.reduce(function(s,r) { return s + parseFee(r['Assignment Fee']); }, 0), deals: deals };
   }
-
   var cm  = grp('Current Month');
   var pf  = grp('Pending Funding');
   var as_ = grp('At Risk - Slipping');
@@ -659,35 +392,28 @@ function processRows(rows, fileDate) {
   var abl = grp('At Risk - Buyer Loss');
   var pp  = grp('Possible Pull Up');
   var ls  = grp('Longshot');
-
   var byStatus = {};
   pipeline.forEach(function(r) {
     var s = r['Status'] || '';
     if (!byStatus[s]) byStatus[s] = { count: 0, fees: 0, deals: [] };
-    byStatus[s].count++;
-    byStatus[s].fees += parseFee(r['Assignment Fee']);
-    byStatus[s].deals.push(r);
+    byStatus[s].count++; byStatus[s].fees += parseFee(r['Assignment Fee']); byStatus[s].deals.push(r);
   });
-
   function isCM(r) {
     var d = parseDate(r['Close Date'] || r['Disposition Closing Date']);
     return d && d.getFullYear() === CY && (d.getMonth() + 1) === CM;
   }
-
   var asCM  = as_.deals.filter(isCM);
   var alCM  = al.deals.filter(isCM);
   var ablCM = abl.deals.filter(isCM);
-  var asCMfees  = asCM.reduce(function(s, r)  { return s + parseFee(r['Assignment Fee']); }, 0);
-  var alCMfees  = alCM.reduce(function(s, r)  { return s + parseFee(r['Assignment Fee']); }, 0);
-  var ablCMfees = ablCM.reduce(function(s, r) { return s + parseFee(r['Assignment Fee']); }, 0);
-
+  var asCMf  = asCM.reduce(function(s,r)  { return s + parseFee(r['Assignment Fee']); }, 0);
+  var alCMf  = alCM.reduce(function(s,r)  { return s + parseFee(r['Assignment Fee']); }, 0);
+  var ablCMf = ablCM.reduce(function(s,r) { return s + parseFee(r['Assignment Fee']); }, 0);
   var minC  = closed.length + cm.count + pf.count;
   var minF  = mtdFees + cm.fees + pf.fees;
   var potC  = minC + asCM.length + alCM.length + ablCM.length + pp.count;
-  var potF  = minF + asCMfees + alCMfees + ablCMfees + pp.fees;
+  var potF  = minF + asCMf + alCMf + ablCMf + pp.fees;
   var bestC = potC + ls.count;
   var bestF = potF + ls.fees;
-
   var closedByDate = {};
   closed.forEach(function(r) {
     var d = parseDate(r['Close Date'] || r['Disposition Closing Date']);
@@ -697,7 +423,6 @@ function processRows(rows, fileDate) {
     closedByDate[key].fees += parseFee(r['Assignment Fee']);
     closedByDate[key].gp   += parseFee(r['Gross Profit']);
   });
-
   var schedByDate = {};
   cm.deals.forEach(function(r) {
     var d = parseDate(r['Close Date'] || r['Disposition Closing Date']);
@@ -706,20 +431,15 @@ function processRows(rows, fileDate) {
     if (!schedByDate[key]) schedByDate[key] = { fees: 0 };
     schedByDate[key].fees += parseFee(r['Assignment Fee']);
   });
-
-  // Future Months: all pipeline deals grouped by close month, excluding current month
   var futureByMonth = {};
   pipeline.forEach(function(r) {
     var d = parseDate(r['Close Date'] || r['Disposition Closing Date']);
     if (!d) return;
-    // Skip deals closing in the current month — they already appear in the main pipeline
     if (d.getFullYear() === CY && (d.getMonth() + 1) === CM) return;
     var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
     if (!futureByMonth[key]) futureByMonth[key] = { count: 0, fees: 0 };
-    futureByMonth[key].count++;
-    futureByMonth[key].fees += parseFee(r['Assignment Fee']);
+    futureByMonth[key].count++; futureByMonth[key].fees += parseFee(r['Assignment Fee']);
   });
-
   return {
     rows: rows, closed: closed, pipeline: pipeline, byStatus: byStatus,
     closedByDate: closedByDate, schedByDate: schedByDate, futureByMonth: futureByMonth,
@@ -730,83 +450,54 @@ function processRows(rows, fileDate) {
   };
 }
 
-// ── FILE HANDLING ─────────────────────────────────────────────
 function handleFile(file) {
   if (!file || !file.name.endsWith('.csv')) return;
   document.getElementById('drop-filename').textContent = file.name;
   document.getElementById('drop-zone').classList.add('has-file');
-
   var dm = file.name.match(/(\d{4}-\d{2}-\d{2})/);
   var fileDate = dm ? dm[1] : new Date().toISOString().slice(0, 10);
   document.getElementById('update-date').textContent = fileDate;
-
   var reader = new FileReader();
   reader.onload = function(e) {
     var rows = parseCSV(e.target.result);
-
     try { var s = localStorage.getItem(WOW_HISTORY_KEY); if (s) wowHistory = JSON.parse(s); } catch(ex) {}
     priorData = null;
     try { var s2 = localStorage.getItem(STORAGE_KEY); if (s2) priorData = JSON.parse(s2); } catch(ex) {}
-
-    // Month-change reset: if the CSV is from a different month than the last
-    // WoW history entry, start fresh — new month, clean slate.
     var newMonth = fileDate.slice(0, 7);
     if (wowHistory.length > 0) {
       var lastMonth = wowHistory[wowHistory.length - 1].date.slice(0, 7);
       if (lastMonth !== newMonth) {
-        wowHistory = [];
-        priorData = null;
+        wowHistory = []; priorData = null;
         try { localStorage.removeItem(WOW_HISTORY_KEY); } catch(ex) {}
         try { localStorage.removeItem(STORAGE_KEY); } catch(ex) {}
-        var adminEl = document.getElementById('admin-status');
-        if (adminEl) {
-          adminEl.textContent = 'New month (' + newMonth + ') - WoW history and prior snapshot reset.';
-          setTimeout(function() { adminEl.textContent = ''; }, 5000);
-        }
+        var ae = document.getElementById('admin-status');
+        if (ae) { ae.textContent = 'New month (' + newMonth + ') - WoW history and prior snapshot reset.'; setTimeout(function() { ae.textContent = ''; }, 5000); }
       }
     }
-
     currentData = processRows(rows, fileDate);
-
     var snap = {
-      date: fileDate,
-      minC: currentData.minC, minF: currentData.minF,
-      potC: currentData.potC, potF: currentData.potF,
-      bestC: currentData.bestC, bestF: currentData.bestF,
+      date: fileDate, minC: currentData.minC, minF: currentData.minF,
+      potC: currentData.potC, potF: currentData.potF, bestC: currentData.bestC, bestF: currentData.bestF,
       mtdCount: currentData.mtdCount, mtdFees: currentData.mtdFees,
-      rows: rows.map(function(r) { return {
-        'Record ID': r['Record ID'], 'Deal Name': r['Deal Name'],
-        'Status': r['Status'], 'Assignment Fee': r['Assignment Fee'],
-        'Deal Stage': r['Deal Stage']
-      }; })
+      rows: rows.map(function(r) { return {'Record ID': r['Record ID'], 'Deal Name': r['Deal Name'], 'Status': r['Status'], 'Assignment Fee': r['Assignment Fee'], 'Deal Stage': r['Deal Stage']}; })
     };
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snap)); } catch(ex) {}
-
-    var entry = {
-      date: fileDate,
-      minC: currentData.minC,  minF: Math.round(currentData.minF),
-      potC: currentData.potC,  potF: Math.round(currentData.potF),
-      bestC: currentData.bestC, bestF: Math.round(currentData.bestF),
-      mtdCount: currentData.mtdCount
-    };
+    var entry = { date: fileDate, minC: currentData.minC, minF: Math.round(currentData.minF), potC: currentData.potC, potF: Math.round(currentData.potF), bestC: currentData.bestC, bestF: Math.round(currentData.bestF), mtdCount: currentData.mtdCount };
     var idx = wowHistory.findIndex(function(h) { return h.date === fileDate; });
     if (idx >= 0) wowHistory[idx] = entry; else wowHistory.push(entry);
     wowHistory.sort(function(a, b) { return a.date.localeCompare(b.date); });
     try { localStorage.setItem(WOW_HISTORY_KEY, JSON.stringify(wowHistory)); } catch(ex) {}
-
     renderAll();
   };
   reader.readAsText(file);
 }
 
-// ── DRAG / DROP ───────────────────────────────────────────────
 var dz = document.getElementById('drop-zone');
 dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
 dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
 dz.addEventListener('drop', function(e) { e.preventDefault(); dz.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
 document.getElementById('file-input').addEventListener('change', function(e) { handleFile(e.target.files[0]); });
 
-// ── TABS ──────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(function(tab) {
   tab.addEventListener('click', function() {
     document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
@@ -816,216 +507,168 @@ document.querySelectorAll('.tab').forEach(function(tab) {
   });
 });
 
-// ── RENDER ALL ────────────────────────────────────────────────
 function renderAll() {
   if (!currentData) return;
-  renderDashboard();
-  renderMovement();
-  renderSlack();
+  renderDashboard(); renderMovement(); renderSlack();
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard() {
   document.getElementById('dashboard-empty').style.display = 'none';
   document.getElementById('dashboard-content').style.display = 'block';
-  var d = currentData;
-  var p = priorData;
+  var d = currentData, p = priorData;
 
+  // APRIL TARGETS: 64 trans / $817.8k fees / $736k GP
   var metrics = [
     { label: 'Closed deals',    value: d.mtdCount,
       sub: 'of 64 target (' + Math.round(d.mtdCount/64*100) + '%)',
-      delta: p ? fmtDelta(d.mtdCount - p.mtdCount) : null,
-      pos: d.mtdCount >= (p ? p.mtdCount : 0) },
+      delta: p ? fmtDelta(d.mtdCount - p.mtdCount) : null, pos: d.mtdCount >= (p ? p.mtdCount : 0) },
     { label: 'Assignment fees', value: fmt(d.mtdFees),
-      sub: 'of $  817.8k target (' + Math.round(d.mtdFees/817800*100) + '%)',
-      delta: p ? fmtDelta(d.mtdFees - p.mtdFees, true) : null,
-      pos: d.mtdFees >= (p ? p.mtdFees : 0) },
+      sub: 'of $817.8k target (' + Math.round(d.mtdFees/817800*100) + '%)',
+      delta: p ? fmtDelta(d.mtdFees - p.mtdFees, true) : null, pos: d.mtdFees >= (p ? p.mtdFees : 0) },
     { label: 'Gross profit',    value: fmt(d.mtdGP),
-      sub: 'of $736k target (' + Math.round(d.mtdGP/736000*100) + '%)',
-      delta: null },
+      sub: 'of $736k target (' + Math.round(d.mtdGP/736000*100) + '%)', delta: null },
     { label: 'GP margin',       value: (d.gpRatio*100).toFixed(1) + '%',
       sub: 'vs 90.0% target', delta: null },
   ];
 
   document.getElementById('metric-grid').innerHTML = metrics.map(function(m) {
-    return '<div class="metric-card">' +
-      '<div class="metric-label">' + m.label + '</div>' +
-      '<div class="metric-value">' + m.value + '</div>' +
-      '<div class="metric-sub">' + m.sub + '</div>' +
-      (m.delta ? '<div class="metric-delta ' + (m.pos ? 'pos' : 'neg') + '">' + m.delta + ' vs prior</div>' : '') +
-      '</div>';
+    return '<div class="metric-card"><div class="metric-label">' + m.label + '</div><div class="metric-value">' + m.value + '</div><div class="metric-sub">' + m.sub + '</div>' +
+      (m.delta ? '<div class="metric-delta ' + (m.pos ? 'pos' : 'neg') + '">' + m.delta + ' vs prior</div>' : '') + '</div>';
   }).join('');
 
-  renderDoDChart(d);
-  renderForecastChart(d);
-  renderWoWChart();
+  renderDoDChart(d); renderForecastChart(d); renderWoWChart();
 
-  // ── Pipeline by status — with curr-month close date breakout ──
-  // Helper: count/fees for deals in a group that close in current month
   function cmBreakout(deals) {
-    var cmDeals = deals.filter(function(r) {
-      var dt = parseDate(r['Close Date'] || r['Disposition Closing Date']);
-      return dt && dt.getFullYear() === d.CY && (dt.getMonth() + 1) === d.CM;
-    });
-    return { count: cmDeals.length, fees: cmDeals.reduce(function(s, r) { return s + parseFee(r['Assignment Fee']); }, 0) };
+    var cd = deals.filter(function(r) { var dt = parseDate(r['Close Date'] || r['Disposition Closing Date']); return dt && dt.getFullYear() === d.CY && (dt.getMonth()+1) === d.CM; });
+    return { count: cd.length, fees: cd.reduce(function(s,r) { return s + parseFee(r['Assignment Fee']); }, 0) };
   }
 
-  var fmDat = d.byStatus['Future Month'] || { count: 0, fees: 0, deals: [] };
-  var abl   = d.byStatus['At Risk - Buyer Loss'] || { count: 0, fees: 0, deals: [] };
-
+  var fmDat  = d.byStatus['Future Month'] || { count: 0, fees: 0, deals: [] };
+  var ablGrp = d.byStatus['At Risk - Buyer Loss'] || { count: 0, fees: 0, deals: [] };
   var statusRows = [
-    { label: 'Current month',         dot: C.blue,    grp: d.cm },
-    { label: 'Pending funding',        dot: C.teal,    grp: d.pf },
-    { label: 'At risk - slipping',     dot: C.amber,   grp: d.as },
-    { label: 'At risk - seller loss',  dot: C.red,     grp: d.al },
-    { label: 'At risk - buyer loss',   dot: C.red,     grp: abl  },
-    { label: 'Possible pull up',       dot: C.blueD,   grp: d.pp },
-    { label: 'Longshot',               dot: C.muted,   grp: d.ls },
-    { label: 'Future month',           dot: '#c8d8de', grp: fmDat },
+    { label: 'Current month',         dot: C.blue,    grp: d.cm    },
+    { label: 'Pending funding',        dot: C.teal,    grp: d.pf    },
+    { label: 'At risk - slipping',     dot: C.amber,   grp: d.as    },
+    { label: 'At risk - seller loss',  dot: C.red,     grp: d.al    },
+    { label: 'At risk - buyer loss',   dot: C.red,     grp: ablGrp  },
+    { label: 'Possible pull up',       dot: C.blueD,   grp: d.pp    },
+    { label: 'Longshot',               dot: C.muted,   grp: d.ls    },
+    { label: 'Future month',           dot: '#c8d8de', grp: fmDat   },
   ].filter(function(r) { return r.grp.count > 0; }).map(function(r) {
     var cm2 = cmBreakout(r.grp.deals || []);
     return { label: r.label, dot: r.dot, count: r.grp.count, fees: r.grp.fees, cmCount: cm2.count, cmFees: cm2.fees };
   });
 
   document.getElementById('status-table').innerHTML =
-    '<thead><tr>' +
-      '<th>Status</th>' +
-      '<th style="text-align:right;">Mar Deals</th>' +
-      '<th style="text-align:right;">Mar Fees</th>' +
-      '<th style="text-align:right;">All Deals</th>' +
-      '<th style="text-align:right;">All Fees</th>' +
-    '</tr></thead><tbody>' +
+    '<thead><tr><th>Status</th><th style="text-align:right;">Apr Deals</th><th style="text-align:right;">Apr Fees</th><th style="text-align:right;">All Deals</th><th style="text-align:right;">All Fees</th></tr></thead><tbody>' +
     statusRows.map(function(r) {
-      return '<tr>' +
-        '<td><span class="dot" style="background:' + r.dot + '"></span>' + r.label + '</td>' +
+      return '<tr><td><span class="dot" style="background:' + r.dot + '"></span>' + r.label + '</td>' +
         '<td>' + (r.cmCount > 0 ? r.cmCount : '<span style="color:var(--muted2)">-</span>') + '</td>' +
         '<td>' + (r.cmCount > 0 ? fmt(r.cmFees) : '<span style="color:var(--muted2)">-</span>') + '</td>' +
-        '<td>' + r.count + '</td>' +
-        '<td>' + fmt(r.fees) + '</td>' +
-        '</tr>';
+        '<td>' + r.count + '</td><td>' + fmt(r.fees) + '</td></tr>';
     }).join('') + '</tbody>';
 
-  // ── At-risk deals — badge curr-month deals ────────────────────
   var atRisk = d.pipeline.filter(function(r) { return r['Status'] && r['Status'].indexOf('At Risk') >= 0; })
-    .sort(function(a, b) { return parseFee(b['Assignment Fee']) - parseFee(a['Assignment Fee']); });
-
+    .sort(function(a,b) { return parseFee(b['Assignment Fee']) - parseFee(a['Assignment Fee']); });
   document.getElementById('risk-table').innerHTML = atRisk.length
     ? '<thead><tr><th>Deal</th><th>Status</th><th>Close</th><th>Fee</th></tr></thead><tbody>' +
       atRisk.map(function(r) {
-        var isSlip  = r['Status'] && r['Status'].indexOf('Slipping') >= 0;
+        var isSlip = r['Status'] && r['Status'].indexOf('Slipping') >= 0;
         var isBuyer = r['Status'] && r['Status'].indexOf('Buyer') >= 0;
-        var pillCls = isSlip ? 'pill-amber' : 'pill-red';
-        var pillLbl = isSlip ? 'Slipping' : (isBuyer ? 'Buyer loss' : 'Seller loss');
         var cd = parseDate(r['Close Date'] || r['Disposition Closing Date']);
-        var inCM = cd && cd.getFullYear() === d.CY && (cd.getMonth() + 1) === d.CM;
+        var inCM = cd && cd.getFullYear() === d.CY && (cd.getMonth()+1) === d.CM;
         var cdStr = cd ? (cd.getMonth()+1) + '/' + cd.getDate() : '-';
-        var cdCell = inCM
-          ? '<span style="color:var(--rb-orange);font-weight:600;">' + cdStr + ' *</span>'
-          : '<span style="color:var(--muted2);">' + cdStr + '</span>';
-        return '<tr>' +
-          '<td>' + shortAddr(r['Deal Name']) + '</td>' +
-          '<td><span class="pill ' + pillCls + '">' + pillLbl + '</span></td>' +
-          '<td>' + cdCell + '</td>' +
-          '<td>' + fmt(parseFee(r['Assignment Fee'])) + '</td>' +
-          '</tr>';
+        return '<tr><td>' + shortAddr(r['Deal Name']) + '</td>' +
+          '<td><span class="pill ' + (isSlip ? 'pill-amber' : 'pill-red') + '">' + (isSlip ? 'Slipping' : (isBuyer ? 'Buyer loss' : 'Seller loss')) + '</span></td>' +
+          '<td>' + (inCM ? '<span style="color:var(--rb-orange);font-weight:600;">' + cdStr + ' *</span>' : '<span style="color:var(--muted2);">' + cdStr + '</span>') + '</td>' +
+          '<td>' + fmt(parseFee(r['Assignment Fee'])) + '</td></tr>';
       }).join('') + '</tbody>'
     : '<tbody><tr><td colspan="4" style="color:var(--muted2);padding:12px 0;font-size:12px;">No at-risk deals</td></tr></tbody>';
 
-
-
-  var futRows = Object.entries(d.futureByMonth).sort(function(a, b) { return a[0].localeCompare(b[0]); });
+  var futRows = Object.entries(d.futureByMonth).sort(function(a,b) { return a[0].localeCompare(b[0]); });
   document.getElementById('future-table').innerHTML =
     '<thead><tr><th>Month</th><th>Deals</th><th>Fees</th></tr></thead><tbody>' +
     futRows.map(function(kv) { return '<tr><td>' + fmtMonth(kv[0]) + '</td><td>' + kv[1].count + '</td><td>' + fmt(kv[1].fees) + '</td></tr>'; }).join('') + '</tbody>';
 
   document.getElementById('forecast-table').innerHTML =
     '<thead><tr><th>Scenario</th><th>Trans</th><th>Fees</th>' + (p ? '<th>D Trans</th><th>D Fees</th>' : '') + '</tr></thead><tbody>' +
-    [['Minimum', d.minC, d.minF, p ? p.minC : null, p ? p.minF : null],
-     ['Potential', d.potC, d.potF, p ? p.potC : null, p ? p.potF : null],
-     ['Best case', d.bestC, d.bestF, p ? p.bestC : null, p ? p.bestF : null]].map(function(row) {
-      var lbl=row[0], c=row[1], f=row[2], pc=row[3], pf2=row[4];
-      var dc = p != null ? c - pc : null;
-      var df = p != null ? f - pf2 : null;
-      return '<tr><td>' + lbl + '</td><td>' + c + '</td><td>' + fmt(f) + '</td>' +
-        (p != null ? '<td class="' + (dc >= 0 ? 'pos' : 'neg') + '">' + fmtDelta(dc) + '</td><td class="' + (df >= 0 ? 'pos' : 'neg') + '">' + fmtDelta(df, true) + '</td>' : '') + '</tr>';
+    [['Minimum',d.minC,d.minF,p?p.minC:null,p?p.minF:null],
+     ['Potential',d.potC,d.potF,p?p.potC:null,p?p.potF:null],
+     ['Best case',d.bestC,d.bestF,p?p.bestC:null,p?p.bestF:null]].map(function(row) {
+      var lbl=row[0],c=row[1],f=row[2],pc=row[3],pf2=row[4];
+      var dc=p!=null?c-pc:null, df=p!=null?f-pf2:null;
+      return '<tr><td>'+lbl+'</td><td>'+c+'</td><td>'+fmt(f)+'</td>' +
+        (p!=null?'<td class="'+(dc>=0?'pos':'neg')+'">'+fmtDelta(dc)+'</td><td class="'+(df>=0?'pos':'neg')+'">'+fmtDelta(df,true)+'</td>':'')+'</tr>';
     }).join('') + '</tbody>';
 }
 
-// ── DOD CHART ─────────────────────────────────────────────────
 function renderDoDChart(d) {
   if (dodChartInst) { dodChartInst.destroy(); dodChartInst = null; }
-  var daysInMonth = new Date(d.CY, d.CM, 0).getDate();
-  var labels  = Array.from({length: daysInMonth}, function(_, i) { return d.CM + '/' + (i+1); });
-  var cFees   = new Array(daysInMonth).fill(null);
-  var cGP     = new Array(daysInMonth).fill(null);
-  var sched   = new Array(daysInMonth).fill(null);
-  var target  = labels.map(function(_, i) { return Math.round(57/daysInMonth*(i+1)*10)/10; });
-
+  var dim = new Date(d.CY, d.CM, 0).getDate();
+  var labels = Array.from({length: dim}, function(_,i) { return d.CM + '/' + (i+1); });
+  var cFees = new Array(dim).fill(null), cGP = new Array(dim).fill(null), sched = new Array(dim).fill(null);
+  // APRIL TARGET: 64 trans
+  var target = labels.map(function(_,i) { return Math.round(64/dim*(i+1)*10)/10; });
   Object.entries(d.closedByDate).forEach(function(kv) {
     var day = parseInt(kv[0].split('-')[2]);
-    if (day >= 1 && day <= daysInMonth) { cFees[day-1] = Math.round(kv[1].fees/1000); cGP[day-1] = Math.round(kv[1].gp/1000); }
+    if (day >= 1 && day <= dim) { cFees[day-1] = Math.round(kv[1].fees/1000); cGP[day-1] = Math.round(kv[1].gp/1000); }
   });
   Object.entries(d.schedByDate).forEach(function(kv) {
     var day = parseInt(kv[0].split('-')[2]);
-    if (day >= 1 && day <= daysInMonth) sched[day-1] = Math.round(kv[1].fees/1000);
+    if (day >= 1 && day <= dim) sched[day-1] = Math.round(kv[1].fees/1000);
   });
-
   dodChartInst = new Chart(document.getElementById('dodChart'), {
     type: 'bar',
     data: { labels: labels, datasets: [
       { label: 'Scheduled',   data: sched,  backgroundColor: '#c8e8f5', borderColor: '#a0d4ed', borderWidth: 0.5, order: 3 },
-      { label: 'Closed fees', data: cFees,  backgroundColor: C.blue,   order: 2 },
-      { label: 'Closed GP',   data: cGP,    backgroundColor: C.teal,   order: 1 },
+      { label: 'Closed fees', data: cFees,  backgroundColor: C.blue, order: 2 },
+      { label: 'Closed GP',   data: cGP,    backgroundColor: C.teal, order: 1 },
       { label: 'Target',      data: target, type: 'line', borderColor: C.orange, borderWidth: 1.5, borderDash: [4,3], pointRadius: 0, fill: false, yAxisID: 'yT', order: 0 },
     ]},
-    options: { responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
-      plugins: { legend: {display: false}, tooltip: { backgroundColor: C.navy, callbacks: {
-        label: function(ctx) { return ctx.parsed.y === null ? null : ctx.dataset.label === 'Target' ? ' Target: ' + ctx.parsed.y + ' trans' : ' ' + ctx.dataset.label + ': $' + ctx.parsed.y + 'k'; }
+    options: { responsive: true, maintainAspectRatio: false, interaction: {mode:'index',intersect:false},
+      plugins: { legend: {display:false}, tooltip: { backgroundColor: C.navy, callbacks: {
+        label: function(ctx) { return ctx.parsed.y===null?null:ctx.dataset.label==='Target'?' Target: '+ctx.parsed.y+' trans':' '+ctx.dataset.label+': $'+ctx.parsed.y+'k'; }
       }}},
       scales: {
-        x: { grid: {display: false}, ticks: {color: C.tick, font: {size: 9}, maxRotation: 0, autoSkip: true, maxTicksLimit: 11} },
-        y: { grid: {color: C.grid},  ticks: {color: C.tick, font: {size: 9}, callback: function(v) { return '$' + v + 'k'; }} },
-        yT: { position: 'right', grid: {display: false}, ticks: {color: C.orange, font: {size: 9}}, min: 0, max: 65 }
+        x: { grid:{display:false}, ticks:{color:C.tick,font:{size:9},maxRotation:0,autoSkip:true,maxTicksLimit:11} },
+        y: { grid:{color:C.grid}, ticks:{color:C.tick,font:{size:9},callback:function(v){return '$'+v+'k';}} },
+        yT: { position:'right', grid:{display:false}, ticks:{color:C.orange,font:{size:9}}, min:0, max:70 }
       }
     }
   });
 }
 
-// ── FORECAST CHART ────────────────────────────────────────────
 function renderForecastChart(d) {
   if (fcChartInst) { fcChartInst.destroy(); fcChartInst = null; }
-  var fees = [d.mtdFees/1000, d.minF/1000, d.potF/1000, d.bestF/1000].map(function(v) { return Math.round(v*10)/10; });
-  var gps  = fees.map(function(v) { return Math.round(v * d.gpRatio * 10) / 10; });
-
+  var fees = [d.mtdFees/1000,d.minF/1000,d.potF/1000,d.bestF/1000].map(function(v){return Math.round(v*10)/10;});
+  var gps  = fees.map(function(v){return Math.round(v*d.gpRatio*10)/10;});
   fcChartInst = new Chart(document.getElementById('fcChart'), {
     type: 'bar',
-    data: { labels: ['Closed MTD', 'Minimum', 'Potential', 'Best case'], datasets: [
+    data: { labels: ['Closed MTD','Minimum','Potential','Best case'], datasets: [
       { label: 'Fees',    data: fees, backgroundColor: C.blue,  borderRadius: 3 },
       { label: 'Est. GP', data: gps,  backgroundColor: C.tealD, borderRadius: 3 },
     ]},
     options: { responsive: true, maintainAspectRatio: false,
-      plugins: { legend: {display: false}, tooltip: { backgroundColor: C.navy,
-        callbacks: { label: function(ctx) { return ' ' + ctx.dataset.label + ': $' + ctx.parsed.y.toFixed(1) + 'k'; } }
-      }},
+      plugins: { legend:{display:false}, tooltip:{ backgroundColor:C.navy, callbacks:{label:function(ctx){return ' '+ctx.dataset.label+': $'+ctx.parsed.y.toFixed(1)+'k';}} }},
       scales: {
-        x: { grid: {display: false}, ticks: {color: C.tick, font: {size: 9}} },
-        y: { grid: {color: C.grid},  ticks: {color: C.tick, font: {size: 9}, callback: function(v) { return '$' + v + 'k'; }}, max: 800 }
+        x: { grid:{display:false}, ticks:{color:C.tick,font:{size:9}} },
+        y: { grid:{color:C.grid}, ticks:{color:C.tick,font:{size:9},callback:function(v){return '$'+v+'k';}}, max:900 }
       }
     },
+    // APRIL TARGETS: $817.8k fees / $736k GP
     plugins: [{ id: 'fcLines', afterDraw: function(chart) {
-      var ctx = chart.ctx, left = chart.chartArea.left, right = chart.chartArea.right, y = chart.scales.y;
-      [[817.8, C.blue, 'Fee target $817k'], [736, C.tealD, 'GP target $736k']].forEach(function(t) {
+      var ctx=chart.ctx, left=chart.chartArea.left, right=chart.chartArea.right, y=chart.scales.y;
+      [[817.8, C.blue, 'Fee target $818k'], [736, C.tealD, 'GP target $736k']].forEach(function(t) {
         var yp = y.getPixelForValue(t[0]);
-        ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle = t[1]; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.5;
-        ctx.beginPath(); ctx.moveTo(left, yp); ctx.lineTo(right, yp); ctx.stroke(); ctx.restore();
-        ctx.save(); ctx.fillStyle = t[1]; ctx.globalAlpha = 0.7; ctx.font = '9px sans-serif';
-        ctx.fillText(t[2], right - 82, yp - 4); ctx.restore();
+        ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle=t[1]; ctx.lineWidth=1.2; ctx.globalAlpha=0.5;
+        ctx.beginPath(); ctx.moveTo(left,yp); ctx.lineTo(right,yp); ctx.stroke(); ctx.restore();
+        ctx.save(); ctx.fillStyle=t[1]; ctx.globalAlpha=0.7; ctx.font='9px sans-serif';
+        ctx.fillText(t[2], right-82, yp-4); ctx.restore();
       });
     }}]
   });
 }
 
-// ── WOW CHART ─────────────────────────────────────────────────
 function renderWoWChart() {
   if (wowChartInst) { wowChartInst.destroy(); wowChartInst = null; }
   if (!wowHistory.length) return;
@@ -1033,42 +676,39 @@ function renderWoWChart() {
   var n = Math.max(2, parseInt(el ? el.value : '8') || 8);
   var slice = wowHistory.slice(-n);
   var labels = slice.map(function(h) { return h.date.slice(5); });
-
   wowChartInst = new Chart(document.getElementById('wowChart'), {
     type: 'line',
     data: { labels: labels, datasets: [
-      { label: 'Best',   data: slice.map(function(h){return h.bestC;}),    borderColor: C.orange, backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: C.orange, tension: 0.2, yAxisID: 'yT' },
-      { label: 'Pot',    data: slice.map(function(h){return h.potC;}),     borderColor: C.blue,   backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: C.blue,   tension: 0.2, yAxisID: 'yT' },
-      { label: 'Min',    data: slice.map(function(h){return h.minC;}),     borderColor: C.muted,  backgroundColor: 'transparent', borderWidth: 2,   pointRadius: 4, pointBackgroundColor: C.muted,  tension: 0.2, yAxisID: 'yT' },
-      { label: 'Closed', data: slice.map(function(h){return h.mtdCount;}), borderColor: C.tealD,  backgroundColor: 'transparent', borderWidth: 2,   pointRadius: 4, pointBackgroundColor: C.tealD,  tension: 0.2, yAxisID: 'yT' },
-      { label: 'Best $', data: slice.map(function(h){return h.bestF/1000;}), borderColor: C.orange, backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4,3], pointRadius: 2, tension: 0.2, yAxisID: 'yF' },
-      { label: 'Pot $',  data: slice.map(function(h){return h.potF/1000;}),  borderColor: C.blue,   backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4,3], pointRadius: 2, tension: 0.2, yAxisID: 'yF' },
-      { label: 'Min $',  data: slice.map(function(h){return h.minF/1000;}),  borderColor: C.muted,  backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4,3], pointRadius: 2, tension: 0.2, yAxisID: 'yF' },
+      { label:'Best',   data:slice.map(function(h){return h.bestC;}),    borderColor:C.orange, backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:C.orange, tension:0.2, yAxisID:'yT' },
+      { label:'Pot',    data:slice.map(function(h){return h.potC;}),     borderColor:C.blue,   backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:C.blue,   tension:0.2, yAxisID:'yT' },
+      { label:'Min',    data:slice.map(function(h){return h.minC;}),     borderColor:C.muted,  backgroundColor:'transparent', borderWidth:2,   pointRadius:4, pointBackgroundColor:C.muted,  tension:0.2, yAxisID:'yT' },
+      { label:'Closed', data:slice.map(function(h){return h.mtdCount;}), borderColor:C.tealD,  backgroundColor:'transparent', borderWidth:2,   pointRadius:4, pointBackgroundColor:C.tealD,  tension:0.2, yAxisID:'yT' },
+      { label:'Best $', data:slice.map(function(h){return h.bestF/1000;}), borderColor:C.orange, backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:2, tension:0.2, yAxisID:'yF' },
+      { label:'Pot $',  data:slice.map(function(h){return h.potF/1000;}),  borderColor:C.blue,   backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:2, tension:0.2, yAxisID:'yF' },
+      { label:'Min $',  data:slice.map(function(h){return h.minF/1000;}),  borderColor:C.muted,  backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:2, tension:0.2, yAxisID:'yF' },
     ]},
-    options: { responsive: true, maintainAspectRatio: false, interaction: {mode: 'index', intersect: false},
-      plugins: { legend: {display: false}, tooltip: { backgroundColor: C.navy,
-        callbacks: { label: function(ctx) {
-          return ctx.dataset.yAxisID === 'yF' ? ' ' + ctx.dataset.label + ': $' + ctx.parsed.y.toFixed(0) + 'k' : ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + ' trans';
-        }}
-      }},
+    options: { responsive: true, maintainAspectRatio: false, interaction:{mode:'index',intersect:false},
+      plugins: { legend:{display:false}, tooltip:{ backgroundColor:C.navy, callbacks:{label:function(ctx){
+        return ctx.dataset.yAxisID==='yF'?' '+ctx.dataset.label+': $'+ctx.parsed.y.toFixed(0)+'k':' '+ctx.dataset.label+': '+ctx.parsed.y+' trans';
+      }}}},
       scales: {
-        x:  { grid: {display: false}, ticks: {color: C.tick, font: {size: 9}} },
-        yT: { position: 'left',  grid: {color: C.grid},    ticks: {color: C.tick, font: {size: 9}, stepSize: 10}, min: 0, max: 65, title: {display: true, text: 'Trans', color: C.tick, font: {size: 9}} },
-        yF: { position: 'right', grid: {display: false},   ticks: {color: C.tick, font: {size: 9}, callback: function(v){return '$'+v+'k';}}, min: 0, max: 800 }
+        x:  { grid:{display:false}, ticks:{color:C.tick,font:{size:9}} },
+        yT: { position:'left',  grid:{color:C.grid}, ticks:{color:C.tick,font:{size:9},stepSize:10}, min:0, max:75, title:{display:true,text:'Trans',color:C.tick,font:{size:9}} },
+        yF: { position:'right', grid:{display:false}, ticks:{color:C.tick,font:{size:9},callback:function(v){return '$'+v+'k';}}, min:0, max:900 }
       }
     },
+    // APRIL TARGET: 64 trans
     plugins: [{ id: 'target64', afterDraw: function(chart) {
-      var ctx = chart.ctx, left = chart.chartArea.left, right = chart.chartArea.right, yT = chart.scales.yT;
+      var ctx=chart.ctx, left=chart.chartArea.left, right=chart.chartArea.right, yT=chart.scales.yT;
       var yp = yT.getPixelForValue(64);
-      ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle = C.orange; ctx.lineWidth = 1; ctx.globalAlpha = 0.35;
-      ctx.beginPath(); ctx.moveTo(left, yp); ctx.lineTo(right, yp); ctx.stroke(); ctx.restore();
-      ctx.save(); ctx.fillStyle = C.orange; ctx.globalAlpha = 0.55; ctx.font = '9px sans-serif';
-      ctx.fillText('Target 64', right - 52, yp - 4); ctx.restore();
+      ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle=C.orange; ctx.lineWidth=1; ctx.globalAlpha=0.35;
+      ctx.beginPath(); ctx.moveTo(left,yp); ctx.lineTo(right,yp); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.fillStyle=C.orange; ctx.globalAlpha=0.55; ctx.font='9px sans-serif';
+      ctx.fillText('Target 64', right-52, yp-4); ctx.restore();
     }}]
   });
 }
 
-// ── MOVEMENT ─────────────────────────────────────────────────
 function renderMovement() {
   if (!priorData || !priorData.rows) {
     document.getElementById('movement-empty').style.display = 'block';
@@ -1077,108 +717,74 @@ function renderMovement() {
   }
   document.getElementById('movement-empty').style.display = 'none';
   document.getElementById('movement-content').style.display = 'block';
-
-  var oldByID = {};
+  var oldByID = {}, newByID = {};
   priorData.rows.forEach(function(r) { oldByID[r['Record ID']] = r; });
-  var newByID = {};
   currentData.rows.forEach(function(r) { newByID[r['Record ID']] = r; });
-
   var dead=[], closedMv=[], movedOut=[], movedIn=[];
-
   Object.keys(oldByID).forEach(function(id) {
     var r = oldByID[id];
     if (r['Status'] !== 'Current Month') return;
     var nr = newByID[id];
-    if (!nr) { dead.push({name: r['Deal Name'], fee: parseFee(r['Assignment Fee']), to: 'Dead'}); return; }
-    var ns = nr['Status'] || (nr['Deal Stage'] === 'BC CLOSED: WIRE CONFIRMED' ? 'Closed' : '');
+    if (!nr) { dead.push({name:r['Deal Name'],fee:parseFee(r['Assignment Fee']),to:'Dead'}); return; }
+    var ns = nr['Status'] || (nr['Deal Stage']==='BC CLOSED: WIRE CONFIRMED'?'Closed':'');
     if (ns !== 'Current Month') {
-      var o = {name: r['Deal Name'], fee: parseFee(r['Assignment Fee']), to: ns};
-      if (ns === 'Closed') closedMv.push(o); else movedOut.push(o);
+      var o = {name:r['Deal Name'],fee:parseFee(r['Assignment Fee']),to:ns};
+      if (ns==='Closed') closedMv.push(o); else movedOut.push(o);
     }
   });
-
   Object.keys(newByID).forEach(function(id) {
     var r = newByID[id];
     if (r['Status'] !== 'Current Month') return;
     var or_ = oldByID[id];
-    if (!or_) movedIn.push({name: r['Deal Name'], fee: parseFee(r['Assignment Fee']), from: 'New'});
-    else if (or_['Status'] !== 'Current Month') movedIn.push({name: r['Deal Name'], fee: parseFee(r['Assignment Fee']), from: or_['Status'] || '?'});
+    if (!or_) movedIn.push({name:r['Deal Name'],fee:parseFee(r['Assignment Fee']),from:'New'});
+    else if (or_['Status'] !== 'Current Month') movedIn.push({name:r['Deal Name'],fee:parseFee(r['Assignment Fee']),from:or_['Status']||'?'});
   });
-
-  [dead, closedMv, movedOut, movedIn].forEach(function(a) { a.sort(function(a,b){return b.fee-a.fee;}); });
-
+  [dead,closedMv,movedOut,movedIn].forEach(function(a) { a.sort(function(a,b){return b.fee-a.fee;}); });
   function pillCls(s) {
-    if (!s || s === 'Dead') return 'pill-red';
-    if (s === 'Closed') return 'pill-teal';
-    if (s.indexOf('Slipping') >= 0) return 'pill-amber';
-    if (s.indexOf('Seller') >= 0) return 'pill-red';
+    if (!s||s==='Dead') return 'pill-red';
+    if (s==='Closed') return 'pill-teal';
+    if (s.indexOf('Slipping')>=0) return 'pill-amber';
+    if (s.indexOf('Seller')>=0) return 'pill-red';
     return 'pill-blue';
   }
-
   function section(title, items, dir) {
     if (!items.length) return '';
     var total = items.reduce(function(s,r){return s+r.fee;},0);
-    return '<div class="movement-section">' +
-      '<div class="movement-header">' + title + ' - ' + items.length + ' deal' + (items.length!==1?'s':'') + ' - ' + fmt(total) + ' fees</div>' +
+    return '<div class="movement-section"><div class="movement-header">' + title + ' - ' + items.length + ' deal' + (items.length!==1?'s':'') + ' - ' + fmt(total) + ' fees</div>' +
       items.map(function(r) {
-        var label = dir === 'out' ? r.to : r.from;
-        return '<div class="move-row">' +
-          '<div class="move-fee ' + (dir==='out'?'neg':'pos') + '">' + (dir==='out'?'-':'+') + fmt(r.fee) + '</div>' +
-          '<div class="move-name">' + shortAddr(r.name) + '</div>' +
-          '<div class="move-arrow">' + (dir==='out'?'&rarr;':'&larr;') + '</div>' +
-          '<span class="move-status ' + pillCls(label) + '">' + label + '</span>' +
-          '</div>';
+        var lbl = dir==='out'?r.to:r.from;
+        return '<div class="move-row"><div class="move-fee '+(dir==='out'?'neg':'pos')+'">'+(dir==='out'?'-':'+')+fmt(r.fee)+'</div>' +
+          '<div class="move-name">'+shortAddr(r.name)+'</div><div class="move-arrow">'+(dir==='out'?'&rarr;':'&larr;')+'</div>' +
+          '<span class="move-status '+pillCls(lbl)+'">'+lbl+'</span></div>';
       }).join('') + '</div>';
   }
-
   var allOut = dead.concat(closedMv).concat(movedOut);
   var netFee   = movedIn.reduce(function(s,r){return s+r.fee;},0) - allOut.reduce(function(s,r){return s+r.fee;},0);
   var netCount = movedIn.length - allOut.length;
-
   document.getElementById('movement-content').innerHTML =
     section('Dead - removed from pipeline', dead, 'out') +
     section('Closed', closedMv, 'out') +
     section('Moved out of current month', movedOut, 'out') +
     section('Moved into current month', movedIn, 'in') +
-    '<div class="move-net">' +
-    '<span>Net deals: <span class="' + (netCount>=0?'pos':'neg') + '">' + fmtDelta(netCount) + '</span></span>' +
-    '<span>Net fees: <span class="' + (netFee>=0?'pos':'neg') + '">' + fmtDelta(netFee, true) + '</span></span>' +
-    '</div>' +
+    '<div class="move-net"><span>Net deals: <span class="'+(netCount>=0?'pos':'neg')+'">'+fmtDelta(netCount)+'</span></span>' +
+    '<span>Net fees: <span class="'+(netFee>=0?'pos':'neg')+'">'+fmtDelta(netFee,true)+'</span></span></div>' +
     '<div class="footer-note" style="margin-top:8px;">vs ' + priorData.date + '</div>';
 }
 
-// ── SLACK ─────────────────────────────────────────────────────
 function renderSlack() {
   document.getElementById('slack-empty').style.display = 'none';
   document.getElementById('slack-content').style.display = 'block';
-  var d = currentData;
-  var p = priorData;
+  var d = currentData, p = priorData;
   var date = document.getElementById('update-date').textContent;
-
-  // At Risk - Buyer Loss group
   var abl = d.byStatus['At Risk - Buyer Loss'] || { count: 0, fees: 0 };
-  var asAll     = d.as.count + d.al.count + abl.count;
-  var asAllFees = d.as.fees  + d.al.fees  + abl.fees;
-
-  // Delta helpers — format like (trans +3, fees (+$38k))
-  function transDelta(curr, prev) {
-    if (!p) return '';
-    var diff = curr - prev;
-    return (diff >= 0 ? '+' : '') + diff;
-  }
-  function feesDelta(curr, prev) {
-    if (!p) return '';
-    var diff = curr - prev;
-    return (diff >= 0 ? '+' : '-') + fmt(Math.abs(diff));
-  }
-
-  var minD  = p ? '(trans ' + transDelta(d.minC,  p.minC)  + ', fees (' + feesDelta(d.minF,  p.minF)  + '))' : '';
-  var potD  = p ? '(trans ' + transDelta(d.potC,  p.potC)  + ', fees (' + feesDelta(d.potF,  p.potF)  + '))' : '';
-  var bestD = p ? '(trans ' + transDelta(d.bestC, p.bestC) + ', fees (' + feesDelta(d.bestF, p.bestF) + '))' : '';
-
+  function transDelta(curr, prev) { if (!p) return ''; var diff=curr-prev; return (diff>=0?'+':'')+diff; }
+  function feesDelta(curr, prev)  { if (!p) return ''; var diff=curr-prev; return (diff>=0?'+':'-')+fmt(Math.abs(diff)); }
+  var minD  = p ? '(trans '+transDelta(d.minC,p.minC)+', fees ('+feesDelta(d.minF,p.minF)+'))' : '';
+  var potD  = p ? '(trans '+transDelta(d.potC,p.potC)+', fees ('+feesDelta(d.potF,p.potF)+'))' : '';
+  var bestD = p ? '(trans '+transDelta(d.bestC,p.bestC)+', fees ('+feesDelta(d.bestF,p.bestF)+'))' : '';
   var futLines = Object.entries(d.futureByMonth).sort(function(a,b){return a[0].localeCompare(b[0]);})
-    .map(function(kv) { return '  - ' + fmtMonth(kv[0]) + ' - ' + kv[1].count + ' for ' + fmt(kv[1].fees) + ' fees'; }).join('\n');
-
+    .map(function(kv){return '  - '+fmtMonth(kv[0])+' - '+kv[1].count+' for '+fmt(kv[1].fees)+' fees';}).join('\n');
+  // APRIL TARGET: 64 trans / $736k GP / $817.8k fees
   document.getElementById('slack-text').textContent = [
     '@here C2C Update - ' + date,
     '<Deals: Rebuilt Closings> - all deals in Buyer Assigned, sorted by Projected Closing Date',
@@ -1210,37 +816,39 @@ function copySlack() {
   });
 }
 
+function draftToSlack() {
+  var statusEl = document.getElementById('slack-status');
+  statusEl.textContent = 'Drafting...';
+  var text = document.getElementById('slack-text').textContent;
+  fetch('https://slack.com/api/chat.postMessage', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({channel: 'C04JN27HW78', text: text})
+  }).then(function() {
+    statusEl.textContent = 'Drafted in #z-slt-rebuilt';
+    setTimeout(function() { statusEl.textContent = ''; }, 4000);
+  }).catch(function() {
+    statusEl.textContent = 'Use Copy button instead';
+    setTimeout(function() { statusEl.textContent = ''; }, 4000);
+  });
+}
 
 function resetWoWHistory() {
   try { localStorage.setItem(WOW_HISTORY_KEY, JSON.stringify(SEED.slice())); } catch(ex) {}
   wowHistory = SEED.slice();
-  var btn = document.getElementById('reset-wow-btn');
-  var status = document.getElementById('admin-status');
-  btn.textContent = 'Reset';
-  btn.classList.add('confirm');
+  var btn = document.getElementById('reset-wow-btn'), status = document.getElementById('admin-status');
+  btn.textContent = 'Reset'; btn.classList.add('confirm');
   status.textContent = 'WoW history reset to seed data (' + SEED.length + ' entries).';
-  setTimeout(function() {
-    btn.textContent = 'X Reset WoW to seed data';
-    btn.classList.remove('confirm');
-    status.textContent = '';
-  }, 3000);
-  if (currentData) renderWoWChart();
-  else renderWoWChart();
+  setTimeout(function() { btn.textContent = 'X Reset WoW to seed data'; btn.classList.remove('confirm'); status.textContent = ''; }, 3000);
+  renderWoWChart();
 }
 
 function clearPriorSnapshot() {
   try { localStorage.removeItem(STORAGE_KEY); } catch(ex) {}
   priorData = null;
-  var btn = document.getElementById('clear-prior-btn');
-  var status = document.getElementById('admin-status');
-  btn.textContent = 'Cleared';
-  btn.classList.add('confirm');
+  var btn = document.getElementById('clear-prior-btn'), status = document.getElementById('admin-status');
+  btn.textContent = 'Cleared'; btn.classList.add('confirm');
   status.textContent = 'Prior snapshot cleared - next CSV will have no deltas.';
-  setTimeout(function() {
-    btn.textContent = 'X Clear prior snapshot';
-    btn.classList.remove('confirm');
-    status.textContent = '';
-  }, 3000);
+  setTimeout(function() { btn.textContent = 'X Clear prior snapshot'; btn.classList.remove('confirm'); status.textContent = ''; }, 3000);
   if (currentData) renderAll();
 }
 
@@ -1252,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ── SEED + INIT ────────────────────────────────────────────────
+// SEED DATA (Feb-Mar history) + INIT
 var SEED = [
   {"date":"2026-02-19","mtdCount":13,"mtdFees":85200,"minC":27,"minF":232600,"potC":39,"potF":357600,"bestC":43,"bestF":458900},
   {"date":"2026-02-23","mtdCount":18,"mtdFees":105300,"minC":27,"minF":208600,"potC":37,"potF":324600,"bestC":39,"bestF":331500},
@@ -1286,7 +894,6 @@ try {
     document.getElementById('update-date').textContent = priorData.date + ' (prior)';
   }
 } catch(ex) {}
-
 </script>
 </body>
 </html>
