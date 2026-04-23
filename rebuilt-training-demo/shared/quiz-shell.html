@@ -1,0 +1,93 @@
+<!--
+  Shared quiz shell markup — reference only.
+  Each knowledge-check page inlines this block (see intro_to_rebuilt_knowledge_check.html
+  for a working example). If this grows in the future, consider using a tiny
+  server-side include or a Google Apps Script HtmlService doGet() that stitches
+  this fragment onto the per-page config.
+-->
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-wrap">
+    <img class="logo-img" src="shared/logo.svg" alt="Rebuilt"/>
+  </div>
+  <div class="header-divider"></div>
+  <div class="header-center">
+    <div class="header-label">Knowledge Check</div>
+    <div class="header-module" id="headerModule"></div>
+  </div>
+  <div class="header-right">
+    <a class="btn-material no-link" id="materialLink" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+      <span>View Course Material</span>
+    </a>
+  </div>
+</div>
+
+<!-- SAVING OVERLAY -->
+<div class="saving-overlay" id="savingOverlay">
+  <div class="saving-box">
+    <div class="spinner"></div>
+    <p>Saving your results…</p>
+  </div>
+</div>
+
+<!-- SCREEN 1: GATE -->
+<div class="screen active" id="screenGate">
+  <div class="gate-card">
+    <div class="module-tag" id="moduleTag">Knowledge Check</div>
+    <h1 id="moduleHeading"></h1>
+    <p class="subtitle" id="moduleSubtitle"></p>
+    <div class="meta-row">
+      <div class="meta-item"><div class="meta-icon">❓</div><span id="metaQuestions"></span></div>
+      <div class="meta-item"><div class="meta-icon">✅</div><span id="metaPass"></span></div>
+      <div class="meta-item"><div class="meta-icon">📊</div>Score Tracked</div>
+    </div>
+    <div class="form-group">
+      <label>Rebuilt Email</label>
+      <input type="text" id="inputEmail" placeholder="you@rebuilt.com" autocomplete="email"/>
+      <div class="gate-error" id="errorEmail">Please enter a valid @rebuilt.com email.</div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Begin Knowledge Check →</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: QUIZ -->
+<div class="screen" id="screenQuiz">
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="progressLabel">Question 1</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div class="q-card">
+    <div class="q-number" id="qNumber">Question 1</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="optionsWrap"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <div class="q-actions">
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: RESULTS -->
+<div class="screen" id="screenResults">
+  <div class="results-card">
+    <div class="result-badge" id="resultBadge"></div>
+    <div class="result-status" id="resultStatus"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-score-label" id="resultScoreLabel"></div>
+    <div class="result-divider"></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="save-status" id="saveStatus"></div>
+    <button class="btn-primary" onclick="window.location.reload()" style="max-width:280px;margin:0 auto;display:block;">Retake Quiz</button>
+    <br/>
+    <a class="btn-retake" href="index.html">← Back to Training Hub</a>
+  </div>
+  <div class="footer">
+    <span class="footer-copy">© Rebuilt Offers, LLC · Onboarding Training</span>
+    <a class="footer-link no-link" id="footerMaterialLink" href="#" target="_blank" rel="noopener">View Course Material →</a>
+  </div>
+</div>

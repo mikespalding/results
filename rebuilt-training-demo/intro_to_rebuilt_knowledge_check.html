@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Introduction to Rebuilt — Knowledge Check</title>
+<link rel="icon" type="image/svg+xml" href="shared/favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared/quiz.css"/>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-wrap"><img class="logo-img" src="shared/logo.svg" alt="Rebuilt"/></div>
+  <div class="header-divider"></div>
+  <div class="header-center">
+    <div class="header-label">Knowledge Check</div>
+    <div class="header-module">Introduction to Rebuilt</div>
+  </div>
+  <div class="header-right">
+    <a class="btn-material no-link" id="materialLink" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+      <span>View Course Material</span>
+    </a>
+  </div>
+</div>
+
+<div class="saving-overlay" id="savingOverlay">
+  <div class="saving-box"><div class="spinner"></div><p>Saving your results…</p></div>
+</div>
+
+<!-- GATE -->
+<div class="screen active" id="screenGate">
+  <div class="gate-card">
+    <div class="module-tag">Module 1</div>
+    <h1>Introduction to Rebuilt</h1>
+    <p class="subtitle">Test your understanding of how Rebuilt operates, who we serve, and the foundation of the business. 7 questions · ~5 minutes.</p>
+    <div class="meta-row">
+      <div class="meta-item"><div class="meta-icon">❓</div>7 Questions</div>
+      <div class="meta-item"><div class="meta-icon">✅</div>70% to Pass</div>
+      <div class="meta-item"><div class="meta-icon">📊</div>Score Tracked</div>
+    </div>
+    <div class="form-group">
+      <label>Rebuilt Email</label>
+      <input type="text" id="inputEmail" placeholder="you@rebuilt.com" autocomplete="email"/>
+      <div class="gate-error" id="errorEmail">Please enter a valid @rebuilt.com email.</div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Begin Knowledge Check →</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screenQuiz">
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="progressLabel">Question 1 of 7</span><span id="progressPct">0%</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div class="q-card">
+    <div class="q-number" id="qNumber">Question 1</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="optionsWrap"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <div class="q-actions"><button class="btn-next" id="btnNext" onclick="nextQuestion()">Next Question →</button></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screenResults">
+  <div class="results-card">
+    <div class="result-badge" id="resultBadge"></div>
+    <div class="result-status" id="resultStatus"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-score-label" id="resultScoreLabel"></div>
+    <div class="result-divider"></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="save-status" id="saveStatus"></div>
+    <button class="btn-primary" onclick="window.location.reload()" style="max-width:280px;margin:0 auto;display:block;">Retake Quiz</button>
+    <br/>
+    <a class="btn-retake" href="index.html">← Back to Training Hub</a>
+  </div>
+  <div class="footer">
+    <span class="footer-copy">© Rebuilt Offers, LLC · Onboarding Training</span>
+    <a class="footer-link no-link" id="footerMaterialLink" href="#" target="_blank" rel="noopener">View Course Material →</a>
+  </div>
+</div>
+
+<!-- ── PER-PAGE CONFIG ── -->
+<script>
+window.QUIZ_CONFIG = {
+  moduleId:      'kc_intro',
+  moduleName:    'Introduction to Rebuilt',
+  materialUrl:   'https://docs.google.com/presentation/d/18p9Bhb64p8EUihqYRAzDoFU8e8ryS6ZXY179LdKjfhc/edit?usp=drive_link',
+  scriptUrl:     'https://script.google.com/macros/s/AKfycbyRSuUKBjwlPZiY8E7IZZUEQ8u-uwwuTXZnQ0nTPqtfk-bu3zyAa6RKZYw7687arJVs/exec',
+  passThreshold: 0.70,
+  resultCopy: {
+    pass: "You've demonstrated a solid understanding of Rebuilt's business model, history, and vision. Your score has been recorded.",
+    fail: "You scored below 70%. Review the Introduction to Rebuilt material and give it another shot — you've got this!"
+  },
+  questions: [
+    {
+      text: "What best describes Rebuilt's core business model?",
+      options: [
+        "Buying and flipping distressed properties",
+        "Acting as a licensed real estate broker for sellers",
+        "Contracting properties at a discount and monetizing the spread",
+        "Managing rental portfolios for institutional investors"
+      ],
+      correct: 2,
+      explanation: "Rebuilt controls the deal, not the asset — they are deal creators for investors, not flippers or brokers. The goal is to contract at a discount and monetize the spread through assignment or resale."
+    },
+    {
+      text: "Who is Rebuilt's primary target buyer/customer?",
+      options: [
+        "Hedge funds and institutional investors",
+        "First-time homebuyers",
+        "Mom-and-pop investors owning 1–20 properties",
+        "National real estate investment trusts (REITs)"
+      ],
+      correct: 2,
+      explanation: "Rebuilt is building loyalty with repeat mom-and-pop operators who value speed, simplicity, and consistent deal flow — not institutional buyers or homeowners."
+    },
+    {
+      text: "Which three departments make up the Rebuilt Wholesaling Sales Cycle?",
+      options: [
+        "Marketing, Sales, and Legal",
+        "Acquisition, Disposition, and TC & Title",
+        "Sourcing, Underwriting, and Closing",
+        "RCC, Dispo, and Proptech"
+      ],
+      correct: 1,
+      explanation: "The Rebuilt Sales Cycle runs through Acquisition, Disposition, and TC & Title. Know where you sit in the machine and who you hand the baton to."
+    },
+    {
+      text: "What is the key advantage of an assignment over a double close?",
+      options: [
+        "Rebuilt earns a higher fee",
+        "The seller receives more money",
+        "It requires transactional funding",
+        "One closing — faster, cheaper, and transparent"
+      ],
+      correct: 3,
+      explanation: "In an assignment, Rebuilt assigns its contract to the investor who closes directly with the seller — one closing, no double funding needed. Faster, cheaper, and fully transparent."
+    },
+    {
+      text: "In what year was Rebuilt founded, and what was the founders' original motivation?",
+      options: [
+        "2015 — to compete with iBuyers like Opendoor",
+        "2018 — to buy investment properties for themselves after paying too many assignment fees",
+        "2020 — to create jobs in the Southeast real estate market",
+        "2016 — to launch a national title company"
+      ],
+      correct: 1,
+      explanation: "The founders started buying wholesale properties for their own portfolios, realized they were paying too many assignment fees to other wholesalers, and launched Rebuilt in 2018 to do it themselves."
+    },
+    {
+      text: "Which statement best captures Rebuilt's stated vision?",
+      options: [
+        "To become the largest iBuyer in the United States",
+        "To provide affordable housing to underserved communities",
+        "To build the most trusted transaction engine for mom-and-pop investors to find distressed real estate",
+        "To replace traditional real estate brokerages with a tech-first model"
+      ],
+      correct: 2,
+      explanation: "Rebuilt's vision is to be the most trusted transaction engine for mom-and-pop investors seeking distressed real estate — not institutional buyers, homeowners, or a brokerage replacement."
+    },
+    {
+      text: "Which of the following best reflects Rebuilt's current scale and traction?",
+      options: [
+        "500+ transactions, $50M GMV, 5 states",
+        "1,800+ off-market transactions, $200M+ GMV, 20,000+ investors on marketplace",
+        "1,000 transactions, $100M GMV, 10 states",
+        "2,500 transactions, $500M GMV, all 50 states"
+      ],
+      correct: 1,
+      explanation: "Rebuilt has completed 1,800+ off-market transactions, transacted $200M+ in GMV, and has 20,000+ mom-and-pop investors on its marketplace across multiple markets."
+    }
+  ]
+};
+</script>
+<script src="shared/quiz.js"></script>
+</body>
+</html>
