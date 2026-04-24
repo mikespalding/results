@@ -686,17 +686,16 @@ function computeScores() {
     CAT_KEYS.forEach(cat => {
       const ks = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
       if (!ks.length) { cats[cat]=null; return; }
-      // Only KPIs where the associate has data contribute; missing KPIs drop
-      // out of the weight sum rather than pinning the associate to 0.
+      // Every KPI carries its full weight. Missing a KPI scores 0 percentile,
+      // so missing an entire category bottoms out at 0 and the category's
+      // weight drags the overall composite down — no free ride for gaps.
       let num=0, den=0;
       ks.forEach(k => {
         const p = pct[k.id]?.[a.email];
-        if (p !== undefined) {
-          num += p * k.weight;
-          den += k.weight;
-        }
+        if (p !== undefined) num += p * k.weight;
+        den += k.weight;
       });
-      cats[cat] = den > 0 ? num/den : null;
+      cats[cat] = num/den;
     });
     let num=0, den=0;
     CAT_KEYS.forEach(cat => {
