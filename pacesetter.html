@@ -453,7 +453,7 @@ const KPI_DEFS = [
 ];
 
 /* ── STATE ── */
-const S = { roster:[], kpiData:{}, scores:{}, nameMap:{} }; // nameMap: email→name
+const S = { roster:[], rawKpiRows:{}, kpiData:{}, scores:{}, nameMap:{} }; // nameMap: email→name; rawKpiRows: url→parsed rows (cached so date changes don't refetch)
 const SORT = { overall:{col:'score',dir:'desc'}, effort:{col:'score',dir:'desc'}, quality:{col:'score',dir:'desc'}, efficiency:{col:'score',dir:'desc'}, outcome:{col:'score',dir:'desc'} };
 
 /* ── CSV ── */
@@ -527,81 +527,90 @@ async function loadRoster() {
   }
 }
 
-/* ── LOAD KPI DATA ── */
-async function loadKPIs() {
-  const byUrl = {};
-  KPI_DEFS.forEach(k => { if (!k.csvUrl) return; (byUrl[k.csvUrl]=byUrl[k.csvUrl]||[]).push(k); });
-  const urls = Object.keys(byUrl);
+/* ── LOAD KPI DATA ──
+   Two phases: fetchKPIs() pulls every feed in parallel and caches raw rows;
+   aggregateKPIs() re-filters by the current date window and builds S.kpiData.
+   Splitting them means changing the end-date picker doesn't hit the network. */
+async function fetchKPIs() {
+  const urls = [...new Set(KPI_DEFS.filter(k => k.csvUrl).map(k => k.csvUrl))];
   dot('dot-data', urls.length?'loading':'ok');
   txt('lbl-data', `KPI feeds: 0 of ${urls.length} loaded`);
+  S.rawKpiRows = {};
   let done = 0;
-  for (const url of urls) {
+  await Promise.all(urls.map(async url => {
     try {
-      const rows = await fetchCSV(url);
-      byUrl[url].forEach(kpi => {
-        const map = {};
-        // Rolling 4-week window: last 28 days from selected end date
-        const now28    = getEndDate();
-        const cutoff28 = new Date(now28.getFullYear(), now28.getMonth(), now28.getDate() - 28);
-
-        if (kpi.aggregate === 'ratio') {
-          // Special: sum numerator and denominator separately, then divide
-          const numMap = {}, denMap = {};
-          rows.forEach(r => {
-            const email = (r[kpi.emailCol]||'').toLowerCase().trim();
-            if (!email) return;
-            // Date filter
-            const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && (d < cutoff28 || d > now28)) return; }
-            const num = parseFloat((r[kpi.ratioNumerator]||'').replace(/[$,%\s]/g,''));
-            const den = parseFloat((r[kpi.ratioDenominator]||'').replace(/[$,%\s]/g,''));
-            if (!isNaN(num)) numMap[email] = (numMap[email]||0) + num;
-            if (!isNaN(den)) denMap[email] = (denMap[email]||0) + den;
-          });
-          // Calculate rate per associate (as percentage 0-100)
-          Object.keys(numMap).forEach(email => {
-            const den = denMap[email] || 0;
-            map[email] = den > 0 ? (numMap[email] / den) * 100 : 0;
-          });
-        } else if (kpi.aggregate === 'avg') {
-          // Average: track sum and count per associate, divide at end
-          const sumMap = {}, cntMap = {};
-          rows.forEach(r => {
-            const email = (r[kpi.emailCol]||'').toLowerCase().trim();
-            const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
-            if (!email || isNaN(val)) return;
-            const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && (d < cutoff28 || d > now28)) return; }
-            sumMap[email] = (sumMap[email] || 0) + val;
-            cntMap[email] = (cntMap[email] || 0) + 1;
-          });
-          Object.keys(sumMap).forEach(email => {
-            map[email] = sumMap[email] / cntMap[email];
-          });
-        } else {
-          rows.forEach(r => {
-            const email = (r[kpi.emailCol]||'').toLowerCase().trim();
-            const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
-            if (!email || isNaN(val)) return;
-            // Date filter using per-KPI dateCol
-            const dStr = kpi.dateCol ? r[kpi.dateCol] : null;
-            if (dStr) { const d = parseFlexDate(dStr); if (d && !isNaN(d) && (d < cutoff28 || d > now28)) return; }
-            if (kpi.aggregate === 'sum') {
-              map[email] = (map[email] || 0) + val;
-            } else {
-              map[email] = val;
-            }
-          });
-        }
-        S.kpiData[kpi.id] = map;
-        console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 28 days`);
-      });
-      done++;
-      txt('lbl-data', `KPI feeds: ${done} of ${urls.length} loaded`);
-    } catch(e) { console.error('[Pacesetter] KPI feed error:', url, e); }
-  }
+      S.rawKpiRows[url] = await fetchCSV(url);
+    } catch(e) {
+      console.error('[Pacesetter] KPI feed error:', url, e);
+      S.rawKpiRows[url] = [];
+    }
+    done++;
+    txt('lbl-data', `KPI feeds: ${done} of ${urls.length} loaded`);
+  }));
   if (urls.length) dot('dot-data','ok');
   txt('kv-kpis', KPI_DEFS.length);
+}
+
+function aggregateKPIs() {
+  const now28    = getEndDate();
+  const cutoff28 = new Date(now28.getFullYear(), now28.getMonth(), now28.getDate() - 28);
+  S.kpiData = {};
+  KPI_DEFS.forEach(kpi => {
+    if (!kpi.csvUrl) return;
+    const rows = S.rawKpiRows[kpi.csvUrl] || [];
+    const map = {};
+
+    const inWindow = dStr => {
+      if (!dStr) return true;
+      const d = parseFlexDate(dStr);
+      if (!d || isNaN(d)) return true;
+      return d >= cutoff28 && d <= now28;
+    };
+
+    if (kpi.aggregate === 'ratio') {
+      const numMap = {}, denMap = {};
+      rows.forEach(r => {
+        const email = (r[kpi.emailCol]||'').toLowerCase().trim();
+        if (!email) return;
+        if (!inWindow(kpi.dateCol ? r[kpi.dateCol] : null)) return;
+        const num = parseFloat((r[kpi.ratioNumerator]||'').replace(/[$,%\s]/g,''));
+        const den = parseFloat((r[kpi.ratioDenominator]||'').replace(/[$,%\s]/g,''));
+        if (!isNaN(num)) numMap[email] = (numMap[email]||0) + num;
+        if (!isNaN(den)) denMap[email] = (denMap[email]||0) + den;
+      });
+      Object.keys(numMap).forEach(email => {
+        const den = denMap[email] || 0;
+        map[email] = den > 0 ? (numMap[email] / den) * 100 : 0;
+      });
+    } else if (kpi.aggregate === 'avg') {
+      const sumMap = {}, cntMap = {};
+      rows.forEach(r => {
+        const email = (r[kpi.emailCol]||'').toLowerCase().trim();
+        const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
+        if (!email || isNaN(val)) return;
+        if (!inWindow(kpi.dateCol ? r[kpi.dateCol] : null)) return;
+        sumMap[email] = (sumMap[email] || 0) + val;
+        cntMap[email] = (cntMap[email] || 0) + 1;
+      });
+      Object.keys(sumMap).forEach(email => {
+        map[email] = sumMap[email] / cntMap[email];
+      });
+    } else {
+      rows.forEach(r => {
+        const email = (r[kpi.emailCol]||'').toLowerCase().trim();
+        const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
+        if (!email || isNaN(val)) return;
+        if (!inWindow(kpi.dateCol ? r[kpi.dateCol] : null)) return;
+        if (kpi.aggregate === 'sum') {
+          map[email] = (map[email] || 0) + val;
+        } else {
+          map[email] = val;
+        }
+      });
+    }
+    S.kpiData[kpi.id] = map;
+    console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 28 days`);
+  });
 }
 
 /* ── SCORING ENGINE ── */
@@ -651,22 +660,17 @@ function computeScores() {
     ['effort','quality','efficiency','outcome'].forEach(cat => {
       const ks = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
       if (!ks.length) { cats[cat]=null; return; }
-      // Score based on KPIs that have data; associates with no data for a KPI
-      // get 0 percentile for that KPI (last place) rather than being excluded
-      let num=0, den=0, hasAny=false;
+      // Only KPIs where the associate has data contribute; missing KPIs drop
+      // out of the weight sum rather than pinning the associate to 0.
+      let num=0, den=0;
       ks.forEach(k => {
         const p = pct[k.id]?.[a.email];
         if (p !== undefined) {
           num += p * k.weight;
           den += k.weight;
-          hasAny = true;
-        } else {
-          // No data for this KPI — score 0 (bottom) but still include in denominator
-          num += 0 * k.weight;
-          den += k.weight;
         }
       });
-      cats[cat] = hasAny ? num/den : null;
+      cats[cat] = den > 0 ? num/den : null;
     });
     let num=0, den=0;
     Object.entries(CAT_WEIGHTS).forEach(([cat,w]) => {
@@ -829,8 +833,10 @@ function getEndDate() {
 }
 
 function onEndDateChange() {
-  // Reload all data with new date window
-  loadAll();
+  // Raw rows are cached — only re-aggregate and re-render for the new window.
+  aggregateKPIs();
+  computeDerived();
+  renderAll();
 }
 
 function updateSummaryKPIs() {
@@ -913,7 +919,8 @@ document.querySelectorAll('.nav-tab').forEach(t => {
 /* ── INIT ── */
 async function loadAll() {
   await loadRoster();
-  await loadKPIs();
+  await fetchKPIs();
+  aggregateKPIs();
   computeDerived();
   renderAll();
 }
