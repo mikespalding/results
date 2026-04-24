@@ -352,7 +352,9 @@ const KPI_DEFS = [
   {
     id:'retrades', label:'Retrades', category:'effort', weight:1/5,
     csvUrl:PROXY_URL+'?feed=retrades',
-    emailCol:'Email', valueCol:'retrade_count', dateCol:'retrade_timestamp',
+    emailCol:['Email','email','user_email','agent_email','agent'],
+    valueCol:['retrade_count','count','retrades','Retrade Count','Count'],
+    dateCol: ['retrade_timestamp','timestamp','date','created_at','Retrade Timestamp'],
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
@@ -553,7 +555,11 @@ async function fetchKPIs() {
   let done = 0;
   await Promise.all(urls.map(async url => {
     try {
-      S.rawKpiRows[url] = await fetchCSV(url);
+      const rows = await fetchCSV(url);
+      S.rawKpiRows[url] = rows;
+      const feed = (url.split('feed=')[1] || url).split('&')[0];
+      if (rows.length) console.log(`[Pacesetter] feed "${feed}" columns:`, Object.keys(rows[0]), '— sample:', rows[0]);
+      else             console.warn(`[Pacesetter] feed "${feed}" returned 0 rows`);
     } catch(e) {
       console.error('[Pacesetter] KPI feed error:', url, e);
       S.rawKpiRows[url] = [];
@@ -563,6 +569,22 @@ async function fetchKPIs() {
   }));
   if (urls.length) dot('dot-data','ok');
   txt('kv-kpis', KPI_DEFS.length);
+}
+
+// Look up a column value tolerantly: accepts a single name or an array of
+// candidates, falls back to a case-insensitive match. Returns '' if absent so
+// existing parseFloat('') / .toLowerCase() chains keep working.
+function getCol(row, col) {
+  if (!col) return '';
+  const cands = Array.isArray(col) ? col : [col];
+  for (const c of cands) if (row[c] !== undefined) return row[c];
+  const lower = {};
+  for (const k of Object.keys(row)) lower[k.toLowerCase()] = row[k];
+  for (const c of cands) {
+    const v = lower[String(c).toLowerCase()];
+    if (v !== undefined) return v;
+  }
+  return '';
 }
 
 function aggregateKPIs() {
@@ -584,11 +606,11 @@ function aggregateKPIs() {
     if (kpi.aggregate === 'ratio') {
       const numMap = {}, denMap = {};
       rows.forEach(r => {
-        const email = (r[kpi.emailCol]||'').toLowerCase().trim();
+        const email = (getCol(r, kpi.emailCol)||'').toLowerCase().trim();
         if (!email) return;
-        if (!inWindow(kpi.dateCol ? r[kpi.dateCol] : null)) return;
-        const num = parseFloat((r[kpi.ratioNumerator]||'').replace(/[$,%\s]/g,''));
-        const den = parseFloat((r[kpi.ratioDenominator]||'').replace(/[$,%\s]/g,''));
+        if (!inWindow(kpi.dateCol ? getCol(r, kpi.dateCol) : null)) return;
+        const num = parseFloat((getCol(r, kpi.ratioNumerator)||'').replace(/[$,%\s]/g,''));
+        const den = parseFloat((getCol(r, kpi.ratioDenominator)||'').replace(/[$,%\s]/g,''));
         if (!isNaN(num)) numMap[email] = (numMap[email]||0) + num;
         if (!isNaN(den)) denMap[email] = (denMap[email]||0) + den;
       });
@@ -599,10 +621,10 @@ function aggregateKPIs() {
     } else if (kpi.aggregate === 'avg') {
       const sumMap = {}, cntMap = {};
       rows.forEach(r => {
-        const email = (r[kpi.emailCol]||'').toLowerCase().trim();
-        const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
+        const email = (getCol(r, kpi.emailCol)||'').toLowerCase().trim();
+        const val   = parseFloat((getCol(r, kpi.valueCol)||'').replace(/[$,%\s]/g,''));
         if (!email || isNaN(val)) return;
-        if (!inWindow(kpi.dateCol ? r[kpi.dateCol] : null)) return;
+        if (!inWindow(kpi.dateCol ? getCol(r, kpi.dateCol) : null)) return;
         sumMap[email] = (sumMap[email] || 0) + val;
         cntMap[email] = (cntMap[email] || 0) + 1;
       });
@@ -611,10 +633,10 @@ function aggregateKPIs() {
       });
     } else {
       rows.forEach(r => {
-        const email = (r[kpi.emailCol]||'').toLowerCase().trim();
-        const val   = parseFloat((r[kpi.valueCol]||'').replace(/[$,%\s]/g,''));
+        const email = (getCol(r, kpi.emailCol)||'').toLowerCase().trim();
+        const val   = parseFloat((getCol(r, kpi.valueCol)||'').replace(/[$,%\s]/g,''));
         if (!email || isNaN(val)) return;
-        if (!inWindow(kpi.dateCol ? r[kpi.dateCol] : null)) return;
+        if (!inWindow(kpi.dateCol ? getCol(r, kpi.dateCol) : null)) return;
         if (kpi.aggregate === 'sum') {
           map[email] = (map[email] || 0) + val;
         } else {
@@ -623,7 +645,11 @@ function aggregateKPIs() {
       });
     }
     S.kpiData[kpi.id] = map;
-    console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 28 days`);
+    if (rows.length && !Object.keys(map).length) {
+      console.warn(`[Pacesetter] "${kpi.id}": 0 matches from ${rows.length} rows — column mismatch? expected emailCol="${kpi.emailCol}", valueCol="${kpi.valueCol}", dateCol="${kpi.dateCol}". Actual columns:`, Object.keys(rows[0]));
+    } else {
+      console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 28 days`);
+    }
   });
 }
 
