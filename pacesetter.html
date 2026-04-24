@@ -298,7 +298,7 @@ const CATEGORIES = [
   {key:'effort',     label:'Effort',     weight:0.30, color:'var(--effort-color)'},
   {key:'quality',    label:'Quality',    weight:0.25, color:'var(--quality-color)'},
   {key:'efficiency', label:'Efficiency', weight:0.20, color:'var(--efficiency-color)'},
-  {key:'outcome',    label:'Outcome',    weight:0.30, color:'var(--outcome-color)'},
+  {key:'outcome',    label:'Outcome',    weight:0.30, color:'var(--outcome-color)', penalizeEmpty:true},
 ];
 const CAT_KEYS    = CATEGORIES.map(c => c.key);
 const CAT_WEIGHTS = Object.fromEntries(CATEGORIES.map(c => [c.key, c.weight]));
@@ -683,18 +683,23 @@ function computeScores() {
 
   S.roster.forEach(a => {
     const cats = {};
-    CAT_KEYS.forEach(cat => {
+    CATEGORIES.forEach(catMeta => {
+      const cat = catMeta.key;
       const ks = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
       if (!ks.length) { cats[cat]=null; return; }
       // Missing data for a KPI scores as 0 percentile (full weight, no credit).
-      // Associates with zero KPIs in the category at all are left unranked.
+      // When the associate has zero data across the entire category:
+      //   - penalizeEmpty categories (Outcome) still score 0, so the weight
+      //     drags the overall score down.
+      //   - other categories stay null (unranked) and are dropped from the
+      //     overall weight sum.
       let num=0, den=0, hasAny=false;
       ks.forEach(k => {
         const p = pct[k.id]?.[a.email];
         if (p !== undefined) { num += p * k.weight; hasAny = true; }
         den += k.weight;
       });
-      cats[cat] = hasAny ? num/den : null;
+      cats[cat] = (hasAny || catMeta.penalizeEmpty) ? num/den : null;
     });
     let num=0, den=0;
     CAT_KEYS.forEach(cat => {
