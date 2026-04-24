@@ -122,6 +122,11 @@
   .kpi-status.pending{background:#fef3e0;color:#c47a10;}
   .kpi-status.loaded{background:#e0f2f1;color:var(--dark-teal);}
   .kpi-struct-empty{padding:12px 15px;font-size:11px;color:#b0b8c1;font-style:italic;}
+  .kpi-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--offwhite);color:#7a8a94;font-size:10px;font-weight:700;margin-left:6px;cursor:help;border:1px solid var(--border);position:relative;transition:background .15s,color .15s;}
+  .kpi-info:hover{background:var(--blue);color:white;border-color:var(--blue);}
+  .kpi-info .kpi-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:white;font-size:11px;font-weight:400;line-height:1.45;padding:8px 11px;border-radius:6px;width:240px;white-space:normal;text-align:left;box-shadow:0 4px 14px rgba(31,53,64,0.25);z-index:50;pointer-events:none;letter-spacing:0;}
+  .kpi-info .kpi-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
+  .kpi-info:hover .kpi-tip{display:block;}
 
   /* CONFIG */
   .config-card{background:white;border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px;}
@@ -350,18 +355,21 @@ const KPI_DEFS = [
   // ── EFFORT (5 KPIs) ────────────────────────────────────
   {
     id:'rts_time', label:'RTS Time', category:'effort', weight:0.30,
+    description:'Total "Ready To Sell" hours logged in the window — time the rep was available on the dialer.',
     csvUrl:PROXY_URL+'?feed=rts_time',
     emailCol:'Email', valueCol:'Total Hrs', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:1,
   },
   {
     id:'ob_dials', label:'OB Dials', category:'effort', weight:0.10,
+    description:'Total outbound dials placed in the window.',
     csvUrl:PROXY_URL+'?feed=ob_dials',
     emailCol:'user_email', valueCol:'Calls', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'retrades', label:'Retrades', category:'effort', weight:0.10,
+    description:'Count of retrade events (post-contract renegotiations) attributed to the rep.',
     csvUrl:PROXY_URL+'?feed=retrades',
     emailCol:['Email','email','user_email','agent_email','agent'],
     valueCol:['retrade_count','count','retrades','Retrade Count','Count'],
@@ -370,12 +378,14 @@ const KPI_DEFS = [
   },
   {
     id:'avg_talk', label:'Avg Talk', category:'effort', weight:0.25,
+    description:'Average talk (on-call) time per call across the window. Higher is better.',
     csvUrl:PROXY_URL+'?feed=avg_talk_acw',
     emailCol:'agent', valueCol:'on_call_time', dateCol:'date',
     aggregate:'avg', higherIsBetter:true, format:'minutes', decimals:1,
   },
   {
     id:'avg_acw', label:'Avg ACW', category:'effort', weight:0.25,
+    description:'Average After-Call Work time per call. Lower is better (less post-call overhead).',
     csvUrl:PROXY_URL+'?feed=avg_talk_acw',
     emailCol:'agent', valueCol:'on_acw_time', dateCol:'date',
     aggregate:'avg', higherIsBetter:false, format:'minutes', decimals:1,
@@ -384,6 +394,7 @@ const KPI_DEFS = [
   // ── QUALITY (2 KPIs) ───────────────────────────────────
   {
     id:'prospect_creation_rate', label:'Prospect Creation Rate', category:'quality', weight:0.40,
+    description:'Prospects created divided by calls taken — how effectively calls are converted into live prospects.',
     csvUrl:PROXY_URL+'?feed=prospect_creation_rate',
     emailCol:'email', valueCol:null, dateCol:null,
     aggregate:'ratio', ratioNumerator:'prospects_created', ratioDenominator:'calls_taken',
@@ -391,6 +402,7 @@ const KPI_DEFS = [
   },
   {
     id:'pos_spread_deals', label:'Positive Spread', category:'quality', weight:0.60,
+    description:'Count of deals reaching marketing with a positive spread (contract below market value).',
     csvUrl:PROXY_URL+'?feed=pos_spread_deals',
     emailCol:'email', valueCol:'count_of_positive_spread', dateCol:'marketing_date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
@@ -399,6 +411,7 @@ const KPI_DEFS = [
   // ── EFFICIENCY (4 KPIs) ────────────────────────────────
   {
     id:'conversation_rate', label:'Five9 Conv Rate', category:'efficiency', weight:0.20,
+    description:'Percent of Five9 calls lasting 3+ minutes — calls that became real conversations.',
     csvUrl:PROXY_URL+'?feed=conversation_rate',
     emailCol:'agent', valueCol:null, dateCol:'call_date',
     aggregate:'ratio', ratioNumerator:'calls_3min_plus', ratioDenominator:'total_calls',
@@ -406,6 +419,7 @@ const KPI_DEFS = [
   },
   {
     id:'zoom_conversation_rate', label:'Zoom Conv Rate', category:'efficiency', weight:0.20,
+    description:'Percent of Zoom calls lasting 3+ minutes — calls that became real conversations.',
     csvUrl:PROXY_URL+'?feed=zoom_conversation_rate',
     emailCol:'email', valueCol:null, dateCol:'date',
     aggregate:'ratio', ratioNumerator:'calls_3min_plus', ratioDenominator:'total_calls',
@@ -413,12 +427,14 @@ const KPI_DEFS = [
   },
   {
     id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:0.25,
+    description:'Average days a deal sits between contract and marketing. Lower is better.',
     csvUrl:PROXY_URL+'?feed=avg_days_hold',
     emailCol:'email', valueCol:'days_between', dateCol:'marketing_date',
     aggregate:'avg', higherIsBetter:false, format:'number', decimals:1,
   },
   {
     id:'pct_c_to_mktg', label:'C>Mktg %', category:'efficiency', weight:0.35,
+    description:'Share of contracts that reach marketing (Contracts-to-Marketing ÷ Contracts).',
     csvUrl:null, derived:true,
     higherIsBetter:true, format:'percent', decimals:1,
   },
@@ -426,36 +442,42 @@ const KPI_DEFS = [
   // ── OUTCOME (6 KPIs) ───────────────────────────────────
   {
     id:'contracts', label:'Contracts', category:'outcome', weight:0.15,
+    description:'Total count of contracts signed in the window.',
     csvUrl:PROXY_URL+'?feed=contracts',
     emailCol:'email', valueCol:'contract_count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'contracts_to_mktg', label:'C>Mktg', category:'outcome', weight:0.30,
+    description:'Count of contracts that advanced to the marketing stage.',
     csvUrl:PROXY_URL+'?feed=contracts_to_mktg',
     emailCol:'email', valueCol:'count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'backouts', label:'Backouts', category:'outcome', weight:0.05,
+    description:'Count of contract backouts (deals that fell through after contract). Lower is better.',
     csvUrl:PROXY_URL+'?feed=backouts',
     emailCol:'email', valueCol:'backout_count', dateCol:null,
     aggregate:'sum', higherIsBetter:false, format:'number', decimals:0,
   },
   {
     id:'assignments', label:'Assignments', category:'outcome', weight:0.30,
+    description:'Count of deals successfully assigned to an end buyer.',
     csvUrl:PROXY_URL+'?feed=assignments_and_fees',
     emailCol:'email', valueCol:'assigned_count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'assignment_fees', label:'Assignment Fees', category:'outcome', weight:0.10,
+    description:'Total assignment-fee dollars earned from assigned deals.',
     csvUrl:PROXY_URL+'?feed=assignments_and_fees',
     emailCol:'email', valueCol:'total_assignment_fee', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'currency_k', decimals:1,
   },
   {
     id:'transactions', label:'Transactions', category:'outcome', weight:0.10,
+    description:'Count of closed transactions (deals that reached closing).',
     csvUrl:PROXY_URL+'?feed=closed_transactions',
     emailCol:'email', valueCol:'closings_count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
@@ -961,15 +983,21 @@ function updateSummaryKPIs() {
 }
 
 function renderKPIStruct() {
+  const escHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   document.getElementById('kpi-struct-grid').innerHTML = CATEGORIES.map(cat => {
     const kpis = KPI_DEFS.filter(k => k.category===cat.key);
     const rows = kpis.length
-      ? kpis.map(k=>`<div class="kpi-struct-row">
-          <span>${k.label}</span>
-          <div class="kpi-struct-meta">
-            <span class="kpi-pct">${Math.round(k.weight*100)}% of cat</span>
-            <span class="kpi-status ${S.kpiData[k.id]?'loaded':'pending'}">${S.kpiData[k.id]?'loaded':'pending'}</span>
-          </div></div>`).join('')
+      ? kpis.map(k=>{
+          const info = k.description
+            ? `<span class="kpi-info" tabindex="0" aria-label="${escHtml(k.description)}">i<span class="kpi-tip">${escHtml(k.description)}</span></span>`
+            : '';
+          return `<div class="kpi-struct-row">
+            <span>${k.label}${info}</span>
+            <div class="kpi-struct-meta">
+              <span class="kpi-pct">${Math.round(k.weight*100)}% of cat</span>
+              <span class="kpi-status ${S.kpiData[k.id]?'loaded':'pending'}">${S.kpiData[k.id]?'loaded':'pending'}</span>
+            </div></div>`;
+        }).join('')
       : '<div class="kpi-struct-empty">+ KPIs pending — awaiting metric definitions</div>';
     return `<div class="kpi-struct-card">
       <div class="kpi-struct-head" style="border-left:4px solid ${cat.color};padding-left:11px">
