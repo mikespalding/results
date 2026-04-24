@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjQ0MCAwIDU1MCA4OTAiPgogIDxwYXRoIGQ9Im0gMzMzNy45OSwzNTQ0LjgzIDExNzkuNzksMTA3Ni43MiB2IDE5MzguMSBMIDMzMzcuOTksNTU5MC42IFYgMzU0NC44MyIKICAgICAgICBmaWxsPSIjNGVhOWUyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjEzMzMzMzMzLDAsMCwtMC4xMzMzMzMzMywwLDEzMzIuNjY2NykiLz4KICA8cGF0aCBkPSJNIDYxNjkuNDgsOTk5NS4wMSBWIDQ2MjEuNTUgbCAxMTc5LjgsLTEwNzYuNzIgdiA1NDkxLjI5IGwgLTExNzkuOCw5NTguODkiCiAgICAgICAgZmlsbD0iIzRlYTllMiIgdHJhbnNmb3JtPSJtYXRyaXgoMC4xMzMzMzMzMywwLDAsLTAuMTMzMzMzMzMsMCwxMzMyLjY2NjcpIi8+CiAgPHBhdGggZD0iTSA0NzUzLjc0LDc3NDQuMDUgViA0ODM2Ljg5IGwgNTg5Ljg5LDUzOC4zNyA1ODkuOSwtNTM4LjM3IDQuMzcsMzk3My43MiAtMTE4NC4xNiwtMTA2Ni41NiIKICAgICAgICBmaWxsPSIjNGVhOWUyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjEzMzMzMzMzLDAsMCwtMC4xMzMzMzMzMywwLDEzMzIuNjY2NykiLz4KICA8cGF0aCBkPSJtIDQ4MDIuMjEsMzQyNS4xOSBoIDQzMC42OSB2IDQzMC42OCBoIC00MzAuNjkgdiAtNDMwLjY4IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjY3KSIvPgogIDxwYXRoIGQ9Im0gNTQ0OC4yNCwzNDI1LjE5IGggNDMwLjcgdiA0MzAuNjggaCAtNDMwLjcgdiAtNDMwLjY4IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjcpIi8+CiAgPHBhdGggZD0ibSA1MjMyLjksNDUwMS45MSBoIC00MzAuNjkgdiAtNDMwLjY5IGggNDMwLjY5IHYgNDMwLjY5IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjY3KSIvPgogIDxwYXRoIGQ9Im0gNTQ0OC4yNCw0NTAxLjkxIHYgLTQzMC42OSBoIDQzMC43IHYgNDMwLjY5IGggLTQzMC43IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjY3KSIvPgo8L3N2Zz4="/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acquisition Pacesetter · Rolling 4 Weeks</title>
+<title>Acquisition Pacesetter · Rolling 30 Days</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
   :root {
@@ -14,6 +14,7 @@
     --effort-color:#21a9e1;--quality-color:#64b4b7;
     --efficiency-color:#f5831f;--outcome-color:#0f696e;
     --gold:#b8860b;--silver:#7a8a94;--bronze:#8b5a2b;
+    --tier-platinum:#4a7a9e;--tier-gold:#c9a227;--tier-silver:#8a94a0;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'DM Sans',sans-serif;background:var(--offwhite);color:var(--navy);min-height:100vh;}
@@ -136,6 +137,16 @@
   /* EMPTY */
   .empty-state{padding:40px 20px;text-align:center;color:#b0b8c1;font-size:13px;line-height:1.6;}
   .empty-icon{font-size:2rem;margin-bottom:10px;opacity:.4;}
+
+  /* TIER BANDING (Overall Rankings) */
+  .tier-row td{background:linear-gradient(90deg,rgba(0,0,0,0.02),transparent);padding:10px 10px 6px !important;border-bottom:none !important;border-top:2px solid var(--tier-color,var(--border)) !important;}
+  .tier-row.first-tier td{border-top:none !important;}
+  .tier-label{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tier-color);}
+  .tier-dot{width:8px;height:8px;border-radius:50%;background:var(--tier-color);}
+  .tier-count{font-size:10px;color:#7a8a94;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:0;text-transform:none;}
+  tr.tier-platinum{box-shadow:inset 3px 0 0 var(--tier-platinum);}
+  tr.tier-gold{box-shadow:inset 3px 0 0 var(--tier-gold);}
+  tr.tier-silver{box-shadow:inset 3px 0 0 var(--tier-silver);}
 </style>
 </head>
 <body>
@@ -168,12 +179,12 @@
     <div class="header-divider"></div>
     <div>
       <div class="header-name">Acquisition Pacesetter</div>
-      <div class="header-sub">Rolling 4-Week Performance Ranking</div>
+      <div class="header-sub">Rolling 30-Day Performance Ranking</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:16px;">
     <div class="header-meta">
-      <div>Rolling 4 Weeks</div>
+      <div>Rolling 30 Days</div>
       <div id="hdr-refreshed">Last refreshed: —</div>
     </div>
     <a class="header-back" href="https://mikespalding.github.io/results/">
@@ -214,7 +225,7 @@
   <div class="kpi-row">
     <div class="kpi-card blue"><div class="kpi-label">Active Associates</div><div class="kpi-value" id="kv-count">—</div><div class="kpi-sub">On roster</div></div>
     <div class="kpi-card teal"><div class="kpi-label">KPIs Tracked</div><div class="kpi-value" id="kv-kpis">0</div><div class="kpi-sub">Across 4 categories</div></div>
-    <div class="kpi-card orange"><div class="kpi-label">Data Window</div><div class="kpi-value" id="kv-asof" style="font-size:14px;letter-spacing:0;line-height:1.3">—</div><div class="kpi-sub" id="kv-asof-sub">Rolling 4 weeks</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Data Window</div><div class="kpi-value" id="kv-asof" style="font-size:14px;letter-spacing:0;line-height:1.3">—</div><div class="kpi-sub" id="kv-asof-sub">Rolling 30 days</div></div>
   </div>
 
   <div class="section-head">
@@ -336,21 +347,21 @@ const RCOLS = {
   }
 */
 const KPI_DEFS = [
-  // ── EFFORT (5 KPIs, equally weighted) ──────────────────
+  // ── EFFORT (5 KPIs) ────────────────────────────────────
   {
-    id:'rts_time', label:'RTS Time', category:'effort', weight:1/5,
+    id:'rts_time', label:'RTS Time', category:'effort', weight:0.30,
     csvUrl:PROXY_URL+'?feed=rts_time',
     emailCol:'Email', valueCol:'Total Hrs', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:1,
   },
   {
-    id:'ob_dials', label:'OB Dials', category:'effort', weight:1/5,
+    id:'ob_dials', label:'OB Dials', category:'effort', weight:0.10,
     csvUrl:PROXY_URL+'?feed=ob_dials',
     emailCol:'user_email', valueCol:'Calls', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
-    id:'retrades', label:'Retrades', category:'effort', weight:1/5,
+    id:'retrades', label:'Retrades', category:'effort', weight:0.10,
     csvUrl:PROXY_URL+'?feed=retrades',
     emailCol:['Email','email','user_email','agent_email','agent'],
     valueCol:['retrade_count','count','retrades','Retrade Count','Count'],
@@ -358,104 +369,105 @@ const KPI_DEFS = [
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
-    id:'avg_talk', label:'Avg Talk', category:'effort', weight:1/5,
+    id:'avg_talk', label:'Avg Talk', category:'effort', weight:0.25,
     csvUrl:PROXY_URL+'?feed=avg_talk_acw',
     emailCol:'agent', valueCol:'on_call_time', dateCol:'date',
     aggregate:'avg', higherIsBetter:true, format:'minutes', decimals:1,
   },
   {
-    id:'avg_acw', label:'Avg ACW', category:'effort', weight:1/5,
+    id:'avg_acw', label:'Avg ACW', category:'effort', weight:0.25,
     csvUrl:PROXY_URL+'?feed=avg_talk_acw',
     emailCol:'agent', valueCol:'on_acw_time', dateCol:'date',
     aggregate:'avg', higherIsBetter:false, format:'minutes', decimals:1,
   },
 
-  // ── QUALITY (3 KPIs, equally weighted) ─────────────────
+  // ── QUALITY (2 KPIs) ───────────────────────────────────
   {
-    id:'prospect_creation_rate', label:'Prospect Creation Rate', category:'quality', weight:1/3,
+    id:'prospect_creation_rate', label:'Prospect Creation Rate', category:'quality', weight:0.40,
     csvUrl:PROXY_URL+'?feed=prospect_creation_rate',
     emailCol:'email', valueCol:null, dateCol:null,
     aggregate:'ratio', ratioNumerator:'prospects_created', ratioDenominator:'calls_taken',
     higherIsBetter:true, format:'percent', decimals:1,
   },
   {
-    id:'uw_mao', label:'< UW MAO', category:'quality', weight:1/3,
-    csvUrl:PROXY_URL+'?feed=uw_mao',
-    emailCol:'email', valueCol:'count', dateCol:null,
-    aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
-  },
-  {
-    id:'pos_spread_deals', label:'Pos Spread Deals', category:'quality', weight:1/3,
+    id:'pos_spread_deals', label:'Positive Spread', category:'quality', weight:0.60,
     csvUrl:PROXY_URL+'?feed=pos_spread_deals',
     emailCol:'email', valueCol:'count_of_positive_spread', dateCol:'marketing_date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
 
-  // ── EFFICIENCY (4 KPIs, equally weighted) ──────────────
+  // ── EFFICIENCY (4 KPIs) ────────────────────────────────
   {
-    id:'conversation_rate', label:'Five9 Conv Rate', category:'efficiency', weight:1/4,
+    id:'conversation_rate', label:'Five9 Conv Rate', category:'efficiency', weight:0.20,
     csvUrl:PROXY_URL+'?feed=conversation_rate',
     emailCol:'agent', valueCol:null, dateCol:'call_date',
     aggregate:'ratio', ratioNumerator:'calls_3min_plus', ratioDenominator:'total_calls',
     higherIsBetter:true, format:'percent', decimals:1,
   },
   {
-    id:'zoom_conversation_rate', label:'Zoom Conv Rate', category:'efficiency', weight:1/4,
+    id:'zoom_conversation_rate', label:'Zoom Conv Rate', category:'efficiency', weight:0.20,
     csvUrl:PROXY_URL+'?feed=zoom_conversation_rate',
     emailCol:'email', valueCol:null, dateCol:'date',
     aggregate:'ratio', ratioNumerator:'calls_3min_plus', ratioDenominator:'total_calls',
     higherIsBetter:true, format:'percent', decimals:1,
   },
   {
-    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:1/4,
+    id:'avg_days_hold', label:'Avg Days On Hold', category:'efficiency', weight:0.25,
     csvUrl:PROXY_URL+'?feed=avg_days_hold',
     emailCol:'email', valueCol:'days_between', dateCol:'marketing_date',
     aggregate:'avg', higherIsBetter:false, format:'number', decimals:1,
   },
   {
-    id:'pct_c_to_mktg', label:'C>Mktg %', category:'efficiency', weight:1/4,
+    id:'pct_c_to_mktg', label:'C>Mktg %', category:'efficiency', weight:0.35,
     csvUrl:null, derived:true,
     higherIsBetter:true, format:'percent', decimals:1,
   },
 
-  // ── OUTCOME (6 KPIs, equally weighted) ─────────────────
+  // ── OUTCOME (6 KPIs) ───────────────────────────────────
   {
-    id:'contracts', label:'Contracts', category:'outcome', weight:1/6,
+    id:'contracts', label:'Contracts', category:'outcome', weight:0.15,
     csvUrl:PROXY_URL+'?feed=contracts',
     emailCol:'email', valueCol:'contract_count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
-    id:'contracts_to_mktg', label:'C>Mktg', category:'outcome', weight:1/6,
+    id:'contracts_to_mktg', label:'C>Mktg', category:'outcome', weight:0.30,
     csvUrl:PROXY_URL+'?feed=contracts_to_mktg',
     emailCol:'email', valueCol:'count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
-    id:'backouts', label:'Backouts', category:'outcome', weight:1/6,
+    id:'backouts', label:'Backouts', category:'outcome', weight:0.05,
     csvUrl:PROXY_URL+'?feed=backouts',
     emailCol:'email', valueCol:'backout_count', dateCol:null,
     aggregate:'sum', higherIsBetter:false, format:'number', decimals:0,
   },
   {
-    id:'assignments', label:'Assignments', category:'outcome', weight:1/6,
+    id:'assignments', label:'Assignments', category:'outcome', weight:0.30,
     csvUrl:PROXY_URL+'?feed=assignments_and_fees',
     emailCol:'email', valueCol:'assigned_count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
-    id:'assignment_fees', label:'Assignment Fees', category:'outcome', weight:1/6,
+    id:'assignment_fees', label:'Assignment Fees', category:'outcome', weight:0.10,
     csvUrl:PROXY_URL+'?feed=assignments_and_fees',
     emailCol:'email', valueCol:'total_assignment_fee', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'currency_k', decimals:1,
   },
   {
-    id:'transactions', label:'Transactions', category:'outcome', weight:1/6,
+    id:'transactions', label:'Transactions', category:'outcome', weight:0.10,
     csvUrl:PROXY_URL+'?feed=closed_transactions',
     emailCol:'email', valueCol:'closings_count', dateCol:null,
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
 ];
+
+// Per-associate KPI opt-outs. Matches on lowercased full name from the roster.
+// Opted-out KPIs are excluded from the associate's category score and re-normalized
+// across the remaining KPIs — no penalty or bonus applied.
+const KPI_OPT_OUTS = {
+  'warren smith': ['rts_time'],
+};
 
 /* ── STATE ── */
 const S = { roster:[], rawKpiRows:{}, kpiData:{}, scores:{}, nameMap:{} }; // nameMap: email→name; rawKpiRows: url→parsed rows (cached so date changes don't refetch)
@@ -588,8 +600,8 @@ function getCol(row, col) {
 }
 
 function aggregateKPIs() {
-  const now28    = getEndDate();
-  const cutoff28 = new Date(now28.getFullYear(), now28.getMonth(), now28.getDate() - 28);
+  const windowEnd    = getEndDate();
+  const windowStart  = new Date(windowEnd.getFullYear(), windowEnd.getMonth(), windowEnd.getDate() - 30);
   S.kpiData = {};
   KPI_DEFS.forEach(kpi => {
     if (!kpi.csvUrl) return;
@@ -600,7 +612,7 @@ function aggregateKPIs() {
       if (!dStr) return true;
       const d = parseFlexDate(dStr);
       if (!d || isNaN(d)) return true;
-      return d >= cutoff28 && d <= now28;
+      return d >= windowStart && d <= windowEnd;
     };
 
     if (kpi.aggregate === 'ratio') {
@@ -648,7 +660,7 @@ function aggregateKPIs() {
     if (rows.length && !Object.keys(map).length) {
       console.warn(`[Pacesetter] "${kpi.id}": 0 matches from ${rows.length} rows — column mismatch? expected emailCol="${kpi.emailCol}", valueCol="${kpi.valueCol}", dateCol="${kpi.dateCol}". Actual columns:`, Object.keys(rows[0]));
     } else {
-      console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 28 days`);
+      console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 30 days`);
     }
   });
 }
@@ -708,13 +720,15 @@ function computeScores() {
   });
 
   S.roster.forEach(a => {
+    const optOuts = KPI_OPT_OUTS[(a.name||'').toLowerCase().trim()] || [];
     const cats = {};
     CAT_KEYS.forEach(cat => {
-      const ks = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived));
+      const ks = KPI_DEFS.filter(k => k.category===cat && (k.csvUrl || k.derived) && !optOuts.includes(k.id));
       if (!ks.length) { cats[cat]=null; return; }
       // Every KPI carries its full weight. Missing a KPI scores 0 percentile,
       // so missing an entire category bottoms out at 0 and the category's
       // weight drags the overall composite down — no free ride for gaps.
+      // Opted-out KPIs are dropped entirely and the remaining weights re-normalize.
       let num=0, den=0;
       ks.forEach(k => {
         const p = pct[k.id]?.[a.email];
@@ -763,6 +777,10 @@ function sortedRows(rows, col, dir, catKPIs) {
     } else if (col === 'name') {
       va = (S.nameMap[a.email] || a.email).toLowerCase();
       vb = (S.nameMap[b.email] || b.email).toLowerCase();
+      return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    } else if (col === 'manager') {
+      va = (a.manager || '').toLowerCase();
+      vb = (b.manager || '').toLowerCase();
       return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
     } else if (col === 'tenure') {
       va = a.hire_date ? new Date(a.hire_date).getTime() : Infinity;
@@ -823,15 +841,53 @@ function renderOverall() {
   const sorted = [...withScore, ...noScore];
   if (!sorted.length) return;
   const finalRows = sortedRows(sorted, SORT.overall.col, SORT.overall.dir, null);
-  wrap.innerHTML = `<table class="lb-table"><thead><tr>
+
+  // Tier assignments by rank position within scored associates:
+  // top 25% → Platinum, middle 50% → Gold, bottom 25% → Silver.
+  const n = withScore.length;
+  const platinumCut = Math.ceil(n * 0.25);
+  const silverStart = n - Math.ceil(n * 0.25);
+  const tierFor = email => {
+    const pos = withScore.findIndex(x => x.email === email);
+    if (pos < 0) return null;
+    if (pos < platinumCut) return 'platinum';
+    if (pos >= silverStart) return 'silver';
+    return 'gold';
+  };
+  const tierMeta = {
+    platinum: {label:'Platinum', color:'var(--tier-platinum)', desc:'Top 25%'},
+    gold:     {label:'Gold',     color:'var(--tier-gold)',     desc:'Middle 50%'},
+    silver:   {label:'Silver',   color:'var(--tier-silver)',   desc:'Bottom 25%'},
+  };
+  const tierCounts = {platinum:0, gold:0, silver:0};
+  withScore.forEach(a => { const t = tierFor(a.email); if (t) tierCounts[t]++; });
+  const COL_COUNT = 6 + CATEGORIES.length; // #, Associate, Manager, Tenure, Overall, Tier + categories
+
+  const headerHtml = `<tr>
     <th style="width:32px">#</th>
     <th style="cursor:pointer" onclick="thClick('overall','name')">Associate${thArrow('overall','name')}</th>
+    <th style="cursor:pointer" onclick="thClick('overall','manager')">Manager${thArrow('overall','manager')}</th>
     <th style="cursor:pointer" onclick="thClick('overall','tenure')">Tenure${thArrow('overall','tenure')}</th>
+    <th>Tier</th>
     <th style="cursor:pointer" onclick="thClick('overall','score')">Overall${thArrow('overall','score')}</th>
     ${CATEGORIES.map(c=>`<th style="color:${c.color};cursor:pointer" onclick="thClick('overall','${c.key}')">${c.label}${thArrow('overall',c.key)}</th>`).join('')}
-  </tr></thead><tbody>
-  ${finalRows.map((a,i)=>{
-    const r=i+1;
+  </tr>`;
+
+  // Build body — when sorted by score desc (default), insert tier-divider rows between bands.
+  const showTierDividers = SORT.overall.col === 'score' && SORT.overall.dir === 'desc';
+  const bodyParts = [];
+  let lastTier = null;
+  let firstTierEmitted = false;
+  finalRows.forEach(a => {
+    const tier = tierFor(a.email);
+    if (showTierDividers && tier && tier !== lastTier) {
+      const m = tierMeta[tier];
+      bodyParts.push(`<tr class="tier-row${firstTierEmitted?'':' first-tier'}" style="--tier-color:${m.color}"><td colspan="${COL_COUNT}">
+        <span class="tier-label" style="--tier-color:${m.color}"><span class="tier-dot"></span>${m.label} <span class="tier-count">· ${m.desc} · ${tierCounts[tier]} associate${tierCounts[tier]===1?'':'s'}</span></span>
+      </td></tr>`);
+      lastTier = tier;
+      firstTierEmitted = true;
+    }
     const catCells = CATEGORIES.map(c => {
       const s = S.scores[a.email]?.[c.key];
       return s!==null&&s!==undefined
@@ -844,9 +900,15 @@ function renderOverall() {
     const origPos  = withScore.findIndex(x => x.email === a.email);
     const rowStyle = a.score === null ? 'opacity:0.45' : '';
     const rankCell = a.score !== null ? badge(origPos + 1) : '<span class="rank-badge" style="color:#ccc">—</span>';
-    return `<tr style="${rowStyle}"><td>${rankCell}</td><td><strong style="cursor:pointer;color:var(--blue)" onclick="openScorecard('${a.email}')">${S.nameMap[a.email] || a.email}</strong></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td><td>${pill(a.score)}</td>${catCells}</tr>`;
-  }).join('')}
-  </tbody></table>`;
+    const tierClass = tier ? ` tier-${tier}` : '';
+    const tierCell  = tier
+      ? `<td><span class="tier-label" style="--tier-color:${tierMeta[tier].color};font-size:10px"><span class="tier-dot"></span>${tierMeta[tier].label}</span></td>`
+      : '<td style="color:#b0b8c1;font-size:11px">—</td>';
+    const managerCell = `<td style="font-size:11px;color:#5a6a73;white-space:nowrap">${a.manager || '<span style="color:#b0b8c1">—</span>'}</td>`;
+    bodyParts.push(`<tr class="${tierClass.trim()}" style="${rowStyle}"><td>${rankCell}</td><td><strong style="cursor:pointer;color:var(--blue)" onclick="openScorecard('${a.email}')">${S.nameMap[a.email] || a.email}</strong></td>${managerCell}<td style="font-family:'DM Mono',monospace;font-size:11px;color:#7a8a94;white-space:nowrap">${fmtTenure(a.hire_date)}</td>${tierCell}<td>${pill(a.score)}</td>${catCells}</tr>`);
+  });
+
+  wrap.innerHTML = `<table class="lb-table"><thead>${headerHtml}</thead><tbody>${bodyParts.join('')}</tbody></table>`;
 }
 
 function renderCat(cat) {
@@ -892,10 +954,10 @@ function onEndDateChange() {
 
 function updateSummaryKPIs() {
   const end   = getEndDate();
-  const start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 28);
+  const start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 30);
   const fmtD  = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
   txt('kv-asof', fmtD(start) + ' – ' + fmtD(end));
-  txt('kv-asof-sub', 'Rolling 28-day window');
+  txt('kv-asof-sub', 'Rolling 30-day window');
 }
 
 function renderKPIStruct() {
