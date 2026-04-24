@@ -355,21 +355,21 @@ const KPI_DEFS = [
   // ── EFFORT (5 KPIs) ────────────────────────────────────
   {
     id:'rts_time', label:'RTS Time', category:'effort', weight:0.30,
-    description:'Total "Ready To Sell" hours logged in the window — time the rep was available on the dialer.',
+    description:'Total "Ready To Sell" hours logged; both Zoom talk time and Five9 available time.',
     csvUrl:PROXY_URL+'?feed=rts_time',
     emailCol:'Email', valueCol:'Total Hrs', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:1,
   },
   {
     id:'ob_dials', label:'OB Dials', category:'effort', weight:0.10,
-    description:'Total outbound dials placed in the window.',
+    description:'Total Zoom outbound dials placed; excluding internal calls.',
     csvUrl:PROXY_URL+'?feed=ob_dials',
     emailCol:'user_email', valueCol:'Calls', dateCol:'Date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'retrades', label:'Retrades', category:'effort', weight:0.10,
-    description:'Count of retrade events (post-contract renegotiations) attributed to the rep.',
+    description:'Count of retrade events (post-contract renegotiations) not attributed to a Dispo associate.',
     csvUrl:PROXY_URL+'?feed=retrades',
     emailCol:['Email','email','user_email','agent_email','agent'],
     valueCol:['retrade_count','count','retrades','Retrade Count','Count'],
@@ -378,14 +378,14 @@ const KPI_DEFS = [
   },
   {
     id:'avg_talk', label:'Avg Talk', category:'effort', weight:0.25,
-    description:'Average talk (on-call) time per call across the window. Higher is better.',
+    description:'Average talk (on-call) time per call in Five9. Higher is better.',
     csvUrl:PROXY_URL+'?feed=avg_talk_acw',
     emailCol:'agent', valueCol:'on_call_time', dateCol:'date',
     aggregate:'avg', higherIsBetter:true, format:'minutes', decimals:1,
   },
   {
     id:'avg_acw', label:'Avg ACW', category:'effort', weight:0.25,
-    description:'Average After-Call Work time per call. Lower is better (less post-call overhead).',
+    description:'Average After-Call Work time per call in Five9. Lower is better.',
     csvUrl:PROXY_URL+'?feed=avg_talk_acw',
     emailCol:'agent', valueCol:'on_acw_time', dateCol:'date',
     aggregate:'avg', higherIsBetter:false, format:'minutes', decimals:1,
@@ -394,7 +394,7 @@ const KPI_DEFS = [
   // ── QUALITY (2 KPIs) ───────────────────────────────────
   {
     id:'prospect_creation_rate', label:'Prospect Creation Rate', category:'quality', weight:0.40,
-    description:'Prospects created divided by calls taken — how effectively calls are converted into live prospects.',
+    description:'Prospects created ÷ calls taken in Five9.',
     csvUrl:PROXY_URL+'?feed=prospect_creation_rate',
     emailCol:'email', valueCol:null, dateCol:null,
     aggregate:'ratio', ratioNumerator:'prospects_created', ratioDenominator:'calls_taken',
@@ -402,7 +402,7 @@ const KPI_DEFS = [
   },
   {
     id:'pos_spread_deals', label:'Positive Spread', category:'quality', weight:0.60,
-    description:'Count of deals reaching marketing with a positive spread (contract below market value).',
+    description:'Deals reaching marketing with a positive spread between Acq price and predicted investor purchase price; up to -$10k.',
     csvUrl:PROXY_URL+'?feed=pos_spread_deals',
     emailCol:'email', valueCol:'count_of_positive_spread', dateCol:'marketing_date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
