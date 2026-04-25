@@ -569,8 +569,8 @@ async function loadRoster() {
   try {
     const rows = await fetchCSV(url);
     if (rows.length) {
-      console.log('[Pacesetter] Roster columns:', Object.keys(rows[0]));
-      console.log('[Pacesetter] Sample:', rows[0]);
+      console.log('[AcqPacesetter] Roster columns:', Object.keys(rows[0]));
+      console.log('[AcqPacesetter] Sample:', rows[0]);
     }
     const EXCLUDE_EMAILS = ['patrick.solomon@rebuilt.com'];
     const active = rows.filter(r => {
@@ -595,11 +595,11 @@ async function loadRoster() {
     txt('lbl-count', `${S.roster.length} associates`);
     txt('kv-count', S.roster.length);
     txt('hdr-refreshed', 'Last refreshed: ' + new Date().toLocaleString());
-    console.log(`[Pacesetter] ${S.roster.length} active Acquisition associates`);
+    console.log(`[AcqPacesetter] ${S.roster.length} active Acquisition associates`);
   } catch(e) {
     dot('dot-roster','error');
     txt('lbl-roster','Roster: error — see console');
-    console.error('[Pacesetter] Roster:', e);
+    console.error('[AcqPacesetter] Roster:', e);
   }
 }
 
@@ -618,10 +618,10 @@ async function fetchKPIs() {
       const rows = await fetchCSV(url);
       S.rawKpiRows[url] = rows;
       const feed = (url.split('feed=')[1] || url).split('&')[0];
-      if (rows.length) console.log(`[Pacesetter] feed "${feed}" columns:`, Object.keys(rows[0]), '— sample:', rows[0]);
-      else             console.warn(`[Pacesetter] feed "${feed}" returned 0 rows`);
+      if (rows.length) console.log(`[AcqPacesetter] feed "${feed}" columns:`, Object.keys(rows[0]), '— sample:', rows[0]);
+      else             console.warn(`[AcqPacesetter] feed "${feed}" returned 0 rows`);
     } catch(e) {
-      console.error('[Pacesetter] KPI feed error:', url, e);
+      console.error('[AcqPacesetter] KPI feed error:', url, e);
       S.rawKpiRows[url] = [];
     }
     done++;
@@ -706,9 +706,9 @@ function aggregateKPIs() {
     }
     S.kpiData[kpi.id] = map;
     if (rows.length && !Object.keys(map).length) {
-      console.warn(`[Pacesetter] "${kpi.id}": 0 matches from ${rows.length} rows — column mismatch? expected emailCol="${kpi.emailCol}", valueCol="${kpi.valueCol}", dateCol="${kpi.dateCol}". Actual columns:`, Object.keys(rows[0]));
+      console.warn(`[AcqPacesetter] "${kpi.id}": 0 matches from ${rows.length} rows — column mismatch? expected emailCol="${kpi.emailCol}", valueCol="${kpi.valueCol}", dateCol="${kpi.dateCol}". Actual columns:`, Object.keys(rows[0]));
     } else {
-      console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 30 days`);
+      console.log(`[AcqPacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 30 days`);
     }
   });
 }
@@ -739,10 +739,10 @@ function parseFlexDate(str) {
 function computeScores() {
   if (!S.roster.length || !KPI_DEFS.length) return;
 
-  console.log('[Pacesetter] computeScores: roster='+S.roster.length+', KPIs='+KPI_DEFS.length);
-  console.log('[Pacesetter] kpiData keys:', Object.keys(S.kpiData));
+  console.log('[AcqPacesetter] computeScores: roster='+S.roster.length+', KPIs='+KPI_DEFS.length);
+  console.log('[AcqPacesetter] kpiData keys:', Object.keys(S.kpiData));
   Object.entries(S.kpiData).forEach(([id, map]) => {
-    console.log('[Pacesetter] '+id+': '+Object.keys(map).length+' entries, sample:', Object.entries(map).slice(0,2));
+    console.log('[AcqPacesetter] '+id+': '+Object.keys(map).length+' entries, sample:', Object.entries(map).slice(0,2));
   });
 
   // Percentile rank per KPI. Tied values share the average percentile of
@@ -764,7 +764,7 @@ function computeScores() {
       i = j + 1;
     }
     pct[kpi.id] = map;
-    console.log('[Pacesetter] pct['+kpi.id+']: '+vals.length+' matches out of '+S.roster.length+' roster');
+    console.log('[AcqPacesetter] pct['+kpi.id+']: '+vals.length+' matches out of '+S.roster.length+' roster');
   });
 
   S.roster.forEach(a => {
@@ -1096,7 +1096,7 @@ function computeDerived() {
     if (den > 0) derived[email] = (num / den) * 100;
   });
   S.kpiData['pct_c_to_mktg'] = derived;
-  console.log('[Pacesetter] pct_c_to_mktg derived:', Object.keys(derived).length, 'associates');
+  console.log('[AcqPacesetter] pct_c_to_mktg derived:', Object.keys(derived).length, 'associates');
 }
 
 
@@ -1217,14 +1217,14 @@ function logView(email) {
     const params = new URLSearchParams({
       action: 'log_view',
       email:  email,
-      page:   'pacesetter',
+      page:   'acq-pacesetter',
       ua:     (navigator.userAgent || '').slice(0, 300),
       ref:    (document.referrer || '').slice(0, 300),
     });
     fetch(PROXY_URL + '?' + params.toString(), { method: 'GET', cache: 'no-store' })
-      .catch(err => console.warn('[Pacesetter] view-log failed:', err));
+      .catch(err => console.warn('[AcqPacesetter] view-log failed:', err));
   } catch (e) {
-    console.warn('[Pacesetter] view-log threw:', e);
+    console.warn('[AcqPacesetter] view-log threw:', e);
   }
 }
 
