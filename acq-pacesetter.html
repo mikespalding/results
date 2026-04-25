@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjQ0MCAwIDU1MCA4OTAiPgogIDxwYXRoIGQ9Im0gMzMzNy45OSwzNTQ0LjgzIDExNzkuNzksMTA3Ni43MiB2IDE5MzguMSBMIDMzMzcuOTksNTU5MC42IFYgMzU0NC44MyIKICAgICAgICBmaWxsPSIjNGVhOWUyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjEzMzMzMzMzLDAsMCwtMC4xMzMzMzMzMywwLDEzMzIuNjY2NykiLz4KICA8cGF0aCBkPSJNIDYxNjkuNDgsOTk5NS4wMSBWIDQ2MjEuNTUgbCAxMTc5LjgsLTEwNzYuNzIgdiA1NDkxLjI5IGwgLTExNzkuOCw5NTguODkiCiAgICAgICAgZmlsbD0iIzRlYTllMiIgdHJhbnNmb3JtPSJtYXRyaXgoMC4xMzMzMzMzMywwLDAsLTAuMTMzMzMzMzMsMCwxMzMyLjY2NjcpIi8+CiAgPHBhdGggZD0iTSA0NzUzLjc0LDc3NDQuMDUgViA0ODM2Ljg5IGwgNTg5Ljg5LDUzOC4zNyA1ODkuOSwtNTM4LjM3IDQuMzcsMzk3My43MiAtMTE4NC4xNiwtMTA2Ni41NiIKICAgICAgICBmaWxsPSIjNGVhOWUyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjEzMzMzMzMzLDAsMCwtMC4xMzMzMzMzMywwLDEzMzIuNjY2NykiLz4KICA8cGF0aCBkPSJtIDQ4MDIuMjEsMzQyNS4xOSBoIDQzMC42OSB2IDQzMC42OCBoIC00MzAuNjkgdiAtNDMwLjY4IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjY3KSIvPgogIDxwYXRoIGQ9Im0gNTQ0OC4yNCwzNDI1LjE5IGggNDMwLjcgdiA0MzAuNjggaCAtNDMwLjcgdiAtNDMwLjY4IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjcpIi8+CiAgPHBhdGggZD0ibSA1MjMyLjksNDUwMS45MSBoIC00MzAuNjkgdiAtNDMwLjY5IGggNDMwLjY5IHYgNDMwLjY5IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjY3KSIvPgogIDxwYXRoIGQ9Im0gNTQ0OC4yNCw0NTAxLjkxIHYgLTQzMC42OSBoIDQzMC43IHYgNDMwLjY5IGggLTQzMC43IgogICAgICAgIGZpbGw9IiM0ZWE5ZTIiIHRyYW5zZm9ybT0ibWF0cml4KDAuMTMzMzMzMzMsMCwwLC0wLjEzMzMzMzMzLDAsMTMzMi42NjY3KSIvPgo8L3N2Zz4="/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acq Pacesetter · Rolling 30 Days</title>
+<title>Acquisition Pacesetter · Rolling 30 Days</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
   :root {
@@ -172,7 +172,7 @@
 <!-- ── EMAIL GATE ── -->
 <div class="gate-backdrop" id="email-gate">
   <div class="gate-card">
-    <div class="gate-title">Acq Pacesetter</div>
+    <div class="gate-title">Acquisition Pacesetter</div>
     <div class="gate-sub">Please enter your Rebuilt email address to access this dashboard.</div>
     <label class="gate-label" for="email-gate-input">Email</label>
     <input class="gate-input" id="email-gate-input" type="email" autocomplete="email" placeholder="you@rebuilt.com" />
@@ -209,7 +209,7 @@
     </div>
     <div class="header-divider"></div>
     <div>
-      <div class="header-name">Acq Pacesetter</div>
+      <div class="header-name">Acquisition Pacesetter</div>
       <div class="header-sub">Rolling 30-Day Performance Ranking</div>
     </div>
   </div>
@@ -569,8 +569,8 @@ async function loadRoster() {
   try {
     const rows = await fetchCSV(url);
     if (rows.length) {
-      console.log('[Pacesetter] Roster columns:', Object.keys(rows[0]));
-      console.log('[Pacesetter] Sample:', rows[0]);
+      console.log('[AcqPacesetter] Roster columns:', Object.keys(rows[0]));
+      console.log('[AcqPacesetter] Sample:', rows[0]);
     }
     const EXCLUDE_EMAILS = ['patrick.solomon@rebuilt.com'];
     const active = rows.filter(r => {
@@ -595,11 +595,11 @@ async function loadRoster() {
     txt('lbl-count', `${S.roster.length} associates`);
     txt('kv-count', S.roster.length);
     txt('hdr-refreshed', 'Last refreshed: ' + new Date().toLocaleString());
-    console.log(`[Pacesetter] ${S.roster.length} active Acquisition associates`);
+    console.log(`[AcqPacesetter] ${S.roster.length} active Acquisition associates`);
   } catch(e) {
     dot('dot-roster','error');
     txt('lbl-roster','Roster: error — see console');
-    console.error('[Pacesetter] Roster:', e);
+    console.error('[AcqPacesetter] Roster:', e);
   }
 }
 
@@ -618,10 +618,10 @@ async function fetchKPIs() {
       const rows = await fetchCSV(url);
       S.rawKpiRows[url] = rows;
       const feed = (url.split('feed=')[1] || url).split('&')[0];
-      if (rows.length) console.log(`[Pacesetter] feed "${feed}" columns:`, Object.keys(rows[0]), '— sample:', rows[0]);
-      else             console.warn(`[Pacesetter] feed "${feed}" returned 0 rows`);
+      if (rows.length) console.log(`[AcqPacesetter] feed "${feed}" columns:`, Object.keys(rows[0]), '— sample:', rows[0]);
+      else             console.warn(`[AcqPacesetter] feed "${feed}" returned 0 rows`);
     } catch(e) {
-      console.error('[Pacesetter] KPI feed error:', url, e);
+      console.error('[AcqPacesetter] KPI feed error:', url, e);
       S.rawKpiRows[url] = [];
     }
     done++;
@@ -706,9 +706,9 @@ function aggregateKPIs() {
     }
     S.kpiData[kpi.id] = map;
     if (rows.length && !Object.keys(map).length) {
-      console.warn(`[Pacesetter] "${kpi.id}": 0 matches from ${rows.length} rows — column mismatch? expected emailCol="${kpi.emailCol}", valueCol="${kpi.valueCol}", dateCol="${kpi.dateCol}". Actual columns:`, Object.keys(rows[0]));
+      console.warn(`[AcqPacesetter] "${kpi.id}": 0 matches from ${rows.length} rows — column mismatch? expected emailCol="${kpi.emailCol}", valueCol="${kpi.valueCol}", dateCol="${kpi.dateCol}". Actual columns:`, Object.keys(rows[0]));
     } else {
-      console.log(`[Pacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 30 days`);
+      console.log(`[AcqPacesetter] "${kpi.id}": ${Object.keys(map).length} associates in last 30 days`);
     }
   });
 }
@@ -739,10 +739,10 @@ function parseFlexDate(str) {
 function computeScores() {
   if (!S.roster.length || !KPI_DEFS.length) return;
 
-  console.log('[Pacesetter] computeScores: roster='+S.roster.length+', KPIs='+KPI_DEFS.length);
-  console.log('[Pacesetter] kpiData keys:', Object.keys(S.kpiData));
+  console.log('[AcqPacesetter] computeScores: roster='+S.roster.length+', KPIs='+KPI_DEFS.length);
+  console.log('[AcqPacesetter] kpiData keys:', Object.keys(S.kpiData));
   Object.entries(S.kpiData).forEach(([id, map]) => {
-    console.log('[Pacesetter] '+id+': '+Object.keys(map).length+' entries, sample:', Object.entries(map).slice(0,2));
+    console.log('[AcqPacesetter] '+id+': '+Object.keys(map).length+' entries, sample:', Object.entries(map).slice(0,2));
   });
 
   // Percentile rank per KPI. Tied values share the average percentile of
@@ -764,7 +764,7 @@ function computeScores() {
       i = j + 1;
     }
     pct[kpi.id] = map;
-    console.log('[Pacesetter] pct['+kpi.id+']: '+vals.length+' matches out of '+S.roster.length+' roster');
+    console.log('[AcqPacesetter] pct['+kpi.id+']: '+vals.length+' matches out of '+S.roster.length+' roster');
   });
 
   S.roster.forEach(a => {
@@ -1096,7 +1096,7 @@ function computeDerived() {
     if (den > 0) derived[email] = (num / den) * 100;
   });
   S.kpiData['pct_c_to_mktg'] = derived;
-  console.log('[Pacesetter] pct_c_to_mktg derived:', Object.keys(derived).length, 'associates');
+  console.log('[AcqPacesetter] pct_c_to_mktg derived:', Object.keys(derived).length, 'associates');
 }
 
 
@@ -1217,14 +1217,14 @@ function logView(email) {
     const params = new URLSearchParams({
       action: 'log_view',
       email:  email,
-      page:   'pacesetter',
+      page:   'acq-pacesetter',
       ua:     (navigator.userAgent || '').slice(0, 300),
       ref:    (document.referrer || '').slice(0, 300),
     });
     fetch(PROXY_URL + '?' + params.toString(), { method: 'GET', cache: 'no-store' })
-      .catch(err => console.warn('[Pacesetter] view-log failed:', err));
+      .catch(err => console.warn('[AcqPacesetter] view-log failed:', err));
   } catch (e) {
-    console.warn('[Pacesetter] view-log threw:', e);
+    console.warn('[AcqPacesetter] view-log threw:', e);
   }
 }
 
