@@ -835,6 +835,10 @@ function sortedRows(rows, col, dir, catKPIs) {
       vb = b.hire_date ? new Date(b.hire_date).getTime() : Infinity;
       // older hire = more tenure; asc by date = desc by tenure
       return dir === 'asc' ? vb - va : va - vb;
+    } else if (CAT_KEYS.includes(col)) {
+      // Category column on the Overall tab — read from computed scores.
+      va = S.scores[a.email]?.[col] ?? -Infinity;
+      vb = S.scores[b.email]?.[col] ?? -Infinity;
     } else {
       // KPI column — find by id
       const kpi = catKPIs ? catKPIs.find(k => k.id === col) : null;
