@@ -877,6 +877,16 @@ function rank(key) {
     .sort((a,b) => b.score-a.score);
 }
 
+function rankKpi(kpiId) {
+  const kpi = KPI_DEFS.find(k => k.id === kpiId);
+  if (!kpi) return [];
+  const data = S.kpiData[kpiId] || {};
+  return S.roster
+    .map(a => ({ email: a.email, val: data[a.email] }))
+    .filter(r => r.val !== undefined && r.val !== null && !Number.isNaN(r.val))
+    .sort((a, b) => kpi.higherIsBetter ? b.val - a.val : a.val - b.val);
+}
+
 function renderOverall() {
   const wrap = document.getElementById('overall-lb');
   // All active associates — those with scores ranked first, then nulls alphabetically
@@ -1139,9 +1149,15 @@ function openScorecard(email) {
 
     const kpiRows = catKPIs.map(k => {
       const val = S.kpiData[k.id]?.[email];
-      return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0ece8;font-size:12px;">
+      const kpiRanked = rankKpi(k.id);
+      const kpiPos    = kpiRanked.findIndex(r => r.email === email);
+      const kpiRank   = kpiPos >= 0 ? `${kpiPos+1} of ${S.roster.length}` : '';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f0ece8;font-size:12px;">
         <span style="color:#7a8a94">${k.label}</span>
-        <span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--navy)">${val !== undefined ? fmt(val,k) : '—'}</span>
+        <span style="display:flex;align-items:baseline;gap:10px">
+          <span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--navy)">${val !== undefined ? fmt(val,k) : '—'}</span>
+          <span style="font-size:10px;color:#7a8a94;font-family:'DM Mono',monospace;min-width:48px;text-align:right">${kpiRank}</span>
+        </span>
       </div>`;
     }).join('');
 
