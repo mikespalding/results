@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <title>Acquisition New Hire Dashboard · 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -206,7 +207,7 @@
     <div class="header-divider"></div>
     <div class="header-titles">
       <div class="header-name">New Hire Performance &amp; Attrition</div>
-      <div class="header-sub">Acquisition Associates · 2026 Cohorts · Jan–Mar</div>
+      <div class="header-sub">Acquisition Associates · 2026 Cohorts</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
@@ -603,15 +604,48 @@ function reshape(feeds, asOf) {
   };
 }
 
-// ─── ACCESS LOGGING ───
-function logView() {
-  if (!PROXY_URL || PROXY_URL.startsWith('__')) return;
-  let email = localStorage.getItem('rebuilt_email') || '';
-  if (!email) {
-    email = (prompt('Enter your @rebuilt.com email:') || '').trim().toLowerCase();
-    if (email && email.endsWith('@rebuilt.com')) localStorage.setItem('rebuilt_email', email);
-    else return;
+// ─── ACCESS GATE ───
+// NOTE: This is a client-side soft gate, not a security boundary. Anyone with
+// the URL plus DevTools can bypass it. The Metabase questions are public and
+// the proxy is Anyone-accessible by design. Use Workspace SSO + restricted
+// Metabase questions if real auth is required.
+const ACCESS_ALLOWLIST = [
+  'mike.spalding@rebuilt.com',
+  'al@rebuilt.com',
+  'scott@rebuilt.com',
+  'brandon@rebuilt.com',
+  'aj@rebuilt.com',
+  'patrick.solomon@rebuilt.com',
+  'melanie.blaszczak@rebuilt.com',
+];
+
+function renderAccessDenied(email) {
+  const tried = email ? ` (tried <code>${email}</code>)` : '';
+  document.body.innerHTML =
+    '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:DM Sans,sans-serif;background:#efedeb;color:#1f3540;">' +
+    '<div style="max-width:480px;padding:40px;background:white;border-radius:8px;box-shadow:0 2px 12px rgba(31,53,64,0.10);text-align:center;">' +
+    '<div style="font-size:18px;font-weight:700;margin-bottom:10px;">Access required</div>' +
+    `<div style="font-size:13px;color:#7a8a94;margin-bottom:20px;">This dashboard is restricted to a specific list of viewers${tried}. Refresh to try again, or contact Mike Spalding for access.</div>` +
+    '<button onclick="localStorage.removeItem(\'rebuilt_email\');location.reload();" style="padding:8px 18px;border:none;border-radius:6px;background:#1f3540;color:white;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">Try a different email</button>' +
+    '</div></div>';
+}
+
+// Returns the validated email, or null if the user is denied.
+function gateAccess() {
+  let email = (localStorage.getItem('rebuilt_email') || '').trim().toLowerCase();
+  if (!email || !ACCESS_ALLOWLIST.includes(email)) {
+    email = (prompt('Enter your @rebuilt.com email to access the dashboard:') || '').trim().toLowerCase();
+    if (!email || !ACCESS_ALLOWLIST.includes(email)) {
+      renderAccessDenied(email);
+      return null;
+    }
+    localStorage.setItem('rebuilt_email', email);
   }
+  return email;
+}
+
+function logView(email) {
+  if (!PROXY_URL || PROXY_URL.startsWith('__')) return;
   const params = new URLSearchParams({
     action: 'log_view', email, page: 'newhire_dashboard',
     ua: navigator.userAgent, ref: document.referrer || '',
@@ -627,6 +661,8 @@ async function loadData() {
       'Configure <code>PROXY_URL</code> in this file with your deployed Apps Script Web App URL.</div>');
     return;
   }
+  const email = gateAccess();
+  if (!email) return;
   const names = ['roster','rts_time','contracts','contracts_to_mktg',
                  'assignments_and_fees','pos_spread_deals','prospect_creation_rate'];
   try {
@@ -640,7 +676,7 @@ async function loadData() {
     return;
   }
   deriveCohorts();
-  logView();
+  logView(email);
   buildOverviewKPIs();
   buildCohortFilters();
   buildAttritionKPIs();
@@ -1055,12 +1091,19 @@ function buildReExp(){
   const reAvgC  = reActive.length  ? (reActive.reduce((s,r)=>s+cumMetric(r,'contracts'),0)/reActive.length).toFixed(1)  : '0';
   const nonAvgC = nonActive.length ? (nonActive.reduce((s,r)=>s+cumMetric(r,'contracts'),0)/nonActive.length).toFixed(1) : '0';
 
-  document.getElementById('re-kpi-row').innerHTML=`
-    <div class="kpi-card blue"><div class="kpi-label">RE Background</div><div class="kpi-value">${RE.length}</div><div class="kpi-sub">${reActive.length} active · ${reExited.length} exited</div></div>
-    <div class="kpi-card teal"><div class="kpi-label">Non-RE Background</div><div class="kpi-value">${Non.length}</div><div class="kpi-sub">${nonActive.length} active · ${nonExited.length} exited</div></div>
-    <div class="kpi-card ${reAttr>nonAttr?'red':'green'}"><div class="kpi-label">RE Attrition Rate</div><div class="kpi-value">${reAttr}%</div><div class="kpi-sub">vs ${nonAttr}% Non-RE</div></div>
-    <div class="kpi-card orange"><div class="kpi-label">RE Avg Exit Week</div><div class="kpi-value">${reAvgExit}</div><div class="kpi-sub">Non-RE: ${nonAvgExit} wks</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">RE Avg Contracts</div><div class="kpi-value">${reAvgC}</div><div class="kpi-sub">Active reps · Non-RE: ${nonAvgC}</div></div>`;
+  const groupCard = (label, color, count, active, exited, attr, avgExit, avgC) => `
+    <div class="kpi-card ${color}">
+      <div class="kpi-label">${label} · ${count} rep${count===1?'':'s'}</div>
+      <div class="kpi-sub" style="margin-bottom:10px;">${active} active · ${exited} exited</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;border-top:1px solid #f0ece8;padding-top:10px;">
+        <div><div style="font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.5px;">${attr}%</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Attrition</div></div>
+        <div><div style="font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.5px;">${avgExit}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Avg Exit Wk</div></div>
+        <div><div style="font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.5px;">${avgC}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Avg Contracts</div></div>
+      </div>
+    </div>`;
+  document.getElementById('re-kpi-row').innerHTML =
+    groupCard('RE Background',     'blue', RE.length,  reActive.length,  reExited.length,  reAttr,  reAvgExit,  reAvgC) +
+    groupCard('Non-RE Background', 'teal', Non.length, nonActive.length, nonExited.length, nonAttr, nonAvgExit, nonAvgC);
 
   // Attrition rate bar
   new Chart(document.getElementById('chart-re-attrition'),{
