@@ -383,6 +383,13 @@ const RE_EXP = {
   "Wyatt Buttars":"Non","Zach Brodsky":"Non"
 };
 
+// Manual hire-date overrides — keyed by lowercase email. Use sparingly to
+// snap a rep to the correct cohort when the roster's hire_date is off by
+// a day (e.g. paperwork lag).
+const HIRE_DATE_OVERRIDES = {
+  "michael.purcell@rebuilt.com": "2026-02-09",  // roster has 2/10; belongs with Feb cohort
+};
+
 // Populated by loadData(). Other code reads DATA.reps / DATA.attrition.
 const DATA = { reps: [], attrition: [], generated: '', total_reps: 0, active: 0, exited: 0 };
 
@@ -543,7 +550,7 @@ function reshape(feeds, asOf) {
   for (const row of roster) {
     const name  = (row.agent_name || '').trim();
     const email = (row.email || '').toLowerCase().trim();
-    const hire  = parseDate(row.hire_date);
+    const hire  = parseDate(HIRE_DATE_OVERRIDES[email] || row.hire_date);
     if (!name || !hire) continue;
     const exit = parseDate(row.exit_date);
     const status = (row.status || '').trim();
