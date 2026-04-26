@@ -210,7 +210,7 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
-    <div class="header-meta">Generated 4/25/2026 · 34 reps</div>
+    <div class="header-meta" id="header-meta">Loading…</div>
     <a class="header-back" href="https://mikespalding.github.io/results/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       Results
@@ -230,27 +230,11 @@
 
   <!-- ═══ OVERVIEW ═══ -->
   <div id="tab-overview" class="tab-panel active">
-    <div class="kpi-row">
-      <div class="kpi-card blue"><div class="kpi-label">Total New Hires</div><div class="kpi-value">34</div><div class="kpi-sub">2026 YTD · 4 cohorts</div></div>
-      <div class="kpi-card teal"><div class="kpi-label">Active</div><div class="kpi-value">15</div><div class="kpi-sub">44% retention rate</div></div>
-      <div class="kpi-card red"><div class="kpi-label">Exited</div><div class="kpi-value">19</div><div class="kpi-sub">56% attrition rate</div></div>
-      <div class="kpi-card orange"><div class="kpi-label">Exited ≤2 Wks</div><div class="kpi-value">5</div><div class="kpi-sub">26% of all exits</div></div>
-      <div class="kpi-card green"><div class="kpi-label">Assignments</div><div class="kpi-value" id="kpi-total-assignments">–</div><div class="kpi-sub">2026 YTD</div></div>
-      <div class="kpi-card blue"><div class="kpi-label">Assignment Fees</div><div class="kpi-value" id="kpi-total-fees">–</div><div class="kpi-sub">2026 YTD</div></div>
-    </div>
+    <div class="kpi-row" id="overview-kpi-row"></div>
 
     <div class="section-head">
       <div class="section-title">All Reps at a Glance</div>
-      <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
-        <span class="filter-label">Filter:</span>
-        <button class="filter-btn active" onclick="filterReps('all',this)">All</button>
-        <button class="filter-btn" onclick="filterReps('Active',this)">Active</button>
-        <button class="filter-btn" onclick="filterReps('Exited',this)">Exited</button>
-        <button class="filter-btn" onclick="filterReps('1/12/2026',this)">Jan Cohort</button>
-        <button class="filter-btn" onclick="filterReps('2/9/2026',this)">Feb Cohort</button>
-        <button class="filter-btn" onclick="filterReps('3/9/2026',this)">Mar Cohort</button>
-        <button class="filter-btn" onclick="filterReps('4/7/2026',this)">Apr Cohort</button>
-      </div>
+      <div id="cohort-filter-bar" style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;"></div>
     </div>
 
     <div class="legend">
@@ -293,7 +277,7 @@
     <div class="card">
       <div class="section-head">
         <div class="section-title">Weekly RTS — Active Reps Trend</div>
-        <div class="section-note">Weeks through 4/6 · lines = 25h min / 30h target</div>
+        <div class="section-note">Last complete wk · lines = 25h min / 30h target</div>
       </div>
       <div class="chart-wrap-tall"><canvas id="chart-rts-trend"></canvas></div>
     </div>
@@ -301,12 +285,7 @@
 
   <!-- ═══ ATTRITION ═══ -->
   <div id="tab-attrition" class="tab-panel">
-    <div class="kpi-row">
-      <div class="kpi-card red"><div class="kpi-label">Total Exits</div><div class="kpi-value">15</div><div class="kpi-sub">58% of 26 hired</div></div>
-      <div class="kpi-card orange"><div class="kpi-label">Exited &lt;1 Wk</div><div class="kpi-value">4</div><div class="kpi-sub">Pre-ramp exits</div></div>
-      <div class="kpi-card orange"><div class="kpi-label">Exited ≤2 Wks</div><div class="kpi-value">6</div><div class="kpi-sub">43% of all exits</div></div>
-      <div class="kpi-card blue"><div class="kpi-label">Avg Wks to Exit</div><div class="kpi-value" id="kpi-avg-exit">–</div><div class="kpi-sub">among exited reps</div></div>
-    </div>
+    <div class="kpi-row" id="attrition-kpi-row"></div>
 
     <div class="card">
       <div class="section-head"><div class="section-title">Exit Stage Distribution</div></div>
@@ -314,7 +293,7 @@
     </div>
 
     <div class="card">
-      <div class="section-head"><div class="section-title">Exit Detail — All 14 Departed Reps</div></div>
+      <div class="section-head"><div class="section-title" id="attrition-detail-title">Exit Detail</div></div>
       <table class="attrition-table" id="attrition-detail-table"></table>
     </div>
 
@@ -385,11 +364,284 @@
 
 <script>
 // ═══════════════════════ DATA ═══════════════════════
-const DATA = {"reps": [{"name": "Andrew Bentley", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Exited", "exit_date": "4/21/2026", "weeks_to_exit": 2.0, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 12.28, "zoom_hrs": 0.55, "five9_hrs": 11.73, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 5.4, "zoom_hrs": 0.0, "five9_hrs": 5.4, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Avery Underwood", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "2/18/2026", "weeks_to_exit": 1.3, "manager": "Patrick Solomon", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Ben Lauria", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "4/13/2026", "weeks_to_exit": 5.0, "manager": "Shon Yoshida", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 13.53, "zoom_hrs": 0.7, "five9_hrs": 12.83, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 23.22, "zoom_hrs": 0.91, "five9_hrs": 22.31, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 25.19, "zoom_hrs": 2.05, "five9_hrs": 23.14, "contracts": 2, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 0}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 22.18, "zoom_hrs": 1.06, "five9_hrs": 21.12, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Brad Ault", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "3/23/2026", "weeks_to_exit": 6.0, "manager": "Devin Buford", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 3.68, "zoom_hrs": 0.18, "five9_hrs": 3.5, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 10.43, "zoom_hrs": 3.28, "five9_hrs": 7.15, "contracts": 2, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 19.48, "zoom_hrs": 6.07, "five9_hrs": 13.41, "contracts": 5, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 25.5, "zoom_hrs": 1.12, "five9_hrs": 24.38, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 1}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 25.77, "zoom_hrs": 1.54, "five9_hrs": 24.23, "contracts": 1, "contracts_to_mktg": 2, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 2}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 2}], "re_exp": "Non"}, {"name": "Chasity Clark", "cohort": "1/12/2026", "hire_date": "1/12/2026", "status": "Exited", "exit_date": "3/24/2026", "weeks_to_exit": 10.1, "manager": "Jesse Sychowski", "weeks": [{"week": "1/12/2026", "week_num": 1, "rts_hrs": 8.39, "zoom_hrs": 0.44, "five9_hrs": 7.95, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "1/19/2026", "week_num": 2, "rts_hrs": 13.13, "zoom_hrs": 6.36, "five9_hrs": 6.77, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "1/26/2026", "week_num": 3, "rts_hrs": 23.29, "zoom_hrs": 3.36, "five9_hrs": 19.93, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "2/2/2026", "week_num": 4, "rts_hrs": 28.74, "zoom_hrs": 4.35, "five9_hrs": 24.39, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "2/9/2026", "week_num": 5, "rts_hrs": 30.13, "zoom_hrs": 2.61, "five9_hrs": 27.52, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 0}, {"week": "2/16/2026", "week_num": 6, "rts_hrs": 28.8, "zoom_hrs": 1.17, "five9_hrs": 27.63, "contracts": 2, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 0}, {"week": "2/23/2026", "week_num": 7, "rts_hrs": 27.16, "zoom_hrs": 1.98, "five9_hrs": 25.18, "contracts": 3, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 0}, {"week": "3/2/2026", "week_num": 8, "rts_hrs": 28.8, "zoom_hrs": 1.26, "five9_hrs": 27.54, "contracts": 1, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 0}, {"week": "3/9/2026", "week_num": 9, "rts_hrs": 27.0, "zoom_hrs": 0.93, "five9_hrs": 26.07, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 10, "rts_hrs": 27.71, "zoom_hrs": 2.89, "five9_hrs": 24.82, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 11, "rts_hrs": 8.18, "zoom_hrs": 1.94, "five9_hrs": 6.24, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Chloe Rodman", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Luis Guzman", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 14.78, "zoom_hrs": 0.27, "five9_hrs": 14.51, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 27.8, "zoom_hrs": 2.99, "five9_hrs": 24.81, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 2, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": 2}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 28.77, "zoom_hrs": 1.78, "five9_hrs": 26.99, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 2}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 22.84, "zoom_hrs": 0.8, "five9_hrs": 22.04, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 2}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 5.27, "zoom_hrs": 0.12, "five9_hrs": 5.15, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 2}, {"week": "4/20/2026", "week_num": 7, "rts_hrs": 27.65, "zoom_hrs": 1.65, "five9_hrs": 26.0, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 2}], "re_exp": "Non"}, {"name": "Chris Roberts", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "3/25/2026", "weeks_to_exit": 6.3, "manager": "Shon Yoshida", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 8.13, "zoom_hrs": 0.0, "five9_hrs": 8.13, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 14.75, "zoom_hrs": 2.35, "five9_hrs": 12.4, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 20.0, "zoom_hrs": 4.66, "five9_hrs": 15.34, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 34.06, "zoom_hrs": 6.36, "five9_hrs": 27.7, "contracts": 2, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 21.77, "zoom_hrs": 3.5, "five9_hrs": 18.27, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 7.42, "zoom_hrs": 0.79, "five9_hrs": 6.63, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Cierra Lynch", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 17.52, "zoom_hrs": 0.87, "five9_hrs": 16.65, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 19.55, "zoom_hrs": 0.1, "five9_hrs": 19.45, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Debran Collins", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Kyle Singer", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 5.6, "zoom_hrs": 0.0, "five9_hrs": 5.6, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 17.78, "zoom_hrs": 1.05, "five9_hrs": 16.73, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 25.64, "zoom_hrs": 1.64, "five9_hrs": 24.0, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 0}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 27.85, "zoom_hrs": 1.83, "five9_hrs": 26.02, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 26.94, "zoom_hrs": 3.95, "five9_hrs": 22.99, "contracts": 5, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 27.64, "zoom_hrs": 0.94, "five9_hrs": 26.7, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 29.98, "zoom_hrs": 3.15, "five9_hrs": 26.83, "contracts": 3, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/6/2026", "week_num": 9, "rts_hrs": 28.24, "zoom_hrs": 1.7, "five9_hrs": 26.54, "contracts": 1, "contracts_to_mktg": 2, "pos_spread_deals": 2, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 2}, {"week": "4/13/2026", "week_num": 10, "rts_hrs": 6.78, "zoom_hrs": 0.43, "five9_hrs": 6.35, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 3}, {"week": "4/20/2026", "week_num": 11, "rts_hrs": 26.33, "zoom_hrs": 1.83, "five9_hrs": 24.5, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 1, "assignment_fees": 3500.0, "rts_tier": "minimum", "cum_pos_spread": 3}], "re_exp": "Non"}, {"name": "EJ Colclough", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Devin Buford", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 12.59, "zoom_hrs": 0.59, "five9_hrs": 12.0, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 24.9, "zoom_hrs": 2.45, "five9_hrs": 22.45, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 0}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 26.38, "zoom_hrs": 3.94, "five9_hrs": 22.44, "contracts": 3, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 1, "assignment_fees": 4910.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 28.1, "zoom_hrs": 4.27, "five9_hrs": 23.83, "contracts": 2, "contracts_to_mktg": 2, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 1}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 5.12, "zoom_hrs": 1.61, "five9_hrs": 3.51, "contracts": 2, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 1, "assignment_fees": 13500.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "4/20/2026", "week_num": 7, "rts_hrs": 26.33, "zoom_hrs": 5.33, "five9_hrs": 21.0, "contracts": 8, "contracts_to_mktg": 4, "pos_spread_deals": 0, "assignments": 2, "assignment_fees": 15000.0, "rts_tier": "minimum", "cum_pos_spread": 1}], "re_exp": "Non"}, {"name": "Eric Loya", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Shon Yoshida", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 13.1, "zoom_hrs": 0.48, "five9_hrs": 12.62, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 28.35, "zoom_hrs": 3.44, "five9_hrs": 24.91, "contracts": 2, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 27.73, "zoom_hrs": 4.38, "five9_hrs": 23.35, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 30.45, "zoom_hrs": 4.06, "five9_hrs": 26.39, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 3.43, "zoom_hrs": 0.54, "five9_hrs": 2.89, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "4/20/2026", "week_num": 7, "rts_hrs": 29.42, "zoom_hrs": 3.42, "five9_hrs": 26.0, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 1}], "re_exp": "RE"}, {"name": "Gerardo Macias", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 4.82, "zoom_hrs": 0.0, "five9_hrs": 4.82, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 7.8, "zoom_hrs": 1.56, "five9_hrs": 6.24, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 20.13, "zoom_hrs": 1.72, "five9_hrs": 18.41, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 19.92, "zoom_hrs": 1.22, "five9_hrs": 18.7, "contracts": 2, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 28.97, "zoom_hrs": 0.58, "five9_hrs": 28.39, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 29.88, "zoom_hrs": 0.5, "five9_hrs": 29.38, "contracts": 5, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 20.72, "zoom_hrs": 1.85, "five9_hrs": 18.87, "contracts": 5, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 1, "assignment_fees": 2000.0, "rts_tier": "below", "cum_pos_spread": 0}, {"week": "4/6/2026", "week_num": 9, "rts_hrs": 21.67, "zoom_hrs": 1.22, "five9_hrs": 20.45, "contracts": 4, "contracts_to_mktg": 5, "pos_spread_deals": 1, "assignments": 1, "assignment_fees": 10000.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "4/13/2026", "week_num": 10, "rts_hrs": 4.19, "zoom_hrs": 0.49, "five9_hrs": 3.7, "contracts": 3, "contracts_to_mktg": 4, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 2}, {"week": "4/20/2026", "week_num": 11, "rts_hrs": 24.48, "zoom_hrs": 3.08, "five9_hrs": 21.4, "contracts": 5, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 1, "assignment_fees": 5000.0, "rts_tier": "below", "cum_pos_spread": 2}], "re_exp": "RE"}, {"name": "Irma Britton", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "4/17/2026", "weeks_to_exit": 5.6, "manager": "Luis Guzman", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 13.41, "zoom_hrs": 0.0, "five9_hrs": 13.41, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 20.92, "zoom_hrs": 1.07, "five9_hrs": 19.85, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 22.15, "zoom_hrs": 0.16, "five9_hrs": 21.99, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 26.29, "zoom_hrs": 0.09, "five9_hrs": 26.2, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 0.08, "zoom_hrs": 0.08, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Jeffrey Linn", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "4/1/2026", "weeks_to_exit": 3.3, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 4.32, "zoom_hrs": 0.26, "five9_hrs": 4.06, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 23.38, "zoom_hrs": 0.6, "five9_hrs": 22.78, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 7.11, "zoom_hrs": 0.45, "five9_hrs": 6.66, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Jessica Williams", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "3/16/2026", "weeks_to_exit": 1.0, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "John Kinney", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 23.23, "zoom_hrs": 1.3, "five9_hrs": 21.93, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 26.0, "zoom_hrs": 1.07, "five9_hrs": 24.93, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Joy Jones", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 10.18, "zoom_hrs": 0.4, "five9_hrs": 9.78, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 26.63, "zoom_hrs": 3.43, "five9_hrs": 23.2, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Justin Fairbanks", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 14.2, "zoom_hrs": 0.55, "five9_hrs": 13.65, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 25.72, "zoom_hrs": 1.4, "five9_hrs": 24.32, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Justin Halladay", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 14.72, "zoom_hrs": 0.22, "five9_hrs": 14.5, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 21.77, "zoom_hrs": 1.92, "five9_hrs": 19.85, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Kelly Foltz", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "3/12/2026", "weeks_to_exit": 0.4, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Kevin Scott", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Shon Yoshida", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 5.17, "zoom_hrs": 0.51, "five9_hrs": 4.66, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 18.94, "zoom_hrs": 1.74, "five9_hrs": 17.2, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 24.97, "zoom_hrs": 3.94, "five9_hrs": 21.03, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 31.05, "zoom_hrs": 2.61, "five9_hrs": 28.44, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 30.0, "zoom_hrs": 1.85, "five9_hrs": 28.15, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 30.56, "zoom_hrs": 6.69, "five9_hrs": 23.87, "contracts": 2, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 34.46, "zoom_hrs": 1.7, "five9_hrs": 32.76, "contracts": 2, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 0}, {"week": "4/6/2026", "week_num": 9, "rts_hrs": 31.13, "zoom_hrs": 3.42, "five9_hrs": 27.71, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 1, "assignment_fees": 10000.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 10, "rts_hrs": 6.75, "zoom_hrs": 0.46, "five9_hrs": 6.29, "contracts": 2, "contracts_to_mktg": 2, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 0}, {"week": "4/20/2026", "week_num": 11, "rts_hrs": 16.67, "zoom_hrs": 3.55, "five9_hrs": 13.12, "contracts": 3, "contracts_to_mktg": 3, "pos_spread_deals": 2, "assignments": 3, "assignment_fees": 21500.0, "rts_tier": "below", "cum_pos_spread": 2}], "re_exp": "Non"}, {"name": "Matthew Jura", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "3/16/2026", "weeks_to_exit": 1.0, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Michael Johnson", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 15.4, "zoom_hrs": 0.47, "five9_hrs": 14.93, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 26.38, "zoom_hrs": 0.93, "five9_hrs": 25.45, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Michael Purcell", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Luis Guzman", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 4.11, "zoom_hrs": 0.0, "five9_hrs": 4.11, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 8.87, "zoom_hrs": 0.92, "five9_hrs": 7.95, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 31.61, "zoom_hrs": 5.6, "five9_hrs": 26.01, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": 1}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 26.16, "zoom_hrs": 3.65, "five9_hrs": 22.51, "contracts": 2, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 2}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 36.74, "zoom_hrs": 1.15, "five9_hrs": 35.59, "contracts": 2, "contracts_to_mktg": 2, "pos_spread_deals": 1, "assignments": 1, "assignment_fees": 3000.0, "rts_tier": "expert", "cum_pos_spread": 3}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 33.27, "zoom_hrs": 1.11, "five9_hrs": 32.16, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 2, "assignment_fees": 11808.0, "rts_tier": "target", "cum_pos_spread": 3}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 30.36, "zoom_hrs": 0.71, "five9_hrs": 29.65, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 3}, {"week": "4/6/2026", "week_num": 9, "rts_hrs": 26.42, "zoom_hrs": 5.13, "five9_hrs": 21.29, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 3}, {"week": "4/13/2026", "week_num": 10, "rts_hrs": 7.22, "zoom_hrs": 1.69, "five9_hrs": 5.53, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 3}, {"week": "4/20/2026", "week_num": 11, "rts_hrs": 26.55, "zoom_hrs": 4.52, "five9_hrs": 22.03, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 3}], "re_exp": "Non"}, {"name": "Nat Dorsey", "cohort": "4/7/2026", "hire_date": "4/7/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Patrick Solomon", "weeks": [{"week": "4/6/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 2, "rts_hrs": 17.52, "zoom_hrs": 0.45, "five9_hrs": 17.07, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "4/20/2026", "week_num": 3, "rts_hrs": 25.82, "zoom_hrs": 1.7, "five9_hrs": 24.12, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": 1}], "re_exp": "Non"}, {"name": "Robby Kordish", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "3/23/2026", "weeks_to_exit": 2.0, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Selena Ziman", "cohort": "1/12/2026", "hire_date": "1/12/2026", "status": "Exited", "exit_date": "3/2/2026", "weeks_to_exit": 7.0, "manager": "Jesse Sychowski", "weeks": [{"week": "1/12/2026", "week_num": 1, "rts_hrs": 8.57, "zoom_hrs": 0.0, "five9_hrs": 8.57, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "1/19/2026", "week_num": 2, "rts_hrs": 11.08, "zoom_hrs": 0.73, "five9_hrs": 10.35, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "1/26/2026", "week_num": 3, "rts_hrs": 34.79, "zoom_hrs": 0.81, "five9_hrs": 33.98, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}, {"week": "2/2/2026", "week_num": 4, "rts_hrs": 43.67, "zoom_hrs": 2.24, "five9_hrs": 41.43, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}, {"week": "2/9/2026", "week_num": 5, "rts_hrs": 44.5, "zoom_hrs": 1.92, "five9_hrs": 42.58, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 6, "rts_hrs": 44.05, "zoom_hrs": 1.29, "five9_hrs": 42.76, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 7, "rts_hrs": 42.61, "zoom_hrs": 2.41, "five9_hrs": 40.2, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": 1}, {"week": "3/2/2026", "week_num": 8, "rts_hrs": 2.31, "zoom_hrs": 0.03, "five9_hrs": 2.28, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}], "re_exp": "RE"}, {"name": "Tanner Orman", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "4/1/2026", "weeks_to_exit": 7.3, "manager": "Luis Guzman", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 4.18, "zoom_hrs": 0.04, "five9_hrs": 4.14, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 14.01, "zoom_hrs": 0.48, "five9_hrs": 13.53, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 26.6, "zoom_hrs": 0.65, "five9_hrs": 25.95, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 26.2, "zoom_hrs": 0.36, "five9_hrs": 25.84, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 25.4, "zoom_hrs": 0.11, "five9_hrs": 25.29, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 13.25, "zoom_hrs": 0.57, "five9_hrs": 12.68, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 4.17, "zoom_hrs": 0.07, "five9_hrs": 4.1, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Ted Hughes", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "4/17/2026", "weeks_to_exit": 5.6, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 10.38, "zoom_hrs": 0.12, "five9_hrs": 10.26, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 23.17, "zoom_hrs": 0.7, "five9_hrs": 22.47, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 27.75, "zoom_hrs": 2.19, "five9_hrs": 25.56, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": null}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 24.06, "zoom_hrs": 0.47, "five9_hrs": 23.59, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 5.45, "zoom_hrs": 0.18, "five9_hrs": 5.27, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Tivia McNeill", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "4/7/2026", "weeks_to_exit": 8.1, "manager": "Devin Buford", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 5.44, "zoom_hrs": 0.0, "five9_hrs": 5.44, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 18.75, "zoom_hrs": 1.21, "five9_hrs": 17.54, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 25.98, "zoom_hrs": 1.01, "five9_hrs": 24.97, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 22.58, "zoom_hrs": 2.01, "five9_hrs": 20.57, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 10.65, "zoom_hrs": 0.2, "five9_hrs": 10.45, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 19.1, "zoom_hrs": 0.11, "five9_hrs": 18.99, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 3.49, "zoom_hrs": 0.0, "five9_hrs": 3.49, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "4/6/2026", "week_num": 9, "rts_hrs": 0.78, "zoom_hrs": 0.0, "five9_hrs": 0.78, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 1, "assignment_fees": 20000.0, "rts_tier": "below", "cum_pos_spread": 1}], "re_exp": "Non"}, {"name": "Tony Riska", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Active", "exit_date": "", "weeks_to_exit": null, "manager": "Kyle Singer", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 5.16, "zoom_hrs": 0.02, "five9_hrs": 5.14, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 15.29, "zoom_hrs": 0.41, "five9_hrs": 14.88, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 27.04, "zoom_hrs": 1.15, "five9_hrs": 25.89, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 0}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 26.72, "zoom_hrs": 0.81, "five9_hrs": 25.91, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 22.87, "zoom_hrs": 2.14, "five9_hrs": 20.73, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 1, "assignment_fees": 2000.0, "rts_tier": "below", "cum_pos_spread": 0}, {"week": "3/23/2026", "week_num": 7, "rts_hrs": 30.16, "zoom_hrs": 1.66, "five9_hrs": 28.5, "contracts": 2, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}, {"week": "3/30/2026", "week_num": 8, "rts_hrs": 37.52, "zoom_hrs": 1.56, "five9_hrs": 35.96, "contracts": 5, "contracts_to_mktg": 5, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": 1}, {"week": "4/6/2026", "week_num": 9, "rts_hrs": 27.0, "zoom_hrs": 3.75, "five9_hrs": 23.25, "contracts": 2, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 1}, {"week": "4/13/2026", "week_num": 10, "rts_hrs": 6.73, "zoom_hrs": 0.4, "five9_hrs": 6.33, "contracts": 4, "contracts_to_mktg": 3, "pos_spread_deals": 1, "assignments": 1, "assignment_fees": 5711.0, "rts_tier": "below", "cum_pos_spread": 2}, {"week": "4/20/2026", "week_num": 11, "rts_hrs": 28.88, "zoom_hrs": 4.93, "five9_hrs": 23.95, "contracts": 5, "contracts_to_mktg": 5, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": 3}], "re_exp": "RE"}, {"name": "Traci-Ayn Reynolds", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "2/11/2026", "weeks_to_exit": 0.3, "manager": "Patrick Solomon", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}], "re_exp": "RE"}, {"name": "Wyatt Buttars", "cohort": "2/9/2026", "hire_date": "2/9/2026", "status": "Exited", "exit_date": "3/16/2026", "weeks_to_exit": 5.0, "manager": "Shon Yoshida", "weeks": [{"week": "2/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "2/16/2026", "week_num": 2, "rts_hrs": 5.86, "zoom_hrs": 0.07, "five9_hrs": 5.79, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "2/23/2026", "week_num": 3, "rts_hrs": 16.18, "zoom_hrs": 1.48, "five9_hrs": 14.7, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}, {"week": "3/2/2026", "week_num": 4, "rts_hrs": 22.79, "zoom_hrs": 1.7, "five9_hrs": 21.09, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/9/2026", "week_num": 5, "rts_hrs": 26.96, "zoom_hrs": 1.68, "five9_hrs": 25.28, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 6, "rts_hrs": 0.76, "zoom_hrs": 0.0, "five9_hrs": 0.76, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": null}], "re_exp": "Non"}, {"name": "Zach Brodsky", "cohort": "3/9/2026", "hire_date": "3/9/2026", "status": "Exited", "exit_date": "4/23/2026", "weeks_to_exit": 6.4, "manager": "Patrick Solomon", "weeks": [{"week": "3/9/2026", "week_num": 1, "rts_hrs": 0.0, "zoom_hrs": 0.0, "five9_hrs": 0.0, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "n/a", "cum_pos_spread": null}, {"week": "3/16/2026", "week_num": 2, "rts_hrs": 14.31, "zoom_hrs": 0.0, "five9_hrs": 14.31, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "minimum", "cum_pos_spread": null}, {"week": "3/23/2026", "week_num": 3, "rts_hrs": 29.09, "zoom_hrs": 0.02, "five9_hrs": 29.07, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "expert", "cum_pos_spread": null}, {"week": "3/30/2026", "week_num": 4, "rts_hrs": 27.28, "zoom_hrs": 0.73, "five9_hrs": 26.55, "contracts": 1, "contracts_to_mktg": 1, "pos_spread_deals": 1, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}, {"week": "4/6/2026", "week_num": 5, "rts_hrs": 30.2, "zoom_hrs": 0.47, "five9_hrs": 29.73, "contracts": 0, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}, {"week": "4/13/2026", "week_num": 6, "rts_hrs": 0.11, "zoom_hrs": 0.11, "five9_hrs": 0.0, "contracts": 1, "contracts_to_mktg": 0, "pos_spread_deals": null, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "below", "cum_pos_spread": 1}, {"week": "4/20/2026", "week_num": 7, "rts_hrs": 31.2, "zoom_hrs": 0.1, "five9_hrs": 31.1, "contracts": 0, "contracts_to_mktg": 1, "pos_spread_deals": 0, "assignments": 0, "assignment_fees": 0.0, "rts_tier": "target", "cum_pos_spread": 1}], "re_exp": "Non"}], "attrition": [{"name": "Selena Ziman", "cohort": "1/12/2026", "weeks_to_exit": 7.0, "exit_stage": "6\u20138 wks", "manager": "Jesse Sychowski", "exit_date": "3/2/2026", "re_exp": "RE"}, {"name": "Chasity Clark", "cohort": "1/12/2026", "weeks_to_exit": 10.1, "exit_stage": "8\u201312 wks", "manager": "Jesse Sychowski", "exit_date": "3/24/2026", "re_exp": "RE"}, {"name": "Traci-Ayn Reynolds", "cohort": "2/9/2026", "weeks_to_exit": 0.3, "exit_stage": "<1 wk", "manager": "Patrick Solomon", "exit_date": "2/11/2026", "re_exp": "RE"}, {"name": "Avery Underwood", "cohort": "2/9/2026", "weeks_to_exit": 1.3, "exit_stage": "1\u20132 wks", "manager": "Patrick Solomon", "exit_date": "2/18/2026", "re_exp": "RE"}, {"name": "Wyatt Buttars", "cohort": "2/9/2026", "weeks_to_exit": 5.0, "exit_stage": "4\u20136 wks", "manager": "Shon Yoshida", "exit_date": "3/16/2026", "re_exp": "Non"}, {"name": "Brad Ault", "cohort": "2/9/2026", "weeks_to_exit": 6.0, "exit_stage": "6\u20138 wks", "manager": "Devin Buford", "exit_date": "3/23/2026", "re_exp": "Non"}, {"name": "Chris Roberts", "cohort": "2/9/2026", "weeks_to_exit": 6.3, "exit_stage": "6\u20138 wks", "manager": "Shon Yoshida", "exit_date": "3/25/2026", "re_exp": "RE"}, {"name": "Tanner Orman", "cohort": "2/9/2026", "weeks_to_exit": 7.3, "exit_stage": "6\u20138 wks", "manager": "Luis Guzman", "exit_date": "4/1/2026", "re_exp": "Non"}, {"name": "Tivia McNeill", "cohort": "2/9/2026", "weeks_to_exit": 8.1, "exit_stage": "8\u201312 wks", "manager": "Devin Buford", "exit_date": "4/7/2026", "re_exp": "Non"}, {"name": "Kelly Foltz", "cohort": "3/9/2026", "weeks_to_exit": 0.4, "exit_stage": "<1 wk", "manager": "Patrick Solomon", "exit_date": "3/12/2026", "re_exp": "RE"}, {"name": "Jessica Williams", "cohort": "3/9/2026", "weeks_to_exit": 1.0, "exit_stage": "1\u20132 wks", "manager": "Patrick Solomon", "exit_date": "3/16/2026", "re_exp": "Non"}, {"name": "Matthew Jura", "cohort": "3/9/2026", "weeks_to_exit": 1.0, "exit_stage": "1\u20132 wks", "manager": "Patrick Solomon", "exit_date": "3/16/2026", "re_exp": "Non"}, {"name": "Robby Kordish", "cohort": "3/9/2026", "weeks_to_exit": 2.0, "exit_stage": "2\u20134 wks", "manager": "Patrick Solomon", "exit_date": "3/23/2026", "re_exp": "RE"}, {"name": "Jeffrey Linn", "cohort": "3/9/2026", "weeks_to_exit": 3.3, "exit_stage": "2\u20134 wks", "manager": "Patrick Solomon", "exit_date": "4/1/2026", "re_exp": "RE"}, {"name": "Ben Lauria", "cohort": "3/9/2026", "weeks_to_exit": 5.0, "exit_stage": "4\u20136 wks", "manager": "Shon Yoshida", "exit_date": "4/13/2026", "re_exp": "Non"}, {"name": "Ted Hughes", "cohort": "3/9/2026", "weeks_to_exit": 5.6, "exit_stage": "4\u20136 wks", "manager": "Patrick Solomon", "exit_date": "4/17/2026", "re_exp": "RE"}, {"name": "Irma Britton", "cohort": "3/9/2026", "weeks_to_exit": 5.6, "exit_stage": "4\u20136 wks", "manager": "Luis Guzman", "exit_date": "4/17/2026", "re_exp": "Non"}, {"name": "Zach Brodsky", "cohort": "3/9/2026", "weeks_to_exit": 6.4, "exit_stage": "6\u20138 wks", "manager": "Patrick Solomon", "exit_date": "4/23/2026", "re_exp": "Non"}, {"name": "Andrew Bentley", "cohort": "4/7/2026", "weeks_to_exit": 2.0, "exit_stage": "2\u20134 wks", "manager": "Patrick Solomon", "exit_date": "4/21/2026", "re_exp": "Non"}], "generated": "4/25/2026", "total_reps": 34, "active": 15, "exited": 19};
+// Live-fetched from Metabase via Google Apps Script proxy.
+// After deploying apps_script/newhire_proxy.gs as a Web App,
+// paste its /exec URL here:
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbx3UUh0ycg9mxKYFKzSu9aQbNAkHX7ZcvxkqRZjpYHJG4zVZpIvamOoxDZqlAnKOMf2Dw/exec';
+
+// RE Experience lookup — maintained manually per new-hire class.
+// 'RE' = prior real-estate background, 'Non' = no RE background.
+const RE_EXP = {
+  "Andrew Bentley":"Non","Avery Underwood":"RE","Ben Lauria":"Non","Brad Ault":"Non",
+  "Chasity Clark":"RE","Chloe Rodman":"Non","Chris Roberts":"RE","Cierra Lynch":"Non",
+  "Debran Collins":"Non","EJ Colclough":"Non","Eric Loya":"RE","Gerardo Macias":"RE",
+  "Irma Britton":"Non","Jeffrey Linn":"RE","Jessica Williams":"Non","John Kinney":"Non",
+  "Joy Jones":"Non","Justin Fairbanks":"Non","Justin Halladay":"Non","Kelly Foltz":"RE",
+  "Kevin Scott":"Non","Matthew Jura":"Non","Michael Johnson":"Non","Michael Purcell":"Non",
+  "Nat Dorsey":"Non","Robby Kordish":"RE","Selena Ziman":"RE","Tanner Orman":"Non",
+  "Ted Hughes":"RE","Tivia McNeill":"Non","Tony Riska":"RE","Traci-Ayn Reynolds":"RE",
+  "Wyatt Buttars":"Non","Zach Brodsky":"Non"
+};
+
+// Populated by loadData(). Other code reads DATA.reps / DATA.attrition.
+const DATA = { reps: [], attrition: [], generated: '', total_reps: 0, active: 0, exited: 0 };
+
+// ─── CSV PARSER (handles quoted fields, embedded commas, CRLF) ───
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQ = false, i = 0;
+  while (i < text.length) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i += 2; continue; }
+        inQ = false; i++; continue;
+      }
+      field += c; i++;
+    } else {
+      if (c === '"') { inQ = true; i++; continue; }
+      if (c === ',') { row.push(field); field = ''; i++; continue; }
+      if (c === '\n' || c === '\r') {
+        row.push(field); rows.push(row); row = []; field = '';
+        if (c === '\r' && text[i+1] === '\n') i += 2; else i++;
+        continue;
+      }
+      field += c; i++;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  if (!rows.length) return [];
+  const header = rows[0].map(h => h.trim());
+  return rows.slice(1).filter(r => r.some(v => v && v.length))
+                     .map(r => Object.fromEntries(header.map((h, i) => [h, (r[i] || '').trim()])));
+}
+
+// ─── DATE PARSER (handles M/D/YY, M/D/YYYY, D-Mon-YY, D-Mon-YYYY) ───
+const MONS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function parseDate(s) {
+  if (!s) return null;
+  s = String(s).trim();
+  if (!s) return null;
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (m) {
+    let yr = parseInt(m[3], 10);
+    if (yr < 100) yr += 2000;
+    return new Date(yr, parseInt(m[1],10) - 1, parseInt(m[2],10));
+  }
+  m = s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{2,4})$/);
+  if (m) {
+    let yr = parseInt(m[3], 10);
+    if (yr < 100) yr += 2000;
+    const mon = MONS[m[2].toLowerCase()];
+    if (mon == null) return null;
+    return new Date(yr, mon, parseInt(m[1],10));
+  }
+  return null;
+}
+function fmtDate(d) { return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear(); }
+function mondayOf(d) {
+  const wd = d.getDay();
+  const diff = wd === 0 ? -6 : 1 - wd;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff);
+}
+
+// ─── RAMP TIER THRESHOLDS (mirrors prior build_data.py compute_tier) ───
+function computeTier(wn, rts) {
+  if (wn === 1) return 'n/a';
+  if (wn === 2) return rts < 12 ? 'below' : rts < 20 ? 'minimum' : rts < 25 ? 'target' : 'expert';
+  if (wn === 3) return rts < 20 ? 'below' : rts < 23 ? 'minimum' : rts < 25 ? 'target' : 'expert';
+  if (wn === 4) return rts < 22 ? 'below' : rts < 25 ? 'minimum' : rts < 30 ? 'target' : 'expert';
+  return rts < 25 ? 'below' : rts < 30 ? 'minimum' : rts < 35 ? 'target' : 'expert';
+}
+function exitStage(wte) {
+  if (wte < 1) return '<1 wk';
+  if (wte < 2) return '1–2 wks';
+  if (wte < 4) return '2–4 wks';
+  if (wte < 6) return '4–6 wks';
+  if (wte < 8) return '6–8 wks';
+  return '8–12 wks';
+}
+
+// ─── FETCH ───
+async function fetchFeed(name) {
+  const r = await fetch(PROXY_URL + '?feed=' + encodeURIComponent(name));
+  if (!r.ok) throw new Error(`feed ${name}: HTTP ${r.status}`);
+  const text = await r.text();
+  if (text.trim().startsWith('{') && text.includes('"error"')) throw new Error(`feed ${name}: ${text}`);
+  return parseCSV(text);
+}
+
+// ─── BUILD WEEKLY BUCKETS ───
+function bucketDaily(rows, dateCol, valueCol, parseValue) {
+  const out = {};
+  for (const row of rows) {
+    const d = parseDate(row[dateCol]);
+    if (!d) continue;
+    const email = (row.email || row.Email || '').toLowerCase().trim();
+    if (!email) continue;
+    const wk = fmtDate(mondayOf(d));
+    const v = parseValue(row[valueCol]);
+    if (v == null || isNaN(v)) continue;
+    if (!out[email]) out[email] = {};
+    out[email][wk] = (out[email][wk] || 0) + v;
+  }
+  return out;
+}
+
+function bucketProspectRate(rows, dateCol) {
+  const sums = {};
+  for (const row of rows) {
+    const d = parseDate(row[dateCol]);
+    if (!d) continue;
+    const email = (row.email || row.Email || '').toLowerCase().trim();
+    if (!email) continue;
+    const wk = fmtDate(mondayOf(d));
+    const p = parseFloat(row.prospects_created) || 0;
+    const c = parseFloat(row.calls_taken) || 0;
+    if (!sums[email]) sums[email] = {};
+    if (!sums[email][wk]) sums[email][wk] = { p: 0, c: 0 };
+    sums[email][wk].p += p;
+    sums[email][wk].c += c;
+  }
+  const out = {};
+  for (const e in sums) {
+    out[e] = {};
+    for (const wk in sums[e]) {
+      const { p, c } = sums[e][wk];
+      out[e][wk] = c > 0 ? p / c : null;
+    }
+  }
+  return out;
+}
+
+// ─── RESHAPE ───
+function reshape(feeds, asOf) {
+  const roster = feeds.roster.filter(r =>
+    (r.team || '').trim() === 'Acquisition' &&
+    /sales rep/i.test(r.title || '')
+  );
+
+  const rtsBy = bucketDaily(feeds.rts_time,             'Date',           'Total Hrs',            v => parseFloat(v));
+  const conBy = bucketDaily(feeds.contracts,            'contract_date',  'contract_count',       v => parseInt(v,10));
+  const mktBy = bucketDaily(feeds.contracts_to_mktg,    'marketing_date', 'count',                v => parseInt(v,10));
+  const asgBy = bucketDaily(feeds.assignments_and_fees, 'assignment_date','assigned_count',       v => parseInt(v,10));
+  const feeBy = bucketDaily(feeds.assignments_and_fees, 'assignment_date','total_assignment_fee', v => parseFloat(String(v).replace(/,/g,'')));
+  const psBy  = bucketDaily(feeds.pos_spread_deals,     'marketing_date', 'count_of_positive_spread', v => parseInt(v,10));
+  const pcrBy = bucketProspectRate(feeds.prospect_creation_rate, 'call_date');
+
+  const reps = [];
+  for (const row of roster) {
+    const name  = (row.agent_name || '').trim();
+    const email = (row.email || '').toLowerCase().trim();
+    const hire  = parseDate(row.hire_date);
+    if (!name || !hire) continue;
+    const exit = parseDate(row.exit_date);
+    const status = (row.status || '').trim();
+
+    const lastDay = exit || asOf;
+    const lastWkM = mondayOf(lastDay);
+    const weeks = [];
+    let cur = mondayOf(hire), wn = 0, cumPos = 0;
+    while (cur <= lastWkM) {
+      wn++;
+      const wkStr = fmtDate(cur);
+      const rts = +(rtsBy[email]?.[wkStr] || 0).toFixed(2);
+      const ps  = psBy[email]?.[wkStr];
+      if (ps != null) cumPos += ps;
+      weeks.push({
+        week: wkStr, week_num: wn, rts_hrs: rts,
+        contracts:           conBy[email]?.[wkStr] || 0,
+        contracts_to_mktg:   mktBy[email]?.[wkStr] || 0,
+        pos_spread_deals:    ps != null ? ps : null,
+        assignments:         asgBy[email]?.[wkStr] || 0,
+        assignment_fees:    +(feeBy[email]?.[wkStr] || 0).toFixed(2),
+        prospect_creation_rate: pcrBy[email]?.[wkStr] != null ? +pcrBy[email][wkStr].toFixed(3) : null,
+        rts_tier: computeTier(wn, rts),
+        cum_pos_spread: cumPos > 0 ? cumPos : null,
+      });
+      cur = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + 7);
+    }
+
+    const wte = exit ? +((exit - hire) / 86400000 / 7).toFixed(1) : null;
+    reps.push({
+      name, email, cohort: fmtDate(hire), hire_date: fmtDate(hire), status,
+      exit_date: exit ? fmtDate(exit) : '', weeks_to_exit: wte,
+      manager: (row.current_manager || '').trim(),
+      weeks, re_exp: RE_EXP[name] || 'Non',
+    });
+  }
+
+  reps.sort((a,b) => a.name.localeCompare(b.name));
+  const attrition = reps.filter(r => r.status === 'Exited').map(r => ({
+    name: r.name, cohort: r.cohort, weeks_to_exit: r.weeks_to_exit,
+    exit_stage: exitStage(r.weeks_to_exit), manager: r.manager,
+    exit_date: r.exit_date, re_exp: r.re_exp,
+  })).sort((a,b) => parseDate(a.cohort) - parseDate(b.cohort) || parseDate(a.exit_date) - parseDate(b.exit_date));
+
+  return {
+    reps, attrition, generated: fmtDate(asOf),
+    total_reps: reps.length,
+    active:  reps.filter(r => r.status === 'Active').length,
+    exited:  reps.filter(r => r.status === 'Exited').length,
+  };
+}
+
+// ─── ACCESS LOGGING ───
+function logView() {
+  if (!PROXY_URL || PROXY_URL.startsWith('__')) return;
+  let email = localStorage.getItem('rebuilt_email') || '';
+  if (!email) {
+    email = (prompt('Enter your @rebuilt.com email:') || '').trim().toLowerCase();
+    if (email && email.endsWith('@rebuilt.com')) localStorage.setItem('rebuilt_email', email);
+    else return;
+  }
+  const params = new URLSearchParams({
+    action: 'log_view', email, page: 'newhire_dashboard',
+    ua: navigator.userAgent, ref: document.referrer || '',
+  });
+  fetch(PROXY_URL + '?' + params.toString()).catch(() => {});
+}
+
+// ─── BOOT ───
+async function loadData() {
+  if (!PROXY_URL || PROXY_URL.startsWith('__')) {
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div style="background:#fde8e8;color:#c0392b;padding:14px 20px;font-family:DM Sans,sans-serif;">' +
+      'Configure <code>PROXY_URL</code> in this file with your deployed Apps Script Web App URL.</div>');
+    return;
+  }
+  const names = ['roster','rts_time','contracts','contracts_to_mktg',
+                 'assignments_and_fees','pos_spread_deals','prospect_creation_rate'];
+  try {
+    const results = await Promise.all(names.map(fetchFeed));
+    const feeds = Object.fromEntries(names.map((n,i) => [n, results[i]]));
+    Object.assign(DATA, reshape(feeds, new Date()));
+  } catch (err) {
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div style="background:#fde8e8;color:#c0392b;padding:14px 20px;font-family:DM Sans,sans-serif;">' +
+      'Failed to load data: ' + (err.message || err) + '</div>');
+    return;
+  }
+  deriveCohorts();
+  logView();
+  buildOverviewKPIs();
+  buildCohortFilters();
+  buildAttritionKPIs();
+  buildOverview();
+  chartsBuilt['overview'] = true;
+  const hm=document.getElementById('header-meta');
+  if(hm) hm.textContent=`Generated ${DATA.generated} · ${DATA.total_reps} reps`;
+}
 
 // ═══════════════════════ HELPERS ═══════════════════════
 const COLORS={below:'#e05252',minimum:'#f5a623',target:'#21a9e1',expert:'#0f696e',na:'#b0b8c1'};
-const COHORT_COLORS={'1/12/2026':'#f5831f','2/9/2026':'#21a9e1','3/9/2026':'#0f696e','4/7/2026':'#9b6dd7'};
+const COHORT_PALETTE = ['#f5831f','#21a9e1','#0f696e','#9b6dd7','#64b4b7','#e05252','#f5a623','#1f3540'];
+let COHORT_COLORS = {};
+function deriveCohorts() {
+  const cohorts = [...new Set(DATA.reps.map(r => r.cohort))].sort((a,b) => parseDate(a) - parseDate(b));
+  COHORT_COLORS = Object.fromEntries(cohorts.map((c,i) => [c, COHORT_PALETTE[i % COHORT_PALETTE.length]]));
+  return cohorts;
+}
 function tierBadge(t){if(!t||t==='n/a')return`<span class="tier tier-na">N/A</span>`;return`<span class="tier tier-${t}">${t[0].toUpperCase()+t.slice(1)}</span>`;}
 function fmtFees(v){if(!v||v===0)return'—';return'$'+Math.round(v).toLocaleString();}
 function fmtRts(v){return v>0?v.toFixed(1)+'h':'—';}
@@ -398,6 +650,13 @@ function cumMetric(r,col){return r.weeks.reduce((s,w)=>s+(w[col]||0),0);}
 function getStageClass(s){if(s==='<1 wk')return'stage-lt1';if(s==='1–2 wks')return'stage-1to2';if(s==='2–4 wks')return'stage-2to4';if(s==='4–6 wks')return'stage-4to6';if(s==='6–8 wks')return'stage-6to8';return'stage-8to12';}
 // Format week date M/D
 function fmtWkDate(w){const p=w.split('/');return p[0]+'/'+p[1];}
+// True if the given week's Sunday is in the future — i.e. data still landing.
+function isInProgressWeek(wkStr){
+  const m=parseDate(wkStr); if(!m) return false;
+  const sun=new Date(m.getFullYear(),m.getMonth(),m.getDate()+6);
+  const today=new Date(); today.setHours(0,0,0,0);
+  return sun>=today;
+}
 
 // ═══════════════════════ TAB LOGIC ═══════════════════════
 let chartsBuilt={};
@@ -410,12 +669,54 @@ function showTab(id,el){
 }
 
 // ═══════════════════════ OVERVIEW ═══════════════════════
-function buildOverview(){
+function buildOverview(){ renderRepGrid('all'); }
+
+function buildOverviewKPIs(){
+  const total=DATA.reps.length;
+  const active=DATA.reps.filter(r=>r.status==='Active').length;
+  const exited=DATA.reps.filter(r=>r.status==='Exited').length;
+  const ex2=DATA.attrition.filter(e=>e.weeks_to_exit<=2).length;
   const totA=DATA.reps.reduce((s,r)=>s+cumMetric(r,'assignments'),0);
   const totF=DATA.reps.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0);
-  document.getElementById('kpi-total-assignments').textContent=totA;
-  document.getElementById('kpi-total-fees').textContent='$'+Math.round(totF/1000)+'k';
-  renderRepGrid('all');
+  const cohortCount=new Set(DATA.reps.map(r=>r.cohort)).size;
+  const retainPct=total?Math.round(active/total*100):0;
+  const attrPct=total?Math.round(exited/total*100):0;
+  const ex2Pct=exited?Math.round(ex2/exited*100):0;
+  document.getElementById('overview-kpi-row').innerHTML=`
+    <div class="kpi-card blue"><div class="kpi-label">Total New Hires</div><div class="kpi-value">${total}</div><div class="kpi-sub">${cohortCount} cohort${cohortCount===1?'':'s'}</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Active</div><div class="kpi-value">${active}</div><div class="kpi-sub">${retainPct}% retention rate</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Exited</div><div class="kpi-value">${exited}</div><div class="kpi-sub">${attrPct}% attrition rate</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Exited ≤2 Wks</div><div class="kpi-value">${ex2}</div><div class="kpi-sub">${ex2Pct}% of all exits</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Assignments</div><div class="kpi-value">${totA}</div><div class="kpi-sub">YTD</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Assignment Fees</div><div class="kpi-value">$${Math.round(totF/1000)}k</div><div class="kpi-sub">YTD</div></div>`;
+}
+
+function buildCohortFilters(){
+  const cohorts=Object.keys(COHORT_COLORS);
+  const monthShort=(c)=>{const d=parseDate(c);return d?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]:c;};
+  const btns=[
+    `<button class="filter-btn active" onclick="filterReps('all',this)">All</button>`,
+    `<button class="filter-btn" onclick="filterReps('Active',this)">Active</button>`,
+    `<button class="filter-btn" onclick="filterReps('Exited',this)">Exited</button>`,
+    ...cohorts.map(c=>`<button class="filter-btn" onclick="filterReps('${c}',this)">${monthShort(c)} Cohort</button>`),
+  ].join('');
+  document.getElementById('cohort-filter-bar').innerHTML=`<span class="filter-label">Filter:</span>${btns}`;
+}
+
+function buildAttritionKPIs(){
+  const ex=DATA.attrition;
+  const total=DATA.reps.length;
+  const ex1=ex.filter(e=>e.weeks_to_exit<1).length;
+  const ex2=ex.filter(e=>e.weeks_to_exit<=2).length;
+  const avg=ex.length?(ex.reduce((s,e)=>s+e.weeks_to_exit,0)/ex.length).toFixed(1):'—';
+  const exitPct=total?Math.round(ex.length/total*100):0;
+  const ex2Pct=ex.length?Math.round(ex2/ex.length*100):0;
+  document.getElementById('attrition-kpi-row').innerHTML=`
+    <div class="kpi-card red"><div class="kpi-label">Total Exits</div><div class="kpi-value">${ex.length}</div><div class="kpi-sub">${exitPct}% of ${total} hired</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Exited &lt;1 Wk</div><div class="kpi-value">${ex1}</div><div class="kpi-sub">Pre-ramp exits</div></div>
+    <div class="kpi-card orange"><div class="kpi-label">Exited ≤2 Wks</div><div class="kpi-value">${ex2}</div><div class="kpi-sub">${ex2Pct}% of all exits</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Avg Wks to Exit</div><div class="kpi-value">${avg}</div><div class="kpi-sub">among exited reps</div></div>`;
+  document.getElementById('attrition-detail-title').textContent=`Exit Detail — ${ex.length} Departed Rep${ex.length===1?'':'s'}`;
 }
 
 function renderRepGrid(filter){
@@ -430,7 +731,7 @@ function renderRepGrid(filter){
     const totC=cumMetric(r,'contracts'),totM=cumMetric(r,'contracts_to_mktg'),totA=cumMetric(r,'assignments');
     const isActive=r.status==='Active';
     // sparkline: skip wk1, skip 4/13 (RTS in progress)
-    const sparkWks=r.weeks.filter(w=>w.week_num>1&&w.week!=='4/13/2026');
+    const sparkWks=r.weeks.filter(w=>w.week_num>1&&!isInProgressWeek(w.week));
     const maxH=Math.max(...sparkWks.map(w=>w.rts_hrs),1);
     const bars=sparkWks.map(w=>{
       const h=Math.max(3,Math.min(32,(w.rts_hrs/Math.max(maxH,35))*32));
@@ -467,7 +768,7 @@ function openDrilldown(name){
   const r=DATA.reps.find(x=>x.name===name);if(!r)return;
   const totC=cumMetric(r,'contracts'),totM=cumMetric(r,'contracts_to_mktg'),totA=cumMetric(r,'assignments'),totF=cumMetric(r,'assignment_fees');
   const cells=r.weeks.map(w=>{
-    const isInProgress=w.week==='4/13/2026';
+    const isInProgress=isInProgressWeek(w.week);
     const cls=w.week_num===1?'wk-na':isInProgress?'wk-na':'wk-'+w.rts_tier;
     return`<div class="week-cell ${cls}">
       <div class="week-cell-label">${w.week_num===1?'Week 1 / Exempt':isInProgress?'IN PROGRESS':w.rts_tier.toUpperCase()}</div>
@@ -509,7 +810,7 @@ function buildPerformance(){
   const totA=all.reduce((s,r)=>s+cumMetric(r,'assignments'),0);
   const totF=all.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0);
   // For RTS: use 4/6 week (last complete week), not 4/13 which is in progress
-  const rtsWeekFor=r=>r.weeks.find(w=>w.week==='4/6/2026')||r.weeks.filter(w=>w.week!=='4/13/2026').slice(-1)[0]||latestWeek(r);
+  const rtsWeekFor=r=>{const c=r.weeks.filter(w=>!isInProgressWeek(w.week));return c.length?c[c.length-1]:latestWeek(r);};
   const rtsVals=active.map(r=>rtsWeekFor(r).rts_hrs).filter(v=>v>0);
   const avgRts=rtsVals.length?rtsVals.reduce((s,v)=>s+v,0)/rtsVals.length:0;
 
@@ -519,7 +820,7 @@ function buildPerformance(){
     <div class="kpi-card blue"><div class="kpi-label">To Marketing</div><div class="kpi-value">${totM}</div><div class="kpi-sub">Active reps YTD</div></div>
     <div class="kpi-card green"><div class="kpi-label">Assignments</div><div class="kpi-value">${totA}</div><div class="kpi-sub">All reps YTD</div></div>
     <div class="kpi-card green"><div class="kpi-label">Assignment Fees</div><div class="kpi-value">$${Math.round(totF/1000)}k</div><div class="kpi-sub">All reps YTD</div></div>
-    <div class="kpi-card ${avgRts>=25?'teal':'orange'}"><div class="kpi-label">Avg RTS (4/6 Wk)</div><div class="kpi-value">${avgRts.toFixed(1)}h</div><div class="kpi-sub">Min: 25h · Active reps</div></div>`;
+    <div class="kpi-card ${avgRts>=25?'teal':'orange'}"><div class="kpi-label">Avg RTS (Last Complete Wk)</div><div class="kpi-value">${avgRts.toFixed(1)}h</div><div class="kpi-sub">Min: 25h · Active reps</div></div>`;
 
   // Contracts bar
   const sortedC=[...active].sort((a,b)=>cumMetric(b,'contracts')-cumMetric(a,'contracts'));
@@ -561,19 +862,21 @@ function buildPerformance(){
   document.getElementById('perf-scorecard').innerHTML=`
     <thead><tr>
       <th>Rep</th><th>Cohort</th><th>Wk</th><th>Manager</th>
-      <th>RTS (4/6)</th><th>RTS Tier</th>
+      <th>RTS</th><th>RTS Tier</th>
+      <th>Prospect Rate</th>
       <th>Contracts</th><th>To Mktg</th>
       <th>Pos Spread</th><th>Assign.</th><th>Fees</th>
     </tr></thead>
     <tbody>${sorted.map(r=>{
-      // use last complete RTS week (4/6), not 4/13 in-progress
       const rtsWk=rtsWeekFor(r);
       const lastPs=[...r.weeks].reverse().find(x=>x.cum_pos_spread!=null);
+      const lastPcr=[...r.weeks].reverse().find(x=>x.prospect_creation_rate!=null);
       const totC=cumMetric(r,'contracts');
       return`<tr>
         <td><strong style="cursor:pointer;color:var(--blue)" onclick="openDrilldown('${r.name}')">${r.name}</strong></td>
         <td>${r.cohort}</td><td>Wk ${latestWeek(r).week_num}</td><td>${r.manager}</td>
         <td>${fmtRts(rtsWk.rts_hrs)}</td><td>${tierBadge(rtsWk.rts_tier)}</td>
+        <td>${lastPcr?(lastPcr.prospect_creation_rate*100).toFixed(0)+'%':'—'}</td>
         <td><strong>${totC}</strong></td><td>${cumMetric(r,'contracts_to_mktg')}</td>
         <td>${lastPs?lastPs.cum_pos_spread:'—'}</td>
         <td>${cumMetric(r,'assignments')}</td>
@@ -582,7 +885,7 @@ function buildPerformance(){
     }).join('')}</tbody>`;
 
   // RTS trend — exclude 4/13
-  const allWeeks=[...new Set(active.flatMap(r=>r.weeks.map(w=>w.week)))].sort((a,b)=>new Date(a)-new Date(b)).filter(w=>w!=='4/13/2026');
+  const allWeeks=[...new Set(active.flatMap(r=>r.weeks.map(w=>w.week)))].sort((a,b)=>new Date(a)-new Date(b)).filter(w=>!isInProgressWeek(w));
   const datasets=active.map((r,i)=>{
     const clrs=['#21a9e1','#0f696e','#f5831f','#64b4b7','#e05252','#9c5fd4','#2ecc71','#e67e22','#1abc9c','#e74c3c','#3498db','#8e44ad'];
     return{label:r.name.split(' ')[0],data:allWeeks.map(wk=>{const w=r.weeks.find(x=>x.week===wk);return w?w.rts_hrs:null;}),borderColor:clrs[i%clrs.length],backgroundColor:clrs[i%clrs.length]+'33',tension:.3,pointRadius:3,borderWidth:2,spanGaps:false};
@@ -639,7 +942,7 @@ function buildAttrition(){
     <thead><tr><th>Rep</th><th>Exit Stage</th><th>Avg RTS (Active Wks)</th><th>Total Contracts</th><th>0-Contract Weeks</th><th>Below-Min RTS Weeks</th></tr></thead>
     <tbody>${withData.map(e=>{
       const r=DATA.reps.find(x=>x.name===e.name);
-      const wks=r.weeks.filter(w=>w.week_num>1&&w.week!=='4/13/2026');
+      const wks=r.weeks.filter(w=>w.week_num>1&&!isInProgressWeek(w.week));
       const avgR=wks.reduce((s,w)=>s+w.rts_hrs,0)/wks.length;
       const zeroC=wks.filter(w=>w.contracts===0).length;
       const belowR=wks.filter(w=>w.rts_tier==='below').length;
@@ -657,7 +960,7 @@ function buildAttrition(){
 
 // ═══════════════════════ COHORT ═══════════════════════
 function buildCohort(){
-  const cohorts=['1/12/2026','2/9/2026','3/9/2026','4/7/2026'];
+  const cohorts=Object.keys(COHORT_COLORS);
   const cohortReps=cohorts.map(c=>DATA.reps.filter(r=>r.cohort===c));
   const cohortActive=cohortReps.map(g=>g.filter(r=>r.status==='Active').length);
   const cohortSizes=cohortReps.map(g=>g.length);
@@ -790,7 +1093,7 @@ function buildReExp(){
   });
 
   // RTS trend by RE vs Non (active reps, week-by-week avg)
-  const allWeeks=[...new Set(DATA.reps.flatMap(r=>r.weeks.map(w=>w.week)))].sort((a,b)=>new Date(a)-new Date(b)).filter(w=>w!=='4/13/2026');
+  const allWeeks=[...new Set(DATA.reps.flatMap(r=>r.weeks.map(w=>w.week)))].sort((a,b)=>new Date(a)-new Date(b)).filter(w=>!isInProgressWeek(w));
   const avgRtsByWk = (group) => allWeeks.map(wk=>{
     const vals=group.flatMap(r=>r.weeks.filter(w=>w.week===wk).map(w=>w.rts_hrs)).filter(v=>v>0);
     return vals.length?vals.reduce((s,v)=>s+v,0)/vals.length:null;
@@ -835,7 +1138,7 @@ function buildReExp(){
     }).join('')}</tbody>`;
 }
 
-buildOverview();
+loadData();
 </script>
 </body>
 </html>
