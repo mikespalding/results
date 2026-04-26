@@ -384,11 +384,15 @@ const RE_EXP = {
   "Wyatt Buttars":"Non","Zach Brodsky":"Non"
 };
 
-// Manual hire-date overrides — keyed by lowercase email. Use sparingly to
-// snap a rep to the correct cohort when the roster's hire_date is off by
-// a day (e.g. paperwork lag).
-const HIRE_DATE_OVERRIDES = {
-  "michael.purcell@rebuilt.com": "2026-02-09",  // roster has 2/10; belongs with Feb cohort
+// Manual roster overrides — keyed by lowercase email. Use sparingly to
+// patch known data errors in the source roster. Any subset of fields may
+// be set: hire_date, exit_date (use '' to clear), status.
+const ROSTER_OVERRIDES = {
+  "michael.purcell@rebuilt.com": {
+    hire_date: "2026-02-09",  // roster has 2/10; belongs with Feb cohort
+    exit_date: "",            // roster shows exit 2/9, but he is still active
+    status:    "Active",
+  },
 };
 
 // Populated by loadData(). Other code reads DATA.reps / DATA.attrition.
@@ -551,10 +555,12 @@ function reshape(feeds, asOf) {
   for (const row of roster) {
     const name  = (row.agent_name || '').trim();
     const email = (row.email || '').toLowerCase().trim();
-    const hire  = parseDate(HIRE_DATE_OVERRIDES[email] || row.hire_date);
+    const ov    = ROSTER_OVERRIDES[email] || {};
+    const hire  = parseDate(ov.hire_date || row.hire_date);
     if (!name || !hire) continue;
-    const exit = parseDate(row.exit_date);
-    const status = (row.status || '').trim();
+    const rawExit = ov.exit_date != null ? ov.exit_date : row.exit_date;
+    const exit = parseDate(rawExit);
+    const status = (ov.status || row.status || '').trim();
 
     const lastDay = exit || asOf;
     const lastWkM = mondayOf(lastDay);
@@ -956,9 +962,6 @@ function buildPerformance(){
 // ═══════════════════════ ATTRITION ═══════════════════════
 function buildAttrition(){
   const ex=DATA.attrition;
-  const avg=ex.reduce((s,e)=>s+e.weeks_to_exit,0)/ex.length;
-  document.getElementById('kpi-avg-exit').textContent=avg.toFixed(1);
-
   // Funnel
   const stages=['<1 wk','1–2 wks','2–4 wks','4–6 wks','6–8 wks','8–12 wks'];
   const counts=Object.fromEntries(stages.map(s=>[s,ex.filter(e=>e.exit_stage===s).length]));
