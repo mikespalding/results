@@ -956,9 +956,6 @@ function buildPerformance(){
 // ═══════════════════════ ATTRITION ═══════════════════════
 function buildAttrition(){
   const ex=DATA.attrition;
-  const avg=ex.reduce((s,e)=>s+e.weeks_to_exit,0)/ex.length;
-  document.getElementById('kpi-avg-exit').textContent=avg.toFixed(1);
-
   // Funnel
   const stages=['<1 wk','1–2 wks','2–4 wks','4–6 wks','6–8 wks','8–12 wks'];
   const counts=Object.fromEntries(stages.map(s=>[s,ex.filter(e=>e.exit_stage===s).length]));
