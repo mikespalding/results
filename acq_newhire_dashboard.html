@@ -416,13 +416,17 @@ function parseCSV(text) {
                      .map(r => Object.fromEntries(header.map((h, i) => [h, (r[i] || '').trim()])));
 }
 
-// ─── DATE PARSER (handles M/D/YY, M/D/YYYY, D-Mon-YY, D-Mon-YYYY) ───
+// ─── DATE PARSER (handles YYYY-MM-DD, M/D/YY, M/D/YYYY, D-Mon-YY, D-Mon-YYYY) ───
 const MONS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
 function parseDate(s) {
   if (!s) return null;
   s = String(s).trim();
   if (!s) return null;
-  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  // Strip time component if present (e.g. "2026-04-07T00:00:00" or "2026-04-07 00:00:00")
+  s = s.split(/[T ]/)[0];
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return new Date(parseInt(m[1],10), parseInt(m[2],10) - 1, parseInt(m[3],10));
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
   if (m) {
     let yr = parseInt(m[3], 10);
     if (yr < 100) yr += 2000;
@@ -514,12 +518,18 @@ function bucketProspectRate(rows, dateCol) {
   return out;
 }
 
+// Earliest hire date to include. Update at year-end to extend the dashboard's
+// new-hire scope (e.g. set to '2027-01-01' once the 2027 class is hired).
+const HIRE_CUTOFF = new Date(2026, 0, 1);
+
 // ─── RESHAPE ───
 function reshape(feeds, asOf) {
-  const roster = feeds.roster.filter(r =>
-    (r.team || '').trim() === 'Acquisition' &&
-    /sales rep/i.test(r.title || '')
-  );
+  const roster = feeds.roster.filter(r => {
+    if ((r.team || '').trim() !== 'Acquisition') return false;
+    if (!/sales rep/i.test(r.title || '')) return false;
+    const hire = parseDate(r.hire_date);
+    return hire && hire >= HIRE_CUTOFF;
+  });
 
   const rtsBy = bucketDaily(feeds.rts_time,             'Date',           'Total Hrs',            v => parseFloat(v));
   const conBy = bucketDaily(feeds.contracts,            'contract_date',  'contract_count',       v => parseInt(v,10));
