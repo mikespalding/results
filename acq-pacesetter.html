@@ -470,14 +470,14 @@ const KPI_DEFS = [
     id:'contracts', label:'Contracts', category:'outcome', weight:0.15,
     description:'Total count of contracts signed in the window.',
     csvUrl:PROXY_URL+'?feed=contracts',
-    emailCol:'email', valueCol:'contract_count', dateCol:null,
+    emailCol:'email', valueCol:'contract_count', dateCol:'contract_date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'contracts_to_mktg', label:'C>Mktg', category:'outcome', weight:0.30,
     description:'Count of contracts that advanced to the marketing stage.',
     csvUrl:PROXY_URL+'?feed=contracts_to_mktg',
-    emailCol:'email', valueCol:'count', dateCol:null,
+    emailCol:'email', valueCol:'count', dateCol:'marketing_date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
@@ -491,14 +491,14 @@ const KPI_DEFS = [
     id:'assignments', label:'Assignments', category:'outcome', weight:0.30,
     description:'Count of deals successfully assigned to an end buyer.',
     csvUrl:PROXY_URL+'?feed=assignments_and_fees',
-    emailCol:'email', valueCol:'assigned_count', dateCol:null,
+    emailCol:'email', valueCol:'assigned_count', dateCol:'assignment_date',
     aggregate:'sum', higherIsBetter:true, format:'number', decimals:0,
   },
   {
     id:'assignment_fees', label:'Assignment Fees', category:'outcome', weight:0.10,
     description:'Total assignment-fee dollars earned from assigned deals.',
     csvUrl:PROXY_URL+'?feed=assignments_and_fees',
-    emailCol:'email', valueCol:'total_assignment_fee', dateCol:null,
+    emailCol:'email', valueCol:'total_assignment_fee', dateCol:'assignment_date',
     aggregate:'sum', higherIsBetter:true, format:'currency_k', decimals:1,
   },
   {
