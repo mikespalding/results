@@ -730,14 +730,20 @@ function showTab(id,el){
 // ═══════════════════════ OVERVIEW ═══════════════════════
 function buildOverview(){ renderRepGrid('all'); }
 
-function buildOverviewKPIs(){
-  const total=DATA.reps.length;
-  const active=DATA.reps.filter(r=>r.status==='Active').length;
-  const exited=DATA.reps.filter(r=>r.status==='Exited').length;
-  const ex2=DATA.attrition.filter(e=>e.weeks_to_exit<=2).length;
-  const totA=DATA.reps.reduce((s,r)=>s+cumMetric(r,'assignments'),0);
-  const totF=DATA.reps.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0);
-  const cohortCount=new Set(DATA.reps.map(r=>r.cohort)).size;
+function buildOverviewKPIs(filter='all'){
+  let reps=DATA.reps;
+  if(filter==='Active')reps=reps.filter(r=>r.status==='Active');
+  else if(filter==='Exited')reps=reps.filter(r=>r.status==='Exited');
+  else if(filter!=='all')reps=reps.filter(r=>r.cohort===filter);
+  const exitedNames=new Set(reps.filter(r=>r.status==='Exited').map(r=>r.name));
+  const attr=DATA.attrition.filter(e=>exitedNames.has(e.name));
+  const total=reps.length;
+  const active=reps.filter(r=>r.status==='Active').length;
+  const exited=reps.filter(r=>r.status==='Exited').length;
+  const ex2=attr.filter(e=>e.weeks_to_exit<=2).length;
+  const totA=reps.reduce((s,r)=>s+cumMetric(r,'assignments'),0);
+  const totF=reps.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0);
+  const cohortCount=new Set(reps.map(r=>r.cohort)).size;
   const retainPct=total?Math.round(active/total*100):0;
   const attrPct=total?Math.round(exited/total*100):0;
   const ex2Pct=exited?Math.round(ex2/exited*100):0;
@@ -819,6 +825,7 @@ function renderRepGrid(filter){
 function filterReps(filter,btn){
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  buildOverviewKPIs(filter);
   renderRepGrid(filter);
 }
 
