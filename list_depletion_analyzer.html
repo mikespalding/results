@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Depletion Analyzer · Rebuilt Acquisitions</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #222222;
+      --border: #2e2e2e;
+      --border2: #3a3a3a;
+      --text: #e8e6e0;
+      --text2: #8a8880;
+      --text3: #555350;
+      --accent: #c8f060;
+      --red: #ff5f5f;
+      --amber: #f0a840;
+      --green: #5fb86a;
+      --blue: #5b9ef0;
+      --done-col: #555350;
+      --ip-col: #5b9ef0;
+      --new-col: #5fb86a;
+      --unr-col: #cc5038;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+    .app { max-width: 1020px; margin: 0 auto; padding: 24px 20px 60px; }
+
+    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .logo { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+    .title { font-size: 22px; font-weight: 600; color: var(--text); }
+    .subtitle { font-size: 13px; color: var(--text2); margin-top: 3px; }
+    .date-badge { font-family: var(--mono); font-size: 10px; color: var(--text3); background: var(--surface); border: 1px solid var(--border); padding: 4px 10px; border-radius: 3px; white-space: nowrap; }
+
+    .drop-zone { border: 1.5px dashed var(--border2); border-radius: 8px; padding: 32px 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface); position: relative; margin-bottom: 24px; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: #1a1f10; }
+    .drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .drop-icon { font-size: 24px; margin-bottom: 8px; opacity: 0.5; }
+    .drop-title { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .drop-sub { font-size: 12px; color: var(--text2); }
+    .drop-sub span { color: var(--accent); }
+
+    .sessions-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .sessions-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; }
+    .session-tab { font-family: var(--mono); font-size: 11px; padding: 5px 12px; border-radius: 4px; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+    .session-tab:hover { border-color: var(--accent); color: var(--text); }
+    .session-tab.active { border-color: var(--accent); background: #1a1f10; color: var(--accent); }
+    .session-tab .del { margin-left: 6px; opacity: 0.4; }
+    .session-tab .del:hover { opacity: 1; color: var(--red); }
+
+    .cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+    .card-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+    .card-value { font-family: var(--mono); font-size: 20px; font-weight: 600; color: var(--text); line-height: 1; }
+    .card-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+    .card-value.growing { color: #3dcfa0; }
+    .card-value.shrinking { color: var(--amber); }
+
+    .section-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 8px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+    th:first-child { text-align: left; }
+    td { padding: 9px 8px; border-bottom: 1px solid #1f1f1f; text-align: right; font-family: var(--mono); font-size: 12px; color: var(--text); vertical-align: middle; }
+    td:first-child { text-align: left; font-family: var(--sans); font-size: 12px; font-weight: 500; }
+    tr:last-child td { border-bottom: none; background: var(--surface2); font-weight: 600; }
+    tr:hover:not(:last-child) td { background: #1e1e1e; }
+
+    .bar-wrap { width: 90px; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; display: flex; margin: 0 auto; }
+    .bar-seg { height: 100%; flex-shrink: 0; }
+
+    .pill { display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
+    .pill-crit  { background: #2a1010; color: #ff6b6b; border: 1px solid #3d1515; }
+    .pill-watch { background: #251a08; color: #f0a840; border: 1px solid #382508; }
+    .pill-ok    { background: #0d1f10; color: #5fb86a; border: 1px solid #133018; }
+    .pill-deep  { background: #161614; color: #8a8880; border: 1px solid #2a2a28; }
+    .pill-grow  { background: #0a1f18; color: #3dcfa0; border: 1px solid #0f2e22; }
+
+    .v-red   { color: var(--red); }
+    .v-amber { color: var(--amber); }
+    .v-green { color: var(--green); }
+    .v-blue  { color: var(--blue); }
+    .v-dim   { color: var(--text3); }
+    .v-grow  { color: #3dcfa0; }
+
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+    .leg-sq { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+    .velocity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .vel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+    .vel-card.growing { border-color: #0f2e22; }
+    .vel-name { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vel-row { display: flex; justify-content: space-between; margin-bottom: 4px; align-items: baseline; }
+    .vel-lbl { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+    .vel-val { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text); }
+    .vel-divider { border: none; border-top: 1px solid var(--border); margin: 7px 0; }
+
+    .alert-banner { background: #1f1008; border: 1px solid #3d2010; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--amber); font-family: var(--mono); }
+    .info-banner  { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--text2); }
+    .info-banner strong { color: var(--accent); }
+    .grow-banner  { background: #0a1f18; border: 1px solid #0f2e22; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #3dcfa0; font-family: var(--mono); }
+
+    .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; font-family: var(--mono); }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+    .footnote { font-size: 11px; color: var(--text3); margin-top: 10px; font-family: var(--mono); line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div>
+      <div class="logo">Rebuilt · Acquisitions</div>
+      <div class="title">List Depletion Analyzer</div>
+      <div class="subtitle">Tracks gross burn rate, daily additions, and true days-to-exhaustion per list</div>
+    </div>
+    <div class="date-badge" id="clock"></div>
+  </div>
+
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept=".csv" multiple>
+    <div class="drop-icon">⬆</div>
+    <div class="drop-title">Drop Five9 list CSV here or click to browse</div>
+    <div class="drop-sub">Single snapshot = completion analysis · <span>Two+ snapshots = burn rate, add rate &amp; true depletion</span></div>
+  </div>
+
+  <div id="app-content">
+    <div class="empty">// awaiting data</div>
+  </div>
+
+</div>
+
+<script>
+let sessions = [];
+
+function tick() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) +
+    ' · ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+tick(); setInterval(tick, 30000);
+
+const dz = document.getElementById('dropZone');
+const fi = document.getElementById('fileInput');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); [...e.dataTransfer.files].filter(f=>f.name.endsWith('.csv')).forEach(handleFile); });
+fi.addEventListener('change', () => { [...fi.files].forEach(handleFile); fi.value=''; });
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const parsed = parseListCSV(e.target.result);
+    if (!parsed || !parsed.length) {
+      alert('Could not parse CSV. Expected columns: List Name, Final, In Progress, New, Unreachable - DNC, Unreachable - DND, Unreachable - Max Attempts');
+      return;
+    }
+    const label = file.name.replace(/\.csv$/i,'').replace(/[_-]/g,' ');
+    const date  = new Date(file.lastModified || Date.now());
+    sessions.push({ label, date, data: parsed });
+    sessions.sort((a,b) => a.date - b.date);
+    render();
+  };
+  reader.readAsText(file);
+}
+
+function parseListCSV(text) {
+  const result = Papa.parse(text, { header:true, skipEmptyLines:true, transformHeader: h=>h.trim() });
+  if (!result.data.length) return null;
+  const sample = result.data[0];
+  const find = (...kws) => Object.keys(sample).find(k => kws.some(kw => k.toLowerCase().includes(kw.toLowerCase())));
+  const nameCol  = find('list name','list','name');
+  const finalCol = find('final');
+  const ipCol    = find('in progress','inprogress');
+  const newCol   = find('new');
+  const dncCol   = find('dnc');
+  const dndCol   = find('dnd');
+  const maxCol   = find('max');
+  if (!nameCol || !finalCol) return null;
+  const toNum = v => parseInt((v||'0').toString().replace(/[^0-9]/g,''))||0;
+  const isTotal = n => !n || /total|grand/i.test(n) || !n.trim();
+  return result.data
+    .filter(r => r[nameCol] && !isTotal(r[nameCol]))
+    .map(r => ({
+      name:   r[nameCol].trim(),
+      final:  toNum(r[finalCol]),
+      ip:     toNum(ipCol  ? r[ipCol]  : 0),
+      new:    toNum(newCol ? r[newCol] : 0),
+      dnc:    toNum(dncCol ? r[dncCol] : 0),
+      dnd:    toNum(dndCol ? r[dndCol] : 0),
+      maxatt: toNum(maxCol ? r[maxCol] : 0),
+    }));
+}
+
+function enrich(d) {
+  const r = {...d};
+  r.unr      = r.dnc + r.dnd + r.maxatt;
+  r.total    = r.final + r.ip + r.new + r.unr;
+  r.workable = r.ip + r.new;
+  r.done_pct = r.total ? Math.round((r.final+r.unr)/r.total*100) : 0;
+  r.new_pct  = r.total ? Math.round(r.new/r.total*100) : 0;
+  return r;
+}
+
+// ── Core depletion math (dynamic list size) ──────────────────────────────
+//
+//  Between two snapshots, total records can go up (additions) or net-down.
+//  We know:
+//    Δtotal    = total2 − total1             (observed net change in list size)
+//    grossBurn = Δfinal + Δunreachable       (records moved to terminal states — only ever increases)
+//    added     = Δtotal + grossBurn          (must have been added to account for both changes)
+//
+//  Rates per day:
+//    grossPerDay = grossBurn / days
+//    addPerDay   = max(0, added) / days
+//    netPerDay   = grossPerDay − addPerDay   (> 0 = shrinking, ≤ 0 = growing)
+//
+//  Days to exhaustion = workable2 / netPerDay
+//    → If netPerDay ≤ 0, list is growing — no exhaustion while trend holds.
+//
+function computeVelocity() {
+  if (sessions.length < 2) return null;
+  const s1 = sessions[sessions.length-2];
+  const s2 = sessions[sessions.length-1];
+  const days = Math.max(0.25, (s2.date - s1.date) / 86400000);
+
+  const vel = {};
+  s2.data.forEach(row2raw => {
+    const row1raw = s1.data.find(r => r.name === row2raw.name);
+    if (!row1raw) return;
+    const r1 = enrich(row1raw);
+    const r2 = enrich(row2raw);
+
+    const deltaTotal  = r2.total - r1.total;
+    const grossBurn   = (r2.final - r1.final) + (r2.unr - r1.unr);
+    const added       = deltaTotal + grossBurn;
+    const addSafe     = Math.max(0, added);
+    const grossPerDay = grossBurn / days;
+    const addPerDay   = addSafe / days;
+    const netPerDay   = grossPerDay - addPerDay;
+    const growing     = netPerDay <= 0;
+    const daysLeft    = growing ? Infinity : r2.workable / netPerDay;
+
+    vel[r2.name] = {
+      grossPerDay:  Math.round(grossPerDay * 10) / 10,
+      addPerDay:    Math.round(addPerDay   * 10) / 10,
+      netPerDay:    Math.round(netPerDay   * 10) / 10,
+      added:        Math.round(addSafe),
+      grossBurn:    Math.round(grossBurn),
+      daysLeft:     Math.round(daysLeft),
+      deplDate:     deplDateStr(daysLeft),
+      growing,
+      days:         Math.round(days * 10) / 10,
+    };
+  });
+  return vel;
+}
+
+function deplDateStr(days) {
+  if (!isFinite(days) || days > 730) return '—';
+  const d = new Date();
+  d.setDate(d.getDate() + Math.round(days));
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function fmt(n) { return Math.abs(n).toLocaleString(); }
+
+function runwayInfo(newPct, growing) {
+  if (growing)    return { label:'Growing',  cls:'pill-grow' };
+  if (newPct < 10) return { label:'Critical', cls:'pill-crit' };
+  if (newPct < 25) return { label:'Watch',    cls:'pill-watch' };
+  if (newPct < 50) return { label:'Healthy',  cls:'pill-ok' };
+  return { label:'Deep', cls:'pill-deep' };
+}
+
+function deplClass(days, growing) {
+  if (growing || !isFinite(days)) return 'v-grow';
+  if (days <= 7)  return 'v-red';
+  if (days <= 21) return 'v-amber';
+  if (days <= 60) return 'v-green';
+  return 'v-dim';
+}
+
+function render() {
+  const content = document.getElementById('app-content');
+  if (!sessions.length) { content.innerHTML = '<div class="empty">// awaiting data</div>'; return; }
+
+  const activeIdx = sessions.length - 1;
+  const rows = sessions[activeIdx].data.map(enrich);
+  const vel  = computeVelocity();
+
+  const tot = rows.reduce((a,r) => ({
+    total:a.total+r.total, final:a.final+r.final,
+    ip:a.ip+r.ip, new:a.new+r.new, unr:a.unr+r.unr, workable:a.workable+r.workable,
+  }), {total:0,final:0,ip:0,new:0,unr:0,workable:0});
+
+  let totGross=0, totAdd=0, totNet=0, growingCount=0;
+  if (vel) {
+    Object.values(vel).forEach(v => { totGross+=v.grossPerDay; totAdd+=v.addPerDay; totNet+=v.netPerDay; if(v.growing) growingCount++; });
+    totGross = Math.round(totGross*10)/10;
+    totAdd   = Math.round(totAdd  *10)/10;
+    totNet   = Math.round(totNet  *10)/10;
+  }
+
+  const critical = rows.filter(r => {
+    const v = vel ? vel[r.name] : null;
+    return r.new_pct < 10 && r.new < 200 && !(v && v.growing);
+  });
+
+  let html = '';
+
+  // Session tabs
+  html += `<div class="sessions-bar"><span class="sessions-label">Snapshots:</span>`;
+  sessions.forEach((s,i) => {
+    const lbl = s.date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    html += `<span class="session-tab ${i===activeIdx?'active':''}" onclick="switchSession(${i})">
+      ${s.label} <span style="color:var(--text3);font-size:10px">${lbl}</span>
+      <span class="del" onclick="event.stopPropagation();deleteSession(${i})">✕</span>
+    </span>`;
+  });
+  html += `</div>`;
+
+  // Banners
+  if (critical.length) {
+    html += `<div class="alert-banner">⚠ Critical: ${critical.map(r=>r.name).join(', ')} — &lt;10% new records with no add rate offsetting burn.</div>`;
+  }
+  if (vel) {
+    const s1 = sessions[sessions.length-2], s2 = sessions[sessions.length-1];
+    const d  = Math.round(Math.abs(s2.date-s1.date)/86400000*10)/10;
+    html += `<div class="info-banner">
+      Comparing <strong>${s1.label}</strong> → <strong>${s2.label}</strong> &nbsp;·&nbsp; <strong>${d} day${d!==1?'s':''}</strong> elapsed &nbsp;·&nbsp;
+      Gross burn: <strong>${totGross}/day</strong> &nbsp;·&nbsp; Adds: <strong>+${totAdd}/day</strong> &nbsp;·&nbsp;
+      Net: <strong class="${totNet<=0?'':''}${totNet<=0?'v-grow':''}" style="${totNet<=0?'color:#3dcfa0':''}">${totNet<=0?'▲ growing (adds &gt; burn)':'▼ '+totNet+'/day net depletion'}</strong>
+    </div>`;
+    if (growingCount > 0) {
+      html += `<div class="grow-banner">▲ ${growingCount} list${growingCount>1?'s are':' is'} growing — add rate exceeds burn rate. Runway is effectively unlimited while this trend holds.</div>`;
+    }
+  } else {
+    html += `<div class="info-banner">Load a <strong>second CSV</strong> from a different date to calculate burn rate, add rate, and true days-to-exhaustion — accounting for records added between snapshots.</div>`;
+  }
+
+  // Summary cards
+  const totNewPct = Math.round(tot.new/tot.total*100);
+  html += `<div class="cards">
+    <div class="card"><div class="card-label">Total records</div><div class="card-value">${fmt(tot.total)}</div></div>
+    <div class="card"><div class="card-label">Worked (final)</div><div class="card-value">${fmt(tot.final)}</div><div class="card-sub">${Math.round(tot.final/tot.total*100)}% of portfolio</div></div>
+    <div class="card"><div class="card-label">Workable left</div><div class="card-value">${fmt(tot.workable)}</div><div class="card-sub">in progress + new</div></div>
+    <div class="card"><div class="card-label">Exhausted</div><div class="card-value">${fmt(tot.unr)}</div><div class="card-sub">DNC · DND · max att.</div></div>
+    ${vel
+      ? `<div class="card"><div class="card-label">Net depl./day</div>
+           <div class="card-value ${totNet<=0?'growing':'shrinking'}">${totNet<=0?'▲ +'+fmt(Math.abs(totNet)):'▼ '+fmt(totNet)}</div>
+           <div class="card-sub">${totAdd}/day added · ${totGross}/day burned</div></div>`
+      : `<div class="card"><div class="card-label">New inventory</div><div class="card-value">${fmt(tot.new)}</div><div class="card-sub">${totNewPct}% of total</div></div>`
+    }
+  </div>`;
+
+  // Legend
+  html += `<div class="legend">
+    <span class="leg"><span class="leg-sq" style="background:var(--done-col)"></span>Final</span>
+    <span class="leg"><span class="leg-sq" style="background:var(--unr-col)"></span>Unreachable</span>
+    <span class="leg"><span class="leg-sq" style="background:var(--ip-col)"></span>In Progress</span>
+    <span class="leg"><span class="leg-sq" style="background:var(--new-col)"></span>New</span>
+  </div>`;
+
+  // Table
+  const velCols = vel ? `<th>Gross/day</th><th>Add/day</th><th>Net/day</th><th>Days left</th><th>Depletes</th>` : '';
+  html += `<div class="section-label">List Detail</div><div class="table-wrap"><table>
+    <thead><tr>
+      <th>List</th><th>Total</th><th>% Done</th><th>Composition</th>
+      <th>New left</th><th>In Prog.</th>${velCols}<th>Runway</th>
+    </tr></thead><tbody>`;
+
+  rows.forEach(r => {
+    const v = vel ? vel[r.name] : null;
+    const isGrowing = v && v.growing;
+    const rw = runwayInfo(r.new_pct, isGrowing);
+    const fP = Math.round(r.final/r.total*100), uP = Math.round(r.unr/r.total*100);
+    const iP = Math.round(r.ip/r.total*100),   nP = Math.round(r.new/r.total*100);
+
+    let dc = '';
+    if (v) dc = deplClass(v.daysLeft, v.growing);
+
+    let deplCells = '';
+    if (vel) {
+      if (v) {
+        deplCells = `
+          <td><span class="v-green">${v.grossPerDay > 0 ? v.grossPerDay : '—'}</span></td>
+          <td><span class="v-blue">${v.addPerDay > 0 ? '+'+v.addPerDay : '—'}</span></td>
+          <td><span class="${v.growing?'v-grow':'v-amber'}">${v.growing ? '▲ grow' : '▼ '+v.netPerDay}</span></td>
+          <td><span class="${dc}">${v.growing ? '∞' : v.daysLeft+'d'}</span></td>
+          <td><span class="${dc}" style="font-size:11px">${v.growing ? 'Growing' : v.deplDate}</span></td>`;
+      } else {
+        deplCells = '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>';
+      }
+    }
+
+    html += `<tr>
+      <td>${r.name}</td><td>${fmt(r.total)}</td><td>${r.done_pct}%</td>
+      <td><div class="bar-wrap">
+        <div class="bar-seg" style="width:${fP}%;background:var(--done-col)"></div>
+        <div class="bar-seg" style="width:${uP}%;background:var(--unr-col)"></div>
+        <div class="bar-seg" style="width:${iP}%;background:var(--ip-col)"></div>
+        <div class="bar-seg" style="width:${nP}%;background:var(--new-col)"></div>
+      </div></td>
+      <td>${fmt(r.new)} <span style="color:var(--text3);font-size:10px">(${r.new_pct}%)</span></td>
+      <td>${fmt(r.ip)}</td>
+      ${deplCells}
+      <td><span class="pill ${rw.cls}">${rw.label}</span></td>
+    </tr>`;
+  });
+
+  // Totals row
+  const tFP=Math.round(tot.final/tot.total*100), tUP=Math.round(tot.unr/tot.total*100);
+  const tIP=Math.round(tot.ip/tot.total*100),    tNP=Math.round(tot.new/tot.total*100);
+  const totRw = runwayInfo(totNewPct, totNet<=0 && !!vel);
+  html += `<tr>
+    <td>All lists</td><td>${fmt(tot.total)}</td>
+    <td>${Math.round((tot.final+tot.unr)/tot.total*100)}%</td>
+    <td><div class="bar-wrap">
+      <div class="bar-seg" style="width:${tFP}%;background:var(--done-col)"></div>
+      <div class="bar-seg" style="width:${tUP}%;background:var(--unr-col)"></div>
+      <div class="bar-seg" style="width:${tIP}%;background:var(--ip-col)"></div>
+      <div class="bar-seg" style="width:${tNP}%;background:var(--new-col)"></div>
+    </div></td>
+    <td>${fmt(tot.new)} <span style="color:var(--text3);font-size:10px">(${totNewPct}%)</span></td>
+    <td>${fmt(tot.ip)}</td>
+    ${vel
+      ? `<td><span class="v-green">${totGross}</span></td>
+         <td><span class="v-blue">+${totAdd}</span></td>
+         <td><span class="${totNet<=0?'v-grow':'v-amber'}">${totNet<=0?'▲ grow':'▼ '+totNet}</span></td>
+         <td>—</td><td>—</td>`
+      : ''}
+    <td><span class="pill ${totRw.cls}">${totRw.label}</span></td>
+  </tr></tbody></table></div>`;
+
+  // Velocity detail cards
+  html += `<hr class="divider">`;
+  if (vel) {
+    html += `<div class="section-label" style="margin-top:0">Depletion Velocity by List</div><div class="velocity-grid">`;
+    rows.forEach(r => {
+      const v = vel[r.name];
+      if (!v) return;
+      const dc = deplClass(v.daysLeft, v.growing);
+      html += `<div class="vel-card ${v.growing?'growing':''}">
+        <div class="vel-name">${r.name}</div>
+        <div class="vel-row"><span class="vel-lbl">Gross burn/day</span><span class="vel-val v-green">${v.grossPerDay > 0 ? v.grossPerDay : '—'}</span></div>
+        <div class="vel-row"><span class="vel-lbl">Records added/day</span><span class="vel-val v-blue">${v.addPerDay > 0 ? '+'+v.addPerDay : '—'}</span></div>
+        <div class="vel-row"><span class="vel-lbl">Net depletion/day</span><span class="vel-val ${v.growing?'v-grow':'v-amber'}">${v.growing?'▲ growing':'▼ '+v.netPerDay}</span></div>
+        <hr class="vel-divider">
+        <div class="vel-row"><span class="vel-lbl">Days to exhaustion</span><span class="vel-val ${dc}">${v.growing||!isFinite(v.daysLeft)?'∞':v.daysLeft+'d'}</span></div>
+        <div class="vel-row"><span class="vel-lbl">Est. depletion date</span><span class="vel-val ${dc}" style="font-size:11px">${v.growing?'Growing':v.deplDate}</span></div>
+        <hr class="vel-divider">
+        <div class="vel-row"><span class="vel-lbl">Added this period</span><span class="vel-val">${v.added > 0 ? '+'+fmt(v.added) : '—'}</span></div>
+        <div class="vel-row"><span class="vel-lbl">Burned this period</span><span class="vel-val">${v.grossBurn > 0 ? fmt(v.grossBurn) : '—'}</span></div>
+      </div>`;
+    });
+    html += `</div>
+    <div class="footnote">
+      Method: added/day = (Δtotal + gross burn) ÷ days elapsed &nbsp;·&nbsp;
+      gross burn = Δfinal + Δunreachable &nbsp;·&nbsp;
+      net depletion = gross burn − adds &nbsp;·&nbsp;
+      days to exhaustion = workable ÷ net depletion rate &nbsp;·&nbsp;
+      growing lists (add rate &gt; burn rate) show ∞ runway
+    </div>`;
+  } else {
+    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;">
+      <span style="color:var(--accent);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:6px">Unlock velocity tracking</span>
+      <span style="font-size:12px;color:var(--text2);">Drop a second CSV from a different date. The tool derives daily add rate from the change in total records + gross completions — no extra columns needed from Five9.</span>
+    </div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+function switchSession(i) { render(); }
+function deleteSession(i) { sessions.splice(i,1); render(); }
+
+render();
+</script>
+</body>
+</html>
