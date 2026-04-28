@@ -267,13 +267,13 @@ tbody tr:last-child td{border-bottom:none;}
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Hour (CT)</th>
               <th colspan="8" class="g-ib">Inbound</th>
-              <th colspan="3" class="g-ob sect-start">Outbound</th>
+              <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
               <th>Total</th><th>Offered</th><th>FTIBC</th><th>Answered</th>
               <th>Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
-              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Conv %</th>
+              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
           </thead>
@@ -321,13 +321,13 @@ tbody tr:last-child td{border-bottom:none;}
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Date</th>
               <th colspan="8" class="g-ib">Inbound</th>
-              <th colspan="3" class="g-ob sect-start">Outbound</th>
+              <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
               <th>Total</th><th>After Hrs</th><th>HOO</th>
               <th>Offered</th><th>Answered</th><th>Ans %</th><th>Adj %</th><th>QCBs</th>
-              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Conv %</th>
+              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
           </thead>
@@ -367,13 +367,13 @@ tbody tr:last-child td{border-bottom:none;}
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Week Of</th>
               <th colspan="7" class="g-ib">Inbound</th>
-              <th colspan="3" class="g-ob sect-start">Outbound</th>
+              <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
               <th>Total</th><th>After Hrs</th><th>HOO</th><th>Pre-Q Abn</th><th>Robo</th>
               <th>Offered</th><th>Answered</th>
-              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Conv %</th>
+              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
           </thead>
@@ -428,7 +428,7 @@ function agg(rows) {
   s.ob_answered_pct     = pct(s.ob_answered, s.ob_total_calls);
   s.ob_conversation_pct = pct(s.ob_conversations, s.ob_total_calls);
   s.ob_positive_pct     = pct(s.ob_appt_set+s.ob_opportunity, s.ob_conversations);
-  s.ob_avg_talk_secs_real = s.ob_conversations>0 ? s.ob_talk_secs_total/s.ob_conversations : 0;
+  s.ob_avg_talk_secs    = s.ob_answered>0 ? s.ob_talk_secs_total/s.ob_answered : 0;
   return s;
 }
 
@@ -546,7 +546,7 @@ function renderHourly() {
   const rows = rawRows.filter(r => r.call_date === dateInput);
 
   if (rows.length===0) {
-    document.getElementById('hourly-tbody').innerHTML='<tr><td colspan="15" style="text-align:center;color:var(--text-dim);padding:24px">No data for this date</td></tr>';
+    document.getElementById('hourly-tbody').innerHTML='<tr><td colspan="17" style="text-align:center;color:var(--text-dim);padding:24px">No data for this date</td></tr>';
     document.getElementById('hourly-kpis').innerHTML='';
     document.getElementById('hourly-loading').style.display='none';
     document.getElementById('hourly-content').style.display='block';
@@ -578,7 +578,7 @@ function renderHourly() {
       side:'ob', label:'Outbound', cards:[
         {label:'OB Calls',      val:fmt.num(tot.ob_total_calls),   accent:'var(--orange)'},
         {label:'Contact %',     val:fmt.pct(tot.ob_answered_pct),  sub:`${fmt.num(tot.ob_answered)} contacted`, accent:'var(--orange)'},
-        {label:'Avg Talk', val:fmt.talk(tot.ob_avg_talk_secs_real), accent:'var(--orange)'},
+        {label:'Avg Talk', val:fmt.talk(tot.ob_avg_talk_secs), accent:'var(--orange)'},
         {label:'Conv Rate',val:fmt.pct(tot.ob_conversation_pct),sub:`${fmt.num(tot.ob_conversations)} convs`, accent:'var(--orange)'},
       ]
     }
@@ -632,6 +632,7 @@ function renderHourly() {
       <td>${fmt.pct(h.ib_positive_pct)}</td>
       <td class="sect-start">${fmt.num(h.ob_total_calls)}</td>
       <td>${fmt.num(h.ob_answered)}</td>
+      <td>${fmt.talk(h.ob_avg_talk_secs)}</td>
       <td>${fmt.pct(h.ob_conversation_pct)}</td>
       <td class="sect-start">${fmt.num(h.ib_appt_set)}</td>
       <td>${fmt.num(h.ib_opportunity)}</td>
@@ -668,7 +669,7 @@ function renderDaily() {
       side:'ob', label:'Outbound', cards:[
         {label:'OB Calls',      val:fmt.num(tot.ob_total_calls),   accent:'var(--orange)'},
         {label:'Contact %',     val:fmt.pct(tot.ob_answered_pct),  sub:`${fmt.num(tot.ob_answered)} contacted`, accent:'var(--orange)'},
-        {label:'Avg Talk', val:fmt.talk(tot.ob_avg_talk_secs_real), accent:'var(--orange)'},
+        {label:'Avg Talk', val:fmt.talk(tot.ob_avg_talk_secs), accent:'var(--orange)'},
         {label:'Conv Rate',val:fmt.pct(tot.ob_conversation_pct),sub:`${fmt.num(tot.ob_conversations)} convs`, accent:'var(--orange)'},
       ]
     }
@@ -709,6 +710,7 @@ function renderDaily() {
       <td class="${cls(d.ib_adj_answered_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_pct)}</td>
       <td>${fmt.num(d.ib_qcb_registered)}</td>
       <td class="sect-start">${fmt.num(d.ob_total_calls)}</td><td>${fmt.num(d.ob_answered)}</td>
+      <td>${fmt.talk(d.ob_avg_talk_secs)}</td>
       <td class="${cls(d.ob_conversation_pct,T.conv)}">${fmt.pct(d.ob_conversation_pct)}</td>
       <td class="sect-start">${fmt.num(d.ib_appt_set)}</td><td>${fmt.num(d.ib_opportunity)}</td>
       <td>${fmt.num(d.ob_appt_set)}</td><td>${fmt.num(d.ob_opportunity)}</td>
@@ -741,7 +743,7 @@ function renderWeekly() {
       side:'ob', label:'Outbound (8 wk)', cards:[
         {label:'OB Calls',      val:last8.ob_total_calls.toLocaleString(), accent:'var(--orange)'},
         {label:'Contact %',     val:fmt.pct(last8.ob_answered_pct), sub:`${fmt.num(last8.ob_answered)} contacted`, accent:'var(--orange)'},
-        {label:'Avg Talk', val:fmt.talk(last8.ob_avg_talk_secs_real), accent:'var(--orange)'},
+        {label:'Avg Talk', val:fmt.talk(last8.ob_avg_talk_secs), accent:'var(--orange)'},
         {label:'Conv Rate',val:fmt.pct(last8.ob_conversation_pct),    sub:`${fmt.num(last8.ob_conversations)} convs`, accent:'var(--orange)'},
       ]
     }
@@ -780,6 +782,7 @@ function renderWeekly() {
       <td>${fmt.num(w.ib_pre_queue_abandon)}</td><td>${fmt.num(w.ib_robo_calls)}</td>
       <td>${fmt.num(w.ib_offered)}</td><td>${fmt.num(w.ib_answered)}</td>
       <td class="sect-start">${fmt.num(w.ob_total_calls)}</td><td>${fmt.num(w.ob_answered)}</td>
+      <td>${fmt.talk(w.ob_avg_talk_secs)}</td>
       <td class="${cls(w.ob_conversation_pct,T.conv)}">${fmt.pct(w.ob_conversation_pct)}</td>
       <td class="sect-start">${fmt.num(w.ib_appt_set)}</td><td>${fmt.num(w.ib_opportunity)}</td>
       <td>${fmt.num(w.ob_appt_set)}</td><td>${fmt.num(w.ob_opportunity)}</td>
