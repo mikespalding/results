@@ -605,8 +605,9 @@ function renderHourly() {
     {type:'bar', label:'OB Calls',     data:active.map(h=>h.ob_total_calls),      backgroundColor:'rgba(245,131,31,0.15)', yAxisID:'y',order:3,stack:'ob'},
     {type:'bar', label:'Contacted',    data:active.map(h=>h.ob_answered),         backgroundColor:'rgba(245,131,31,0.50)', yAxisID:'y',order:2,stack:'ob'},
     {type:'bar', label:'Conversations',data:active.map(h=>h.ob_conversations),    backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ob'},
+    {type:'line',label:'Contact %',    data:active.map(h=>h.ob_answered_pct),     borderColor:'#f5831f',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Conv %',       data:active.map(h=>h.ob_conversation_pct), borderColor:'#f5c842',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
-  ],lb,'Calls','Conv Rate %',true,'auto');
+  ],lb,'Calls','Rate %',true,'auto');
 
   mkChart('c-hr-ob-appt',[
     {type:'bar',label:'Appt Set',   data:active.map(h=>h.ob_appt_set),   backgroundColor:'rgba(245,131,31,0.75)',yAxisID:'y',order:2},
@@ -689,8 +690,9 @@ function renderDaily() {
     {type:'bar', label:'OB Calls',     data:ch.map(d=>d.ob_total_calls),      backgroundColor:'rgba(245,131,31,0.15)', yAxisID:'y',order:3,stack:'ob'},
     {type:'bar', label:'Contacted',    data:ch.map(d=>d.ob_answered),         backgroundColor:'rgba(245,131,31,0.50)', yAxisID:'y',order:2,stack:'ob'},
     {type:'bar', label:'Conversations',data:ch.map(d=>d.ob_conversations),    backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ob'},
+    {type:'line',label:'Contact %',    data:ch.map(d=>d.ob_answered_pct),     borderColor:'#f5831f',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Conv %',       data:ch.map(d=>d.ob_conversation_pct), borderColor:'#f5c842',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
-  ],lb,'Calls','Conv Rate %',true,'auto');
+  ],lb,'Calls','Rate %',true,'auto');
   mkChart('c-ob-appt',[
     {type:'bar',label:'Appt Set',   data:ch.map(d=>d.ob_appt_set),   backgroundColor:'rgba(245,131,31,0.75)',yAxisID:'y',order:2},
     {type:'bar',label:'Opportunity',data:ch.map(d=>d.ob_opportunity), backgroundColor:'rgba(245,131,31,0.3)', yAxisID:'y',order:2},
@@ -760,8 +762,9 @@ function renderWeekly() {
     {type:'bar', label:'OB Calls',     data:cw.map(w=>w.ob_total_calls),      backgroundColor:'rgba(245,131,31,0.15)', yAxisID:'y',order:3,stack:'ob'},
     {type:'bar', label:'Contacted',    data:cw.map(w=>w.ob_answered),         backgroundColor:'rgba(245,131,31,0.50)', yAxisID:'y',order:2,stack:'ob'},
     {type:'bar', label:'Conversations',data:cw.map(w=>w.ob_conversations),    backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ob'},
+    {type:'line',label:'Contact %',    data:cw.map(w=>w.ob_answered_pct),     borderColor:'#f5831f',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Conv %',       data:cw.map(w=>w.ob_conversation_pct), borderColor:'#f5c842',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
-  ],lb,'Calls','Conv Rate %',true,'auto');
+  ],lb,'Calls','Rate %',true,'auto');
   mkChart('c-wob-appt',[
     {type:'bar',label:'Appt Set',   data:cw.map(w=>w.ob_appt_set),   backgroundColor:'rgba(245,131,31,0.75)',yAxisID:'y',order:2},
     {type:'bar',label:'Opportunity',data:cw.map(w=>w.ob_opportunity), backgroundColor:'rgba(245,131,31,0.3)', yAxisID:'y',order:2},
