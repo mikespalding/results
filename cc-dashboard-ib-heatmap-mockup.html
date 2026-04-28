@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup · IB Heatmaps · Contact Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#21a9e1; --teal:#64b4b7; --dark-teal:#0f696e; --orange:#f5831f;
+  --navy:#1f3540; --navy-mid:#243d4c; --offwhite:#efedeb;
+  --green:#2ecc71; --red:#e74c3c; --yellow:#f5c842;
+  --font:'Montserrat',sans-serif;
+  --text-dim:#7a8a94; --text-mid:#4a6478;
+}
+body{font-family:var(--font);background:var(--offwhite);color:var(--navy);min-height:100vh;}
+
+/* HEADER */
+.site-header{background:var(--navy);height:64px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,0.28);}
+.header-left{display:flex;align-items:center;gap:16px;}
+.header-divider{width:1px;height:32px;background:rgba(255,255,255,0.15);}
+.header-title-main{font-size:14px;font-weight:800;color:#fff;letter-spacing:.01em;line-height:1;}
+.header-title-sub{font-size:10px;font-weight:600;color:var(--text-dim);letter-spacing:.12em;text-transform:uppercase;line-height:1;margin-top:2px;}
+.mockup-pill{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--orange);padding:3px 8px;border-radius:4px;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.last-updated{font-size:11px;color:#7a8a94;font-weight:500;}
+
+/* TABS */
+.tabs{background:var(--navy);border-bottom:1px solid rgba(31,53,64,0.10);padding:0 28px;display:flex;gap:2px;}
+.tab{padding:11px 18px;font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.04em;text-transform:uppercase;}
+.tab:hover{color:#cfd8dd;}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* LAYOUT */
+.main{padding:22px 28px;max-width:1700px;margin:0 auto;}
+
+/* TOOL BAR */
+.tool-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.tool-bar label{font-size:10px;font-weight:700;color:#7a8a94;text-transform:uppercase;letter-spacing:.9px;}
+.day-btn{background:#fff;border:1px solid rgba(31,53,64,0.18);color:#4a6478;padding:5px 12px;border-radius:6px;font-size:12px;font-family:var(--font);font-weight:600;cursor:pointer;transition:all .15s;}
+.day-btn:hover{border-color:var(--blue);color:var(--blue);}
+.day-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.tool-divider{width:1px;height:22px;background:rgba(31,53,64,0.15);}
+
+/* KPI STRIP */
+.kpi-section{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.kpi{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(31,53,64,0.07);}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--blue));}
+.kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7a8a94;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:800;line-height:1;color:var(--navy);}
+.kpi-sub{font-size:10px;color:#7a8a94;margin-top:4px;font-weight:600;}
+
+/* SECTION HEAD */
+.sec-head{display:flex;align-items:center;gap:10px;margin:22px 0 10px;}
+.sec-head h2{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.8px;color:#5a7888;}
+.sec-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;background:rgba(33,169,225,.12);color:var(--blue);}
+.sec-line{flex:1;height:1px;background:rgba(31,53,64,0.10);}
+
+/* HEATMAP CARD */
+.heatmap-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:18px 20px 14px;box-shadow:0 1px 4px rgba(31,53,64,0.07);margin-bottom:18px;}
+.heatmap-meta{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.heatmap-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;}
+.heatmap-sub{font-size:10px;color:#7a8a94;font-weight:600;margin-top:3px;}
+
+/* HEATMAP GRID */
+.heatmap-grid{display:grid;grid-template-columns:74px repeat(7,1fr);gap:3px;}
+.hm-corner{}
+.hm-col{font-size:10px;font-weight:800;text-align:center;color:#5a7888;text-transform:uppercase;letter-spacing:.8px;padding:6px 0 8px;border-bottom:1px solid rgba(31,53,64,0.10);}
+.hm-col .dow-sub{display:block;font-size:8px;color:#a9b6bd;font-weight:600;margin-top:1px;letter-spacing:.4px;}
+.hm-col.weekend{color:#a9b6bd;}
+.hm-row-label{font-size:10px;font-weight:700;color:#5a7888;text-align:right;padding:0 8px;display:flex;align-items:center;justify-content:flex-end;font-variant-numeric:tabular-nums;}
+.hm-cell{
+  position:relative;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy);
+  cursor:default;transition:transform .12s,box-shadow .12s;
+  border:1px solid rgba(31,53,64,0.05);
+}
+.hm-cell:hover{transform:scale(1.06);box-shadow:0 4px 12px rgba(31,53,64,0.18);z-index:5;border-color:rgba(31,53,64,0.25);}
+.hm-cell.zero{background:#f3f1ef;color:#c4ccd1;font-weight:500;}
+.hm-cell.dim{color:rgba(31,53,64,0.55);}
+.hm-cell.bright{color:#fff;}
+.hm-tooltip{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--navy);color:#fff;font-size:10px;font-weight:600;
+  padding:6px 9px;border-radius:5px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+}
+.hm-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--navy);}
+.hm-cell:hover .hm-tooltip{opacity:1;}
+
+/* LEGEND */
+.legend-row{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(31,53,64,0.08);flex-wrap:wrap;}
+.legend-label{font-size:10px;font-weight:700;color:#7a8a94;text-transform:uppercase;letter-spacing:.8px;}
+.legend-bar{display:flex;flex:1;min-width:240px;max-width:380px;height:14px;border-radius:4px;overflow:hidden;border:1px solid rgba(31,53,64,0.10);}
+.legend-stop{flex:1;}
+.legend-ticks{display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#5a7888;font-variant-numeric:tabular-nums;width:100%;max-width:380px;min-width:240px;}
+
+/* INSIGHTS */
+.insights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+@media(max-width:960px){.insights-grid{grid-template-columns:1fr;}}
+.insight-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(31,53,64,0.07);}
+.insight-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;margin-bottom:10px;}
+.insight-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(31,53,64,0.06);font-size:12px;}
+.insight-row:last-child{border-bottom:none;}
+.insight-row .lbl{color:#4a6478;font-weight:600;}
+.insight-row .v{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;}
+.insight-row .v .pill{display:inline-block;background:var(--blue);color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;font-weight:700;}
+
+/* MOCKUP NOTE */
+.mockup-note{background:rgba(245,131,31,.08);border:1px dashed rgba(245,131,31,.4);border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:var(--navy);font-weight:500;line-height:1.5;}
+.mockup-note strong{color:var(--orange);}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <div class="header-title">
+      <div class="header-title-main">Contact Center</div>
+      <div class="header-title-sub">Performance Dashboard</div>
+    </div>
+    <div class="header-divider"></div>
+    <span class="mockup-pill">Mockup</span>
+  </div>
+  <div class="header-right">
+    <span class="last-updated">Mock data · for design review</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tab">Hourly</div>
+  <div class="tab">Daily</div>
+  <div class="tab">Weekly</div>
+  <div class="tab active">IB Heatmaps</div>
+</nav>
+
+<main class="main">
+
+  <div class="mockup-note">
+    <strong>Mockup preview.</strong> This file uses fabricated values to validate layout and color scale. After approval, this view becomes a 4th tab in <code>cc_dashboard.html</code> driven by the live <code>ib_offered</code> data, averaged per (day-of-week × hour) cell over the selected window.
+  </div>
+
+  <!-- TOOL BAR -->
+  <div class="tool-bar">
+    <label>Window</label>
+    <button class="day-btn">7d</button>
+    <button class="day-btn">14d</button>
+    <button class="day-btn active">30d</button>
+    <button class="day-btn">60d</button>
+    <div class="tool-divider"></div>
+    <label>Hours</label>
+    <button class="day-btn active">Business (7a–8p)</button>
+    <button class="day-btn">All 24h</button>
+    <div class="tool-divider"></div>
+    <label>Metric</label>
+    <button class="day-btn active">Avg Offered</button>
+    <button class="day-btn">Total Offered</button>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-section" id="kpis"></div>
+
+  <!-- HEATMAP -->
+  <div class="sec-head">
+    <span class="sec-badge">IB</span>
+    <h2>Calls Offered · Avg per Hour by Day of Week</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="heatmap-card">
+    <div class="heatmap-meta">
+      <div>
+        <div class="heatmap-title">Average IB Calls Offered</div>
+        <div class="heatmap-sub">Last 30 days · Mar 29 – Apr 27, 2026 · all times Central</div>
+      </div>
+      <div class="heatmap-sub" id="rangeSub">Each cell = avg offered for that hour on that day of week</div>
+    </div>
+
+    <div class="heatmap-grid" id="grid"></div>
+
+    <div class="legend-row">
+      <span class="legend-label">Fewer ←</span>
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px;max-width:380px;min-width:240px;">
+        <div class="legend-bar" id="legendBar"></div>
+        <div class="legend-ticks" id="legendTicks"></div>
+      </div>
+      <span class="legend-label">→ More</span>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-title">Top 5 Hottest Cells</div>
+      <div id="topCells"></div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-title">By Day of Week (Daily Avg Offered)</div>
+      <div id="byDow"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── Mock data generator ──
+// Realistic IB pattern: M-F peak 9a-12p and 1p-4p; lower weekends; tail off after-hours
+const HOURS = Array.from({length:14},(_,i)=>i+7); // 7..20
+const DOW   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DOW_FACTOR = [1.00, 1.06, 1.04, 1.02, 0.92, 0.42, 0.30];
+const HOUR_FACTOR = {7:0.10,8:0.45,9:1.00,10:1.18,11:1.10,12:0.78,13:0.92,14:1.05,15:1.00,16:0.82,17:0.55,18:0.30,19:0.18,20:0.08};
+const PEAK = 38; // peak avg offered/hr in mock
+
+function mockAvg(dowIdx, hour){
+  const base = PEAK * (HOUR_FACTOR[hour]||0) * DOW_FACTOR[dowIdx];
+  // jitter so it's not a clean gradient
+  const seed = (dowIdx*97 + hour*13) % 11;
+  const jitter = 1 + ((seed-5)/35);
+  return Math.max(0, Math.round(base * jitter * 10) / 10);
+}
+
+// Build cell grid: data[dowIdx][hour] = value
+const data = DOW.map((_,d)=>{
+  const o = {};
+  HOURS.forEach(h => o[h] = mockAvg(d,h));
+  return o;
+});
+
+// ── Color scale (light → blue → teal → navy) ──
+const STOPS = [
+  [0.00, [243,241,239]], // offwhite-ish
+  [0.20, [197,228,242]],
+  [0.45, [129,200,229]],
+  [0.70, [ 33,169,225]], // blue
+  [1.00, [ 15,105,110]], // dark teal
+];
+function lerp(a,b,t){return a+(b-a)*t;}
+function colorAt(t){
+  t = Math.max(0,Math.min(1,t));
+  for(let i=0;i<STOPS.length-1;i++){
+    const [t0,c0]=STOPS[i],[t1,c1]=STOPS[i+1];
+    if(t>=t0 && t<=t1){
+      const k=(t-t0)/(t1-t0);
+      return [Math.round(lerp(c0[0],c1[0],k)),Math.round(lerp(c0[1],c1[1],k)),Math.round(lerp(c0[2],c1[2],k))];
+    }
+  }
+  return STOPS[STOPS.length-1][1];
+}
+const rgb = c=>`rgb(${c[0]},${c[1]},${c[2]})`;
+
+// ── Compute scale max ──
+const allVals = [];
+DOW.forEach((_,d)=>HOURS.forEach(h=>allVals.push(data[d][h])));
+const vMax = Math.max(...allVals);
+
+// ── Format hour ──
+function fmtHour(h){const a=h>=12?'PM':'AM',d=h===0?12:h>12?h-12:h;return `${d} ${a}`;}
+
+// ── Render grid ──
+const grid = document.getElementById('grid');
+let html = `<div class="hm-corner"></div>`;
+DOW.forEach((d,i)=>{
+  const isWk = i>=5;
+  html += `<div class="hm-col${isWk?' weekend':''}">${d}<span class="dow-sub">${isWk?'wknd':'wkdy'}</span></div>`;
+});
+HOURS.forEach(h=>{
+  html += `<div class="hm-row-label">${fmtHour(h)}</div>`;
+  DOW.forEach((d,i)=>{
+    const v = data[i][h];
+    const t = vMax>0 ? v/vMax : 0;
+    const c = colorAt(t);
+    const bright = t>0.55;
+    const zero = v===0;
+    const dim = !zero && t<0.18;
+    const cls = zero?'zero':(bright?'bright':(dim?'dim':''));
+    const display = zero ? '–' : (v<10 ? v.toFixed(1) : Math.round(v));
+    html += `<div class="hm-cell ${cls}" style="background:${zero?'':rgb(c)}">
+      ${display}
+      <div class="hm-tooltip">${d} · ${fmtHour(h)}<br>Avg ${v.toFixed(1)} offered</div>
+    </div>`;
+  });
+});
+grid.innerHTML = html;
+
+// ── Legend ──
+const lb = document.getElementById('legendBar');
+const stops = 24;
+let lbHTML = '';
+for(let i=0;i<stops;i++){
+  const t=i/(stops-1); lbHTML += `<div class="legend-stop" style="background:${rgb(colorAt(t))}"></div>`;
+}
+lb.innerHTML = lbHTML;
+document.getElementById('legendTicks').innerHTML = `<span>0</span><span>${(vMax/4).toFixed(0)}</span><span>${(vMax/2).toFixed(0)}</span><span>${(vMax*3/4).toFixed(0)}</span><span>${Math.round(vMax)}</span>`;
+
+// ── KPIs ──
+let peakV=-1, peakD=0, peakH=0;
+let weekdayTot=0, weekendTot=0, allTot=0;
+DOW.forEach((d,i)=>HOURS.forEach(h=>{
+  const v=data[i][h];
+  allTot+=v;
+  if(i<5) weekdayTot+=v; else weekendTot+=v;
+  if(v>peakV){peakV=v;peakD=i;peakH=h;}
+}));
+const avgPerCell = allTot/(DOW.length*HOURS.length);
+const weekdayDailyAvg = weekdayTot/5; // avg offered per weekday across business hours
+const weekendDailyAvg = weekendTot/2;
+
+document.getElementById('kpis').innerHTML = `
+  <div class="kpi" style="--accent:var(--blue)">
+    <div class="kpi-label">Peak Cell</div>
+    <div class="kpi-val">${peakV.toFixed(1)}</div>
+    <div class="kpi-sub">${DOW[peakD]} · ${fmtHour(peakH)}</div>
+  </div>
+  <div class="kpi" style="--accent:var(--teal)">
+    <div class="kpi-label">Weekday Daily Avg</div>
+    <div class="kpi-val">${Math.round(weekdayDailyAvg)}</div>
+    <div class="kpi-sub">offered / weekday (business hrs)</div>
+  </div>
+  <div class="kpi" style="--accent:var(--orange)">
+    <div class="kpi-label">Weekend Daily Avg</div>
+    <div class="kpi-val">${Math.round(weekendDailyAvg)}</div>
+    <div class="kpi-sub">offered / weekend day</div>
+  </div>
+  <div class="kpi" style="--accent:var(--dark-teal)">
+    <div class="kpi-label">Avg per Hour Cell</div>
+    <div class="kpi-val">${avgPerCell.toFixed(1)}</div>
+    <div class="kpi-sub">across all (DOW × hour) cells</div>
+  </div>
+`;
+
+// ── Top 5 hottest cells ──
+const flat = [];
+DOW.forEach((d,i)=>HOURS.forEach(h=>flat.push({d,i,h,v:data[i][h]})));
+flat.sort((a,b)=>b.v-a.v);
+document.getElementById('topCells').innerHTML = flat.slice(0,5).map(c=>`
+  <div class="insight-row">
+    <span class="lbl">${c.d} · ${fmtHour(c.h)}</span>
+    <span class="v">${c.v.toFixed(1)} <span class="pill">offered</span></span>
+  </div>`).join('');
+
+// ── By day of week ──
+const dowTotals = DOW.map((d,i)=>{
+  const sum = HOURS.reduce((s,h)=>s+data[i][h],0);
+  return {d, sum};
+});
+const dowMax = Math.max(...dowTotals.map(x=>x.sum));
+document.getElementById('byDow').innerHTML = dowTotals.map(x=>{
+  const pct = dowMax>0 ? (x.sum/dowMax*100).toFixed(0) : 0;
+  return `<div class="insight-row">
+    <span class="lbl">${x.d}</span>
+    <span class="v" style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-block;width:120px;height:6px;background:rgba(31,53,64,.08);border-radius:3px;overflow:hidden;">
+        <span style="display:block;height:100%;width:${pct}%;background:var(--blue);"></span>
+      </span>
+      ${Math.round(x.sum)}
+    </span>
+  </div>`;
+}).join('');
+</script>
+</body>
+</html>
