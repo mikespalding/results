@@ -177,6 +177,43 @@ tbody tr:last-child td{border-bottom:none;}
 .good{color:var(--green)!important;font-weight:700;}
 .warn{color:var(--yellow)!important;font-weight:700;}
 .bad{color:var(--red)!important;font-weight:700;}
+
+/* ── HEATMAP ── */
+.tool-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.tool-bar label{font-size:10px;font-weight:700;color:#7a8a94;text-transform:uppercase;letter-spacing:.9px;}
+.tool-divider{width:1px;height:22px;background:rgba(31,53,64,0.15);}
+.heatmap-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:18px 20px 14px;box-shadow:0 1px 4px rgba(31,53,64,0.07);margin-bottom:18px;}
+.heatmap-meta{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.heatmap-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;}
+.heatmap-sub{font-size:10px;color:#7a8a94;font-weight:600;margin-top:3px;}
+.heatmap-grid{display:grid;grid-template-columns:74px repeat(7,1fr);gap:3px;}
+.hm-corner{}
+.hm-col{font-size:10px;font-weight:800;text-align:center;color:#5a7888;text-transform:uppercase;letter-spacing:.8px;padding:6px 0 8px;border-bottom:1px solid rgba(31,53,64,0.10);}
+.hm-col .dow-sub{display:block;font-size:8px;color:#a9b6bd;font-weight:600;margin-top:1px;letter-spacing:.4px;}
+.hm-col.weekend{color:#a9b6bd;}
+.hm-row-label{font-size:10px;font-weight:700;color:#5a7888;text-align:right;padding:0 8px;display:flex;align-items:center;justify-content:flex-end;font-variant-numeric:tabular-nums;}
+.hm-cell{position:relative;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy);cursor:default;transition:transform .12s,box-shadow .12s;border:1px solid rgba(31,53,64,0.05);}
+.hm-cell:hover{transform:scale(1.06);box-shadow:0 4px 12px rgba(31,53,64,0.18);z-index:5;border-color:rgba(31,53,64,0.25);}
+.hm-cell.zero{background:#f3f1ef;color:#c4ccd1;font-weight:500;}
+.hm-cell.dim{color:rgba(31,53,64,0.55);}
+.hm-cell.bright{color:#fff;}
+.hm-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:10px;font-weight:600;padding:6px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+.hm-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--navy);}
+.hm-cell:hover .hm-tooltip{opacity:1;}
+.legend-row{display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(31,53,64,0.08);flex-wrap:wrap;}
+.legend-label{font-size:10px;font-weight:700;color:#7a8a94;text-transform:uppercase;letter-spacing:.8px;}
+.legend-bar{display:flex;height:14px;border-radius:4px;overflow:hidden;border:1px solid rgba(31,53,64,0.10);}
+.legend-stop{flex:1;}
+.legend-ticks{display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#5a7888;font-variant-numeric:tabular-nums;}
+.insights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+@media(max-width:960px){.insights-grid{grid-template-columns:1fr;}}
+.insight-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(31,53,64,0.07);}
+.insight-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;margin-bottom:10px;}
+.insight-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(31,53,64,0.06);font-size:12px;}
+.insight-row:last-child{border-bottom:none;}
+.insight-row .lbl{color:#4a6478;font-weight:600;}
+.insight-row .v{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;}
+.insight-row .v .pill{display:inline-block;background:var(--blue);color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -223,6 +260,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="tab active" data-view="hourly">Hourly</div>
   <div class="tab" data-view="daily">Daily</div>
   <div class="tab" data-view="weekly">Weekly</div>
+  <div class="tab" data-view="heatmap">IB Heatmaps</div>
 </nav>
 
 <main class="main">
@@ -383,12 +421,85 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
+  <!-- ══ IB HEATMAPS VIEW ══ -->
+  <div class="view" id="view-heatmap">
+    <div class="loading" id="heatmap-loading"><div class="spinner"></div><p>Building IB heatmap…</p></div>
+    <div id="heatmap-content" style="display:none">
+      <div class="tool-bar">
+        <label>Window</label>
+        <button class="day-btn" data-hm-days="7">7d</button>
+        <button class="day-btn" data-hm-days="14">14d</button>
+        <button class="day-btn active" data-hm-days="30">30d</button>
+        <button class="day-btn" data-hm-days="60">60d</button>
+        <div class="tool-divider"></div>
+        <label>Hours</label>
+        <button class="day-btn active" data-hm-hours="business">Business (7a–8p)</button>
+        <button class="day-btn" data-hm-hours="all">All 24h</button>
+        <div class="tool-divider"></div>
+        <label>Metric</label>
+        <button class="day-btn active" data-hm-metric="avg">Avg Offered</button>
+        <button class="day-btn" data-hm-metric="total">Total Offered</button>
+      </div>
+
+      <div class="kpi-section" id="heatmap-kpis" style="grid-template-columns:repeat(4,1fr)"></div>
+
+      <div class="sec-head">
+        <span class="sec-badge ib">IB</span>
+        <h2 id="heatmap-section-title">Calls Offered · Avg per Hour by Day of Week</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="heatmap-card">
+        <div class="heatmap-meta">
+          <div>
+            <div class="heatmap-title" id="heatmap-title">Average IB Calls Offered</div>
+            <div class="heatmap-sub" id="heatmap-sub">—</div>
+          </div>
+          <div class="heatmap-sub" id="heatmap-cell-note">Each cell = avg offered for that hour on that day of week</div>
+        </div>
+
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+
+        <div class="legend-row">
+          <span class="legend-label">Fewer ←</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px;max-width:380px;min-width:240px;">
+            <div class="legend-bar" id="heatmap-legend-bar"></div>
+            <div class="legend-ticks" id="heatmap-legend-ticks"></div>
+          </div>
+          <span class="legend-label">→ More</span>
+        </div>
+      </div>
+
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-title" id="heatmap-top-title">Top 5 Hottest Cells</div>
+          <div id="heatmap-top-cells"></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-title" id="heatmap-dow-title">By Day of Week (Daily Avg Offered)</div>
+          <div id="heatmap-by-dow"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
 const PROXY_URL    = 'https://script.google.com/macros/s/AKfycbxBcttPgoFDa3RUDnAlBHIa0qdXfrboGD3xKPv1BNW82CbMaCA1JumO14qKm9Y7GBrb/exec';
 let DAILY_DAYS = 30;
 const WEEKLY_WEEKS = 52;
+let HEATMAP_DAYS = 30;
+let HEATMAP_HOURS_MODE = 'business'; // 'business' | 'all'
+let HEATMAP_METRIC = 'avg';            // 'avg' | 'total'
+const HM_DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const HM_STOPS = [
+  [0.00,[243,241,239]],
+  [0.20,[197,228,242]],
+  [0.45,[129,200,229]],
+  [0.70,[ 33,169,225]],
+  [1.00,[ 15,105,110]],
+];
 const T = { ans:{good:95,warn:92}, adj:{good:97,warn:93}, conv:{good:8,warn:5} };
 
 let rawRows = [], charts = {};
@@ -504,7 +615,7 @@ function mkChart(id, datasets, labels, yLabel, y2Label, stacked, y2Mode) {
 // ── Day range setter ──
 function setDailyDays(n, btn) {
   DAILY_DAYS = n;
-  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#view-daily .day-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   if (rawRows.length > 0) renderDaily();
 }
@@ -512,7 +623,7 @@ function setDailyDays(n, btn) {
 // ── Load data ──
 async function loadData() {
   document.getElementById('lastUpdated').textContent='Loading…';
-  ['hourly','daily','weekly'].forEach(v=>{
+  ['hourly','daily','weekly','heatmap'].forEach(v=>{
     document.getElementById(`${v}-loading`).style.display='flex';
     document.getElementById(`${v}-content`).style.display='none';
   });
@@ -527,10 +638,11 @@ async function loadData() {
     renderHourly();
     renderDaily();
     renderWeekly();
+    renderHeatmap();
   } catch(err) {
     console.error(err);
     document.getElementById('lastUpdated').textContent='Error loading data';
-    ['hourly','daily','weekly'].forEach(v=>{
+    ['hourly','daily','weekly','heatmap'].forEach(v=>{
       document.getElementById(`${v}-loading`).style.display='none';
       const c=document.getElementById(`${v}-content`);
       c.innerHTML=`<div class="error-box">Failed to load data: ${err.message}</div>`;
@@ -791,6 +903,219 @@ function renderWeekly() {
   document.getElementById('weekly-loading').style.display='none';
   document.getElementById('weekly-content').style.display='block';
 }
+
+// ── Render IB Heatmap ──
+function hmColorAt(t) {
+  t = Math.max(0, Math.min(1, t));
+  for (let i=0; i<HM_STOPS.length-1; i++) {
+    const [t0,c0] = HM_STOPS[i], [t1,c1] = HM_STOPS[i+1];
+    if (t>=t0 && t<=t1) {
+      const k = (t-t0)/(t1-t0);
+      return [Math.round(c0[0]+(c1[0]-c0[0])*k), Math.round(c0[1]+(c1[1]-c0[1])*k), Math.round(c0[2]+(c1[2]-c0[2])*k)];
+    }
+  }
+  return HM_STOPS[HM_STOPS.length-1][1];
+}
+const hmRgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+function hmFmtHour(h) { const a=h>=12?'PM':'AM', d=h===0?12:h>12?h-12:h; return `${d} ${a}`; }
+function hmDow(dateStr) { return (new Date(dateStr+'T00:00:00').getDay()+6)%7; } // Mon=0..Sun=6
+
+function renderHeatmap() {
+  if (rawRows.length === 0) {
+    document.getElementById('heatmap-loading').style.display='none';
+    document.getElementById('heatmap-content').style.display='block';
+    document.getElementById('heatmap-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text-dim);padding:40px;font-size:12px">No data loaded.</div>';
+    return;
+  }
+
+  // Window: last N complete days (exclude today since it's partial)
+  const todayStr = new Date().toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
+  const cutoff = new Date(todayStr+'T00:00:00');
+  cutoff.setDate(cutoff.getDate() - HEATMAP_DAYS);
+  const cutoffStr = cutoff.toLocaleDateString('en-CA');
+  const filtered = rawRows.filter(r => r.call_date && r.call_date >= cutoffStr && r.call_date < todayStr);
+
+  // Distinct dates per DOW (denominator for averages)
+  const datesByDow = Array.from({length:7}, () => new Set());
+  for (const r of filtered) datesByDow[hmDow(r.call_date)].add(r.call_date);
+
+  // Sum ib_offered by (dow, hour)
+  const sums = Array.from({length:7}, () => ({}));
+  for (const r of filtered) {
+    const dow = hmDow(r.call_date);
+    const h = parseInt(r.call_hour);
+    if (isNaN(h)) continue;
+    sums[dow][h] = (sums[dow][h]||0) + n(r.ib_offered);
+  }
+
+  // Build cell value matrix per active metric
+  const useAvg = HEATMAP_METRIC === 'avg';
+  const data = sums.map((bucket, dow) => {
+    const denom = datesByDow[dow].size;
+    const o = {};
+    for (const h in bucket) {
+      o[h] = useAvg ? (denom>0 ? bucket[h]/denom : 0) : bucket[h];
+    }
+    return o;
+  });
+
+  // Hour range
+  const hours = HEATMAP_HOURS_MODE === 'all'
+    ? Array.from({length:24}, (_,i) => i)
+    : Array.from({length:14}, (_,i) => i+7); // 7..20
+
+  // Color scale max (across visible cells only)
+  let vMax = 0;
+  for (let d=0; d<7; d++) for (const h of hours) { const v = data[d][h]||0; if (v>vMax) vMax=v; }
+
+  // Render grid
+  let html = `<div class="hm-corner"></div>`;
+  HM_DOW.forEach((d,i) => {
+    const wknd = i>=5;
+    html += `<div class="hm-col${wknd?' weekend':''}">${d}<span class="dow-sub">${wknd?'wknd':'wkdy'}</span></div>`;
+  });
+  hours.forEach(h => {
+    html += `<div class="hm-row-label">${hmFmtHour(h)}</div>`;
+    HM_DOW.forEach((d,i) => {
+      const v = data[i][h] || 0;
+      const t = vMax>0 ? v/vMax : 0;
+      const c = hmColorAt(t);
+      const zero = v===0;
+      const bright = !zero && t>0.55;
+      const dim = !zero && t<0.18;
+      const cellCls = zero?'zero':(bright?'bright':(dim?'dim':''));
+      const display = zero ? '–' : (useAvg ? (v<10 ? v.toFixed(1) : Math.round(v).toString()) : Math.round(v).toLocaleString());
+      const tip = zero
+        ? `${d} · ${hmFmtHour(h)}<br>No offered calls`
+        : `${d} · ${hmFmtHour(h)}<br>${useAvg ? `Avg ${v.toFixed(1)} offered (n=${datesByDow[i].size})` : `Total ${Math.round(v).toLocaleString()} offered (${datesByDow[i].size} ${d}s)`}`;
+      html += `<div class="hm-cell ${cellCls}" style="${zero?'':`background:${hmRgb(c)}`}">${display}<div class="hm-tooltip">${tip}</div></div>`;
+    });
+  });
+  document.getElementById('heatmap-grid').innerHTML = html;
+
+  // Legend
+  const stops = 24;
+  let lbHtml='';
+  for (let i=0; i<stops; i++) lbHtml += `<div class="legend-stop" style="background:${hmRgb(hmColorAt(i/(stops-1)))}"></div>`;
+  document.getElementById('heatmap-legend-bar').innerHTML = lbHtml;
+  const tickFmt = v => useAvg ? (v<10 ? v.toFixed(1) : Math.round(v).toString()) : Math.round(v).toLocaleString();
+  document.getElementById('heatmap-legend-ticks').innerHTML =
+    `<span>0</span><span>${tickFmt(vMax/4)}</span><span>${tickFmt(vMax/2)}</span><span>${tickFmt(vMax*3/4)}</span><span>${tickFmt(vMax)}</span>`;
+
+  // KPIs
+  let peakV=-1, peakD=0, peakH=0;
+  let weekdayTot=0, weekendTot=0, allTot=0, cellCount=0, weekdayDates=0, weekendDates=0;
+  for (let d=0; d<7; d++) {
+    for (const h of hours) {
+      const v = data[d][h]||0;
+      allTot += v; cellCount++;
+      if (d<5) weekdayTot += v; else weekendTot += v;
+      if (v>peakV) { peakV=v; peakD=d; peakH=h; }
+    }
+  }
+  // Weekday/weekend daily totals
+  // For avg mode: weekdayTot is the sum across (5 weekday DOWs × hours) of avg-per-hour. That's avg total per "average weekday" / 5? No:
+  //   - weekdayTot already = sum over 5 DOWs of (sum_of_hourly_avgs).  Each DOW's sum_of_hourly_avgs = avg total offered on a typical that-DOW-day during business hours.
+  //   - So avg per weekday = weekdayTot / 5.
+  const weekdayDailyAvg = useAvg ? weekdayTot/5 : weekdayTot/Math.max(1, [0,1,2,3,4].reduce((s,d)=>s+datesByDow[d].size,0));
+  const weekendDailyAvg = useAvg ? weekendTot/2 : weekendTot/Math.max(1, [5,6].reduce((s,d)=>s+datesByDow[d].size,0));
+  const avgPerCell = cellCount>0 ? allTot/cellCount : 0;
+
+  const metricLabel = useAvg ? 'Avg Offered' : 'Total Offered';
+  const peakSub = useAvg ? `${HM_DOW[peakD]} · ${hmFmtHour(peakH)}` : `${HM_DOW[peakD]} · ${hmFmtHour(peakH)}`;
+
+  document.getElementById('heatmap-kpis').innerHTML = `
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Peak Cell</div>
+      <div class="kpi-val">${useAvg ? peakV.toFixed(1) : Math.round(peakV).toLocaleString()}</div>
+      <div class="kpi-sub">${peakSub}</div>
+    </div>
+    <div class="kpi" style="--accent:var(--teal)">
+      <div class="kpi-label">Weekday Daily ${useAvg?'Avg':'Total'}</div>
+      <div class="kpi-val">${useAvg ? Math.round(weekdayDailyAvg).toLocaleString() : Math.round(weekdayDailyAvg).toLocaleString()}</div>
+      <div class="kpi-sub">offered / weekday${HEATMAP_HOURS_MODE==='business'?' (7a–8p)':''}</div>
+    </div>
+    <div class="kpi" style="--accent:var(--orange)">
+      <div class="kpi-label">Weekend Daily ${useAvg?'Avg':'Total'}</div>
+      <div class="kpi-val">${Math.round(weekendDailyAvg).toLocaleString()}</div>
+      <div class="kpi-sub">offered / weekend day</div>
+    </div>
+    <div class="kpi" style="--accent:var(--dark-teal)">
+      <div class="kpi-label">${useAvg?'Avg':'Total'} per Hour Cell</div>
+      <div class="kpi-val">${useAvg ? avgPerCell.toFixed(1) : Math.round(avgPerCell).toLocaleString()}</div>
+      <div class="kpi-sub">across ${cellCount} (DOW × hour) cells</div>
+    </div>
+  `;
+
+  // Subtitle: date range and sample size
+  const totalDates = datesByDow.reduce((s,set)=>s+set.size,0);
+  const fmtMD = d => new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const lastDate = filtered.length ? filtered.map(r=>r.call_date).sort().slice(-1)[0] : cutoffStr;
+  document.getElementById('heatmap-title').textContent = `${useAvg?'Average':'Total'} IB Calls Offered`;
+  document.getElementById('heatmap-section-title').textContent = `Calls Offered · ${useAvg?'Avg per Hour':'Total per Hour'} by Day of Week`;
+  document.getElementById('heatmap-sub').textContent =
+    `Last ${HEATMAP_DAYS} complete days · ${fmtMD(cutoffStr)} – ${fmtMD(lastDate)} · ${totalDates} dates · times Central`;
+  document.getElementById('heatmap-cell-note').textContent =
+    useAvg ? 'Each cell = avg offered for that hour on that day of week' : 'Each cell = total offered for that hour across all matching weekdays in window';
+
+  // Top 5 hottest cells
+  const flat = [];
+  for (let d=0; d<7; d++) for (const h of hours) { const v=data[d][h]||0; if (v>0) flat.push({d,h,v}); }
+  flat.sort((a,b)=>b.v-a.v);
+  document.getElementById('heatmap-top-title').textContent = `Top 5 Hottest Cells (${metricLabel})`;
+  document.getElementById('heatmap-top-cells').innerHTML = (flat.length===0
+    ? `<div class="insight-row"><span class="lbl">No offered calls in window</span></div>`
+    : flat.slice(0,5).map(c => `
+        <div class="insight-row">
+          <span class="lbl">${HM_DOW[c.d]} · ${hmFmtHour(c.h)}</span>
+          <span class="v">${useAvg ? c.v.toFixed(1) : Math.round(c.v).toLocaleString()} <span class="pill">offered</span></span>
+        </div>`).join(''));
+
+  // By DOW
+  const dowTotals = HM_DOW.map((d,i) => {
+    const sum = hours.reduce((s,h)=>s+(data[i][h]||0), 0);
+    return { d, sum };
+  });
+  const dowMax = Math.max(1, ...dowTotals.map(x=>x.sum));
+  document.getElementById('heatmap-dow-title').textContent = useAvg
+    ? `By Day of Week (Daily Avg Offered${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`
+    : `By Day of Week (Window Total Offered${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`;
+  document.getElementById('heatmap-by-dow').innerHTML = dowTotals.map(x => {
+    const pct = (x.sum/dowMax*100).toFixed(0);
+    return `<div class="insight-row">
+      <span class="lbl">${x.d}</span>
+      <span class="v" style="display:flex;align-items:center;gap:8px;">
+        <span style="display:inline-block;width:120px;height:6px;background:rgba(31,53,64,.08);border-radius:3px;overflow:hidden;">
+          <span style="display:block;height:100%;width:${pct}%;background:var(--blue);"></span>
+        </span>
+        ${useAvg ? Math.round(x.sum).toLocaleString() : Math.round(x.sum).toLocaleString()}
+      </span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('heatmap-loading').style.display='none';
+  document.getElementById('heatmap-content').style.display='block';
+}
+
+// ── Heatmap toggles ──
+document.querySelectorAll('[data-hm-days]').forEach(b => b.addEventListener('click', () => {
+  HEATMAP_DAYS = parseInt(b.dataset.hmDays);
+  document.querySelectorAll('[data-hm-days]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  if (rawRows.length>0) renderHeatmap();
+}));
+document.querySelectorAll('[data-hm-hours]').forEach(b => b.addEventListener('click', () => {
+  HEATMAP_HOURS_MODE = b.dataset.hmHours;
+  document.querySelectorAll('[data-hm-hours]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  if (rawRows.length>0) renderHeatmap();
+}));
+document.querySelectorAll('[data-hm-metric]').forEach(b => b.addEventListener('click', () => {
+  HEATMAP_METRIC = b.dataset.hmMetric;
+  document.querySelectorAll('[data-hm-metric]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  if (rawRows.length>0) renderHeatmap();
+}));
 
 // ── Tabs ──
 document.querySelectorAll('.tab').forEach(tab=>{
