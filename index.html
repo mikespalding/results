@@ -210,6 +210,65 @@ body { font-family: var(--font); background: var(--off-white); color: var(--navy
   border-top: 1px solid var(--border);
 }
 
+/* ── TABS ── */
+.tab-bar {
+  display: flex; gap: 2px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.tab {
+  font-family: inherit;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  padding: 12px 18px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.18s;
+  display: flex; align-items: center; gap: 8px;
+}
+.tab:hover { color: var(--navy); }
+.tab.active { color: var(--navy); }
+.tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--blue);
+}
+.tab-count {
+  font-size: 9px; font-weight: 700;
+  color: var(--muted);
+  background: rgba(31,53,64,0.07);
+  padding: 2px 7px; border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+.tab.active .tab-count {
+  color: var(--blue);
+  background: rgba(33,169,225,0.13);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 56px 24px;
+  background: var(--white);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+.empty-state-title {
+  font-size: 14px; font-weight: 800; color: var(--navy);
+  margin-bottom: 6px;
+}
+.empty-state-sub {
+  font-size: 11px; color: var(--muted); line-height: 1.6;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
   .site-header { padding: 0 16px; height: 60px; }
@@ -260,16 +319,18 @@ body { font-family: var(--font); background: var(--off-white); color: var(--navy
   <!-- HERO -->
   <div class="hero-panel">
     <div class="hero-title">Performance Dashboards</div>
-    <div class="hero-sub">Live KPI views updated automatically from source data. Covers Acquisition and Operations. Select a dashboard below.</div>
+    <div class="hero-sub">Live KPI views updated automatically from source data. Covers Acquisition, Disposition, and Operations. Select a tab below.</div>
   </div>
 
-  <!-- CONTACT CENTER SECTION -->
-  <div class="section-header">
-    <div class="section-label">Contact Center</div>
-    <div class="section-line"></div>
-    <div class="section-count">1 view</div>
+  <!-- TABS -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab active" data-tab="acquisition" role="tab" aria-selected="true">Acquisition <span class="tab-count">4</span></button>
+    <button class="tab" data-tab="disposition" role="tab" aria-selected="false">Disposition <span class="tab-count">0</span></button>
+    <button class="tab" data-tab="operations" role="tab" aria-selected="false">Operations <span class="tab-count">2</span></button>
   </div>
 
+  <!-- ACQUISITION TAB -->
+  <div class="tab-panel active" data-tab="acquisition" role="tabpanel">
   <div class="view-grid">
 
     <!-- Contact Center Dashboard -->
@@ -302,17 +363,6 @@ body { font-family: var(--font); background: var(--off-white); color: var(--navy
         </div>
       </div>
     </a>
-
-  </div>
-
-  <!-- ACQUISITIONS SECTION -->
-  <div class="section-header">
-    <div class="section-label">Acquisition</div>
-    <div class="section-line"></div>
-    <div class="section-count">3 views</div>
-  </div>
-
-  <div class="view-grid">
 
     <!-- ACQ 7-Day KPIs -->
     <a class="view-card acq" href="acq-kpi-dashboard.html">
@@ -409,15 +459,21 @@ body { font-family: var(--font); background: var(--off-white); color: var(--navy
     </a>
 
   </div>
-  <div class="section-header">
-    <div class="section-label">Operations</div>
-    <div class="section-line"></div>
-    <div class="section-count">2 views</div>
   </div>
 
+  <!-- DISPOSITION TAB -->
+  <div class="tab-panel" data-tab="disposition" role="tabpanel">
+    <div class="empty-state">
+      <div class="empty-state-title">No Disposition dashboards yet</div>
+      <div class="empty-state-sub">Disposition views will appear here as they are added.</div>
+    </div>
+  </div>
+
+  <!-- OPERATIONS TAB -->
+  <div class="tab-panel" data-tab="operations" role="tabpanel">
   <div class="view-grid">
 
-    <!-- List Depletion Analyzer -->
+    <!-- Dialer List Depletion Analyzer -->
     <a class="view-card all" href="https://mikespalding.github.io/results/list_depletion_analyzer">
       <div class="card-top">
         <div class="card-badges">
@@ -426,7 +482,7 @@ body { font-family: var(--font); background: var(--off-white); color: var(--navy
         </div>
         <span class="card-arrow">→</span>
       </div>
-      <div class="card-title">List Depletion Analyzer</div>
+      <div class="card-title">Dialer List Depletion Analyzer</div>
       <div class="card-desc">Tracks gross burn rate, daily additions, and true days-to-exhaustion per list. Drop one Five9 list CSV for completion analysis or two+ snapshots to model true depletion.</div>
       <div class="card-metrics">
         <span class="metric-chip blue">Burn Rate</span>
@@ -479,13 +535,40 @@ body { font-family: var(--font); background: var(--off-white); color: var(--navy
     </a>
 
   </div>
-
+  </div>
 
 </main>
 
 <footer class="site-footer">
   © Rebuilt Offers, LLC · Results · Data refreshed on each page load
 </footer>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  function activate(name) {
+    let matched = false;
+    tabs.forEach(t => {
+      const on = t.dataset.tab === name;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on) matched = true;
+    });
+    panels.forEach(p => p.classList.toggle('active', p.dataset.tab === name));
+    return matched;
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => {
+    activate(t.dataset.tab);
+    history.replaceState(null, '', '#' + t.dataset.tab);
+  }));
+
+  const initial = (location.hash || '').slice(1);
+  if (!initial || !activate(initial)) activate('acquisition');
+})();
+</script>
 
 </body>
 </html>
