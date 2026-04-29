@@ -799,7 +799,7 @@ function fmtTenure(hireDateStr, ref) {
   if (!hireDateStr) return '—';
   const hire = new Date(hireDateStr);
   if (isNaN(hire)) return '—';
-  const refDate = ref || getEndDate();
+  const refDate = ref || new Date();
   const days = Math.floor((refDate - hire) / (1000 * 60 * 60 * 24));
   if (days < 0)  return '—';
   if (days < 14) return days + 'd';
