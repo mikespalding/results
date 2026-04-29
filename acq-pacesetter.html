@@ -799,7 +799,7 @@ function fmtTenure(hireDateStr, ref) {
   if (!hireDateStr) return '—';
   const hire = new Date(hireDateStr);
   if (isNaN(hire)) return '—';
-  const refDate = ref || new Date();
+  const refDate = ref || getEndDate();
   const days = Math.floor((refDate - hire) / (1000 * 60 * 60 * 24));
   if (days < 0)  return '—';
   if (days < 14) return days + 'd';
@@ -929,7 +929,7 @@ function renderOverall() {
     <th style="width:32px">#</th>
     <th style="cursor:pointer" onclick="thClick('overall','name')">Associate${thArrow('overall','name')}</th>
     <th style="cursor:pointer" onclick="thClick('overall','manager')">Manager${thArrow('overall','manager')}</th>
-    <th style="cursor:pointer" onclick="thClick('overall','tenure')">Tenure${thArrow('overall','tenure')}</th>
+    <th style="cursor:pointer" onclick="thClick('overall','tenure')" title="Tenure as of the Window end date">Tenure${thArrow('overall','tenure')}</th>
     <th>Tier</th>
     <th style="cursor:pointer" onclick="thClick('overall','score')">Overall${thArrow('overall','score')}</th>
     ${CATEGORIES.map(c=>`<th style="color:${c.color};cursor:pointer" onclick="thClick('overall','${c.key}')">${c.label}${thArrow('overall',c.key)}</th>`).join('')}
@@ -1274,7 +1274,7 @@ window.addEventListener('load', async () => {
       <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px" id="sc-name"></div>
       <div style="display:flex;gap:20px;flex-wrap:wrap;">
         <span style="font-size:12px;color:#7a8a94"><strong>Hired:</strong> <span id="sc-hire"></span></span>
-        <span style="font-size:12px;color:#7a8a94"><strong>Tenure:</strong> <span id="sc-tenure"></span></span>
+        <span style="font-size:12px;color:#7a8a94" title="Tenure as of the Window end date"><strong>Tenure:</strong> <span id="sc-tenure"></span></span>
         <span style="font-size:12px;color:#7a8a94"><strong>Manager:</strong> <span id="sc-manager"></span></span>
       </div>
     </div>
