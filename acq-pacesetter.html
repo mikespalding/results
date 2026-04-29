@@ -128,19 +128,6 @@
   .kpi-info .kpi-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
   .kpi-info:hover .kpi-tip{display:block;}
 
-  /* EMAIL GATE */
-  .gate-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,25,32,0.85);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
-  .gate-card{background:white;border-radius:12px;max-width:440px;width:100%;padding:32px 34px;box-shadow:0 20px 60px rgba(0,0,0,0.35);}
-  .gate-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;letter-spacing:-0.3px;}
-  .gate-sub{font-size:13px;color:#7a8a94;line-height:1.5;margin-bottom:20px;}
-  .gate-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#7a8a94;margin-bottom:6px;}
-  .gate-input{width:100%;border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--navy);outline:none;transition:border-color .15s;}
-  .gate-input:focus{border-color:var(--blue);}
-  .gate-err{display:none;font-size:12px;color:var(--below);margin-top:8px;}
-  .gate-btn{width:100%;margin-top:16px;padding:11px;background:var(--blue);color:white;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;}
-  .gate-btn:hover{background:#35baf0;}
-  .gate-note{font-size:11px;color:#b0b8c1;margin-top:14px;text-align:center;line-height:1.5;}
-
   /* CONFIG */
   .config-card{background:white;border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-bottom:18px;}
   .config-card h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7a8a94;margin-bottom:14px;}
@@ -166,21 +153,10 @@
   tr.tier-gold{box-shadow:inset 3px 0 0 var(--tier-gold);}
   tr.tier-silver{box-shadow:inset 3px 0 0 var(--tier-silver);}
 </style>
+<script>window.REBUILT_GATE_PAGE = 'acq-pacesetter';</script>
+<script src="gate.js" defer></script>
 </head>
 <body>
-
-<!-- ── EMAIL GATE ── -->
-<div class="gate-backdrop" id="email-gate">
-  <div class="gate-card">
-    <div class="gate-title">Acquisition Pacesetter</div>
-    <div class="gate-sub">Please enter your Rebuilt email address to access this dashboard.</div>
-    <label class="gate-label" for="email-gate-input">Email</label>
-    <input class="gate-input" id="email-gate-input" type="email" autocomplete="email" placeholder="you@rebuilt.com" />
-    <div class="gate-err" id="email-gate-err"></div>
-    <button class="gate-btn" id="email-gate-btn">Enter Dashboard</button>
-    <div class="gate-note">Restricted to <strong>@rebuilt.com</strong> accounts · Access is logged for audit purposes.</div>
-  </div>
-</div>
 
 <!-- HEADER -->
 <div class="header">
@@ -1190,67 +1166,6 @@ function closeScorecard() {
   document.getElementById('scorecard-modal').style.display = 'none';
 }
 
-/* ── EMAIL GATE ── */
-const EMAIL_STORAGE_KEY = 'pacesetter_viewer_email';
-const EMAIL_DOMAIN      = '@rebuilt.com';
-
-function emailGate() {
-  return new Promise(resolve => {
-    const stored = (localStorage.getItem(EMAIL_STORAGE_KEY) || '').toLowerCase().trim();
-    if (stored && stored.endsWith(EMAIL_DOMAIN)) {
-      logView(stored);
-      resolve(stored);
-      return;
-    }
-    const modal = document.getElementById('email-gate');
-    const input = document.getElementById('email-gate-input');
-    const btn   = document.getElementById('email-gate-btn');
-    const err   = document.getElementById('email-gate-err');
-    modal.style.display = 'flex';
-    setTimeout(() => input.focus(), 50);
-
-    const submit = () => {
-      const val = (input.value || '').toLowerCase().trim();
-      // Basic shape check, then enforce the rebuilt.com domain.
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-        err.textContent = 'Please enter a valid email address.';
-        err.style.display = 'block';
-        return;
-      }
-      if (!val.endsWith(EMAIL_DOMAIN)) {
-        err.textContent = 'Access is restricted to ' + EMAIL_DOMAIN + ' email addresses.';
-        err.style.display = 'block';
-        return;
-      }
-      err.style.display = 'none';
-      localStorage.setItem(EMAIL_STORAGE_KEY, val);
-      logView(val);
-      modal.style.display = 'none';
-      resolve(val);
-    };
-    btn.addEventListener('click', submit);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-  });
-}
-
-function logView(email) {
-  // Fire-and-forget. Uses GET (no preflight) so Apps Script returns 200 quickly.
-  // Failures are logged but never block page use.
-  try {
-    const params = new URLSearchParams({
-      action: 'log_view',
-      email:  email,
-      page:   'acq-pacesetter',
-      ua:     (navigator.userAgent || '').slice(0, 300),
-      ref:    (document.referrer || '').slice(0, 300),
-    });
-    fetch(PROXY_URL + '?' + params.toString(), { method: 'GET', cache: 'no-store' })
-      .catch(err => console.warn('[AcqPacesetter] view-log failed:', err));
-  } catch (e) {
-    console.warn('[AcqPacesetter] view-log threw:', e);
-  }
-}
-
 window.addEventListener('load', async () => {
   // Set date input to today
   const today = new Date();
@@ -1259,7 +1174,7 @@ window.addEventListener('load', async () => {
   const dd    = String(today.getDate()).padStart(2,'0');
   const input = document.getElementById('end-date-input');
   if (input) input.value = `${yyyy}-${mm}-${dd}`;
-  await emailGate();
+  await window.RebuiltGate.ready;
   loadAll();
 });
 </script>

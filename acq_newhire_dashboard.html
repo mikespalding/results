@@ -175,6 +175,8 @@
   ::-webkit-scrollbar{width:5px;}
   ::-webkit-scrollbar-thumb{background:#c8c0b8;border-radius:3px;}
 </style>
+<script>window.REBUILT_GATE_PAGE = 'newhire_dashboard';</script>
+<script src="gate.js" defer></script>
 </head>
 <body>
 
@@ -610,55 +612,6 @@ function reshape(feeds, asOf) {
   };
 }
 
-// ─── ACCESS GATE ───
-// NOTE: This is a client-side soft gate, not a security boundary. Anyone with
-// the URL plus DevTools can bypass it. The Metabase questions are public and
-// the proxy is Anyone-accessible by design. Use Workspace SSO + restricted
-// Metabase questions if real auth is required.
-const ACCESS_ALLOWLIST = [
-  'mike.spalding@rebuilt.com',
-  'al@rebuilt.com',
-  'scott@rebuilt.com',
-  'brandon@rebuilt.com',
-  'aj@rebuilt.com',
-  'patrick.solomon@rebuilt.com',
-  'melanie.blaszczak@rebuilt.com',
-];
-
-function renderAccessDenied(email) {
-  const tried = email ? ` (tried <code>${email}</code>)` : '';
-  document.body.innerHTML =
-    '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:DM Sans,sans-serif;background:#efedeb;color:#1f3540;">' +
-    '<div style="max-width:480px;padding:40px;background:white;border-radius:8px;box-shadow:0 2px 12px rgba(31,53,64,0.10);text-align:center;">' +
-    '<div style="font-size:18px;font-weight:700;margin-bottom:10px;">Access required</div>' +
-    `<div style="font-size:13px;color:#7a8a94;margin-bottom:20px;">This dashboard is restricted to a specific list of viewers${tried}. Refresh to try again, or contact Mike Spalding for access.</div>` +
-    '<button onclick="localStorage.removeItem(\'rebuilt_email\');location.reload();" style="padding:8px 18px;border:none;border-radius:6px;background:#1f3540;color:white;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">Try a different email</button>' +
-    '</div></div>';
-}
-
-// Returns the validated email, or null if the user is denied.
-function gateAccess() {
-  let email = (localStorage.getItem('rebuilt_email') || '').trim().toLowerCase();
-  if (!email || !ACCESS_ALLOWLIST.includes(email)) {
-    email = (prompt('Enter your @rebuilt.com email to access the dashboard:') || '').trim().toLowerCase();
-    if (!email || !ACCESS_ALLOWLIST.includes(email)) {
-      renderAccessDenied(email);
-      return null;
-    }
-    localStorage.setItem('rebuilt_email', email);
-  }
-  return email;
-}
-
-function logView(email) {
-  if (!PROXY_URL || PROXY_URL.startsWith('__')) return;
-  const params = new URLSearchParams({
-    action: 'log_view', email, page: 'newhire_dashboard',
-    ua: navigator.userAgent, ref: document.referrer || '',
-  });
-  fetch(PROXY_URL + '?' + params.toString()).catch(() => {});
-}
-
 // ─── BOOT ───
 async function loadData() {
   if (!PROXY_URL || PROXY_URL.startsWith('__')) {
@@ -667,8 +620,7 @@ async function loadData() {
       'Configure <code>PROXY_URL</code> in this file with your deployed Apps Script Web App URL.</div>');
     return;
   }
-  const email = gateAccess();
-  if (!email) return;
+  await window.RebuiltGate.ready;
   const names = ['roster','rts_time','contracts','contracts_to_mktg',
                  'assignments_and_fees','pos_spread_deals','prospect_creation_rate'];
   try {
@@ -682,7 +634,6 @@ async function loadData() {
     return;
   }
   deriveCohorts();
-  logView(email);
   buildOverviewKPIs();
   buildCohortFilters();
   buildAttritionKPIs();
