@@ -1159,7 +1159,9 @@ function buildReExp(){
     }).join('')}</tbody>`;
 }
 
-loadData();
+// gate.js is loaded with `defer`, so window.RebuiltGate isn't defined until
+// the parser finishes. Wait for DOMContentLoaded — by then defer scripts have run.
+document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
 </html>
