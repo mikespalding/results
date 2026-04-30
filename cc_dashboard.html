@@ -214,6 +214,15 @@ tbody tr:last-child td{border-bottom:none;}
 .insight-row .lbl{color:#4a6478;font-weight:600;}
 .insight-row .v{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;}
 .insight-row .v .pill{display:inline-block;background:var(--blue);color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;font-weight:700;}
+.dow-chart{display:flex;align-items:stretch;gap:10px;height:210px;padding:6px 2px 0;}
+.dow-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;}
+.dow-bar-area{flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;}
+.dow-bar-val{font-size:11px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1;}
+.dow-bar{width:100%;background:var(--blue);border-radius:4px 4px 0 0;min-height:2px;position:relative;transition:opacity .15s;}
+.dow-bar.weekend{background:var(--orange);}
+.dow-bar:hover{opacity:.82;}
+.dow-bar-label{font-size:11px;font-weight:700;color:#5a7888;letter-spacing:.5px;margin-top:6px;padding-top:5px;border-top:1px solid rgba(31,53,64,.08);width:100%;text-align:center;}
+.dow-bar-label.weekend{color:var(--orange);}
 </style>
 <script src="gate.js" defer></script>
 </head>
@@ -442,8 +451,6 @@ tbody tr:last-child td{border-bottom:none;}
         <button class="day-btn" data-hm-metric="total">Total Offered</button>
       </div>
 
-      <div class="kpi-section" id="heatmap-kpis" style="grid-template-columns:repeat(4,1fr)"></div>
-
       <div class="sec-head">
         <span class="sec-badge ib">IB</span>
         <h2 id="heatmap-section-title">Calls Offered · Avg per Hour by Day of Week</h2>
@@ -473,12 +480,12 @@ tbody tr:last-child td{border-bottom:none;}
 
       <div class="insights-grid">
         <div class="insight-card">
-          <div class="insight-title" id="heatmap-top-title">Top 5 Hottest Cells</div>
-          <div id="heatmap-top-cells"></div>
+          <div class="insight-title" id="heatmap-dow-title">Calls Offered by Day of Week</div>
+          <div class="dow-chart" id="heatmap-by-dow"></div>
         </div>
         <div class="insight-card">
-          <div class="insight-title" id="heatmap-dow-title">By Day of Week (Daily Avg Offered)</div>
-          <div id="heatmap-by-dow"></div>
+          <div class="insight-title" id="heatmap-top-title">Top 5 Hottest Cells</div>
+          <div id="heatmap-top-cells"></div>
         </div>
       </div>
     </div>
@@ -1003,50 +1010,7 @@ function renderHeatmap() {
   document.getElementById('heatmap-legend-ticks').innerHTML =
     `<span>0</span><span>${tickFmt(vMax/4)}</span><span>${tickFmt(vMax/2)}</span><span>${tickFmt(vMax*3/4)}</span><span>${tickFmt(vMax)}</span>`;
 
-  // KPIs
-  let peakV=-1, peakD=0, peakH=0;
-  let weekdayTot=0, weekendTot=0, allTot=0, cellCount=0, weekdayDates=0, weekendDates=0;
-  for (let d=0; d<7; d++) {
-    for (const h of hours) {
-      const v = data[d][h]||0;
-      allTot += v; cellCount++;
-      if (d<5) weekdayTot += v; else weekendTot += v;
-      if (v>peakV) { peakV=v; peakD=d; peakH=h; }
-    }
-  }
-  // Weekday/weekend daily totals
-  // For avg mode: weekdayTot is the sum across (5 weekday DOWs × hours) of avg-per-hour. That's avg total per "average weekday" / 5? No:
-  //   - weekdayTot already = sum over 5 DOWs of (sum_of_hourly_avgs).  Each DOW's sum_of_hourly_avgs = avg total offered on a typical that-DOW-day during business hours.
-  //   - So avg per weekday = weekdayTot / 5.
-  const weekdayDailyAvg = useAvg ? weekdayTot/5 : weekdayTot/Math.max(1, [0,1,2,3,4].reduce((s,d)=>s+datesByDow[d].size,0));
-  const weekendDailyAvg = useAvg ? weekendTot/2 : weekendTot/Math.max(1, [5,6].reduce((s,d)=>s+datesByDow[d].size,0));
-  const avgPerCell = cellCount>0 ? allTot/cellCount : 0;
-
   const metricLabel = useAvg ? 'Avg Offered' : 'Total Offered';
-  const peakSub = useAvg ? `${HM_DOW[peakD]} · ${hmFmtHour(peakH)}` : `${HM_DOW[peakD]} · ${hmFmtHour(peakH)}`;
-
-  document.getElementById('heatmap-kpis').innerHTML = `
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Peak Cell</div>
-      <div class="kpi-val">${useAvg ? peakV.toFixed(1) : Math.round(peakV).toLocaleString()}</div>
-      <div class="kpi-sub">${peakSub}</div>
-    </div>
-    <div class="kpi" style="--accent:var(--teal)">
-      <div class="kpi-label">Weekday Daily ${useAvg?'Avg':'Total'}</div>
-      <div class="kpi-val">${useAvg ? Math.round(weekdayDailyAvg).toLocaleString() : Math.round(weekdayDailyAvg).toLocaleString()}</div>
-      <div class="kpi-sub">offered / weekday${HEATMAP_HOURS_MODE==='business'?' (7a–8p)':''}</div>
-    </div>
-    <div class="kpi" style="--accent:var(--orange)">
-      <div class="kpi-label">Weekend Daily ${useAvg?'Avg':'Total'}</div>
-      <div class="kpi-val">${Math.round(weekendDailyAvg).toLocaleString()}</div>
-      <div class="kpi-sub">offered / weekend day</div>
-    </div>
-    <div class="kpi" style="--accent:var(--dark-teal)">
-      <div class="kpi-label">${useAvg?'Avg':'Total'} per Hour Cell</div>
-      <div class="kpi-val">${useAvg ? avgPerCell.toFixed(1) : Math.round(avgPerCell).toLocaleString()}</div>
-      <div class="kpi-sub">across ${cellCount} (DOW × hour) cells</div>
-    </div>
-  `;
 
   // Subtitle: date range and sample size
   const totalDates = datesByDow.reduce((s,set)=>s+set.size,0);
@@ -1072,25 +1036,24 @@ function renderHeatmap() {
           <span class="v">${useAvg ? c.v.toFixed(1) : Math.round(c.v).toLocaleString()} <span class="pill">offered</span></span>
         </div>`).join(''));
 
-  // By DOW
+  // Calls Offered by Day of Week (bar chart)
   const dowTotals = HM_DOW.map((d,i) => {
     const sum = hours.reduce((s,h)=>s+(data[i][h]||0), 0);
-    return { d, sum };
+    return { d, sum, weekend: i>=5 };
   });
   const dowMax = Math.max(1, ...dowTotals.map(x=>x.sum));
   document.getElementById('heatmap-dow-title').textContent = useAvg
-    ? `By Day of Week (Daily Avg Offered${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`
-    : `By Day of Week (Window Total Offered${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`;
+    ? `Calls Offered by Day of Week (Daily Avg${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`
+    : `Calls Offered by Day of Week (Window Total${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`;
   document.getElementById('heatmap-by-dow').innerHTML = dowTotals.map(x => {
-    const pct = (x.sum/dowMax*100).toFixed(0);
-    return `<div class="insight-row">
-      <span class="lbl">${x.d}</span>
-      <span class="v" style="display:flex;align-items:center;gap:8px;">
-        <span style="display:inline-block;width:120px;height:6px;background:rgba(31,53,64,.08);border-radius:3px;overflow:hidden;">
-          <span style="display:block;height:100%;width:${pct}%;background:var(--blue);"></span>
-        </span>
-        ${useAvg ? Math.round(x.sum).toLocaleString() : Math.round(x.sum).toLocaleString()}
-      </span>
+    const pct = (x.sum/dowMax*100).toFixed(1);
+    const valDisplay = x.sum>0 ? Math.round(x.sum).toLocaleString() : '–';
+    return `<div class="dow-bar-col">
+      <div class="dow-bar-area">
+        <div class="dow-bar-val">${valDisplay}</div>
+        <div class="dow-bar${x.weekend?' weekend':''}" style="height:${pct}%"></div>
+      </div>
+      <div class="dow-bar-label${x.weekend?' weekend':''}">${x.d}</div>
     </div>`;
   }).join('');
 
