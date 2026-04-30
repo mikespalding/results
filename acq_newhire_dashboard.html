@@ -93,9 +93,9 @@
   .rep-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
   .rep-name{font-size:13px;font-weight:700;}
   .rep-meta{font-size:11px;color:#7a8a94;margin-top:2px;}
-  .rep-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:7px;}
+  .rep-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:7px;}
   .rep-metric{text-align:center;background:var(--offwhite);border-radius:5px;padding:5px 3px;}
-  .rep-metric-val{font-size:15px;font-weight:700;color:var(--navy);}
+  .rep-metric-val{font-size:14px;font-weight:700;color:var(--navy);}
   .rep-metric-lbl{font-size:9px;color:#7a8a94;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
 
   /* SPARKLINE */
@@ -744,7 +744,7 @@ function renderRepGrid(filter){
 
   grid.innerHTML=reps.map(r=>{
     const lw=latestWeek(r);
-    const totC=cumMetric(r,'contracts'),totM=cumMetric(r,'contracts_to_mktg'),totA=cumMetric(r,'assignments');
+    const totC=cumMetric(r,'contracts'),totM=cumMetric(r,'contracts_to_mktg'),totPs=cumMetric(r,'pos_spread_deals'),totA=cumMetric(r,'assignments');
     const isActive=r.status==='Active';
     // sparkline: skip wk1, skip 4/13 (RTS in progress)
     const sparkWks=r.weeks.filter(w=>w.week_num>1&&!isInProgressWeek(w.week));
@@ -763,6 +763,7 @@ function renderRepGrid(filter){
       <div class="rep-metrics">
         <div class="rep-metric"><div class="rep-metric-val">${totC}</div><div class="rep-metric-lbl">Contracts</div></div>
         <div class="rep-metric"><div class="rep-metric-val">${totM}</div><div class="rep-metric-lbl">To Mktg</div></div>
+        <div class="rep-metric"><div class="rep-metric-val">${totPs}</div><div class="rep-metric-lbl">Pos Spread</div></div>
         <div class="rep-metric"><div class="rep-metric-val">${totA}</div><div class="rep-metric-lbl">Assigned</div></div>
       </div>
       <div class="week-bar-section">
@@ -783,7 +784,7 @@ function filterReps(filter,btn){
 // ═══════════════════════ DRILLDOWN ═══════════════════════
 function openDrilldown(name){
   const r=DATA.reps.find(x=>x.name===name);if(!r)return;
-  const totC=cumMetric(r,'contracts'),totM=cumMetric(r,'contracts_to_mktg'),totA=cumMetric(r,'assignments'),totF=cumMetric(r,'assignment_fees');
+  const totC=cumMetric(r,'contracts'),totM=cumMetric(r,'contracts_to_mktg'),totPs=cumMetric(r,'pos_spread_deals'),totA=cumMetric(r,'assignments'),totF=cumMetric(r,'assignment_fees');
   const cells=r.weeks.map(w=>{
     const isInProgress=isInProgressWeek(w.week);
     const cls=w.week_num===1?'wk-na':isInProgress?'wk-na':'wk-'+w.rts_tier;
@@ -803,9 +804,10 @@ function openDrilldown(name){
   document.getElementById('drilldown-body').innerHTML=`
     <h2 style="font-size:19px;font-weight:700;margin-bottom:4px;">${r.name}</h2>
     <div style="color:#7a8a94;font-size:12px;margin-bottom:14px;">${r.cohort} &nbsp;·&nbsp; ${r.manager} &nbsp;·&nbsp; <span class="status-${r.status.toLowerCase()}">${r.status}</span>${r.exit_date?` &nbsp;·&nbsp; Exited ${r.exit_date} (Wk ${r.weeks_to_exit.toFixed(1)})`:'&nbsp;·&nbsp; '+r.weeks.length+' weeks active'}</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:18px;">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:18px;">
       <div style="background:var(--offwhite);border-radius:6px;padding:11px;text-align:center;"><div style="font-size:20px;font-weight:700;">${totC}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Contracts</div></div>
       <div style="background:var(--offwhite);border-radius:6px;padding:11px;text-align:center;"><div style="font-size:20px;font-weight:700;">${totM}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">To Mktg</div></div>
+      <div style="background:var(--offwhite);border-radius:6px;padding:11px;text-align:center;"><div style="font-size:20px;font-weight:700;">${totPs}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Pos Spread</div></div>
       <div style="background:var(--offwhite);border-radius:6px;padding:11px;text-align:center;"><div style="font-size:20px;font-weight:700;">${totA}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Assignments</div></div>
       <div style="background:var(--offwhite);border-radius:6px;padding:11px;text-align:center;"><div style="font-size:20px;font-weight:700;">${fmtFees(totF)}</div><div style="font-size:10px;color:#7a8a94;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Fees</div></div>
     </div>
@@ -1017,7 +1019,7 @@ function buildCohort(){
   });
 
   document.getElementById('cohort-summary-table').innerHTML=`
-    <thead><tr><th>Cohort</th><th>Hired</th><th>Active</th><th>Exited</th><th>Retention</th><th>Avg Exit Wk</th><th>Total Contracts</th><th>Assignments</th><th>Fees</th></tr></thead>
+    <thead><tr><th>Cohort</th><th>Hired</th><th>Active</th><th>Exited</th><th>Retention</th><th>Avg Exit Wk</th><th>Total Contracts</th><th>To Mktg</th><th>Pos Spread</th><th>Assignments</th><th>Fees</th></tr></thead>
     <tbody>${cohorts.map((c,i)=>{
       const reps=cohortReps[i],exited=reps.filter(r=>r.status==='Exited');
       const avgEx=exited.length?exited.reduce((s,r)=>s+r.weeks_to_exit,0)/exited.length:null;
@@ -1028,6 +1030,8 @@ function buildCohort(){
         <td><strong style="color:${ret>=60?'var(--dark-teal)':ret>=40?'#c47a10':'var(--below)'}">${ret}%</strong></td>
         <td>${avgEx?avgEx.toFixed(1)+' wks':'—'}</td>
         <td>${reps.reduce((s,r)=>s+cumMetric(r,'contracts'),0)}</td>
+        <td>${reps.reduce((s,r)=>s+cumMetric(r,'contracts_to_mktg'),0)}</td>
+        <td>${reps.reduce((s,r)=>s+cumMetric(r,'pos_spread_deals'),0)}</td>
         <td>${reps.reduce((s,r)=>s+cumMetric(r,'assignments'),0)}</td>
         <td>${fmtFees(reps.reduce((s,r)=>s+cumMetric(r,'assignment_fees'),0))}</td>
       </tr>`;
