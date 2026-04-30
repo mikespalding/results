@@ -446,9 +446,13 @@ tbody tr:last-child td{border-bottom:none;}
         <button class="day-btn active" data-hm-hours="business">Business (7a–8p)</button>
         <button class="day-btn" data-hm-hours="all">All 24h</button>
         <div class="tool-divider"></div>
+        <label>Calls</label>
+        <button class="day-btn active" data-hm-calltype="offered">Offered</button>
+        <button class="day-btn" data-hm-calltype="total">Total</button>
+        <div class="tool-divider"></div>
         <label>Metric</label>
-        <button class="day-btn active" data-hm-metric="avg">Avg Offered</button>
-        <button class="day-btn" data-hm-metric="total">Total Offered</button>
+        <button class="day-btn active" data-hm-metric="avg">Avg</button>
+        <button class="day-btn" data-hm-metric="total">Total</button>
       </div>
 
       <div class="sec-head">
@@ -500,6 +504,7 @@ const WEEKLY_WEEKS = 52;
 let HEATMAP_DAYS = 30;
 let HEATMAP_HOURS_MODE = 'business'; // 'business' | 'all'
 let HEATMAP_METRIC = 'avg';            // 'avg' | 'total'
+let HEATMAP_CALL_TYPE = 'offered';     // 'offered' | 'total'
 const HM_DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const HM_STOPS = [
   [0.00,[243,241,239]],
@@ -947,13 +952,16 @@ function renderHeatmap() {
   const datesByDow = Array.from({length:7}, () => new Set());
   for (const r of filtered) datesByDow[hmDow(r.call_date)].add(r.call_date);
 
-  // Sum ib_offered by (dow, hour)
+  // Sum selected call type by (dow, hour)
+  const callField = HEATMAP_CALL_TYPE === 'total' ? 'ib_total_calls' : 'ib_offered';
+  const callNoun = HEATMAP_CALL_TYPE === 'total' ? 'Total Calls' : 'Offered';
+  const callNounLower = HEATMAP_CALL_TYPE === 'total' ? 'total calls' : 'offered';
   const sums = Array.from({length:7}, () => ({}));
   for (const r of filtered) {
     const dow = hmDow(r.call_date);
     const h = parseInt(r.call_hour);
     if (isNaN(h)) continue;
-    sums[dow][h] = (sums[dow][h]||0) + n(r.ib_offered);
+    sums[dow][h] = (sums[dow][h]||0) + n(r[callField]);
   }
 
   // Build cell value matrix per active metric
@@ -994,8 +1002,8 @@ function renderHeatmap() {
       const cellCls = zero?'zero':(bright?'bright':(dim?'dim':''));
       const display = zero ? '–' : (useAvg ? (v<10 ? v.toFixed(1) : Math.round(v).toString()) : Math.round(v).toLocaleString());
       const tip = zero
-        ? `${d} · ${hmFmtHour(h)}<br>No offered calls`
-        : `${d} · ${hmFmtHour(h)}<br>${useAvg ? `Avg ${v.toFixed(1)} offered (n=${datesByDow[i].size})` : `Total ${Math.round(v).toLocaleString()} offered (${datesByDow[i].size} ${d}s)`}`;
+        ? `${d} · ${hmFmtHour(h)}<br>No ${callNounLower}`
+        : `${d} · ${hmFmtHour(h)}<br>${useAvg ? `Avg ${v.toFixed(1)} ${callNounLower} (n=${datesByDow[i].size})` : `Total ${Math.round(v).toLocaleString()} ${callNounLower} (${datesByDow[i].size} ${d}s)`}`;
       html += `<div class="hm-cell ${cellCls}" style="${zero?'':`background:${hmRgb(c)}`}">${display}<div class="hm-tooltip">${tip}</div></div>`;
     });
   });
@@ -1010,30 +1018,33 @@ function renderHeatmap() {
   document.getElementById('heatmap-legend-ticks').innerHTML =
     `<span>0</span><span>${tickFmt(vMax/4)}</span><span>${tickFmt(vMax/2)}</span><span>${tickFmt(vMax*3/4)}</span><span>${tickFmt(vMax)}</span>`;
 
-  const metricLabel = useAvg ? 'Avg Offered' : 'Total Offered';
+  const metricLabel = `${useAvg?'Avg':'Total'} ${callNoun}`;
 
   // Subtitle: date range and sample size
   const totalDates = datesByDow.reduce((s,set)=>s+set.size,0);
   const fmtMD = d => new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
   const lastDate = filtered.length ? filtered.map(r=>r.call_date).sort().slice(-1)[0] : cutoffStr;
-  document.getElementById('heatmap-title').textContent = `${useAvg?'Average':'Total'} IB Calls Offered`;
-  document.getElementById('heatmap-section-title').textContent = `Calls Offered · ${useAvg?'Avg per Hour':'Total per Hour'} by Day of Week`;
+  const titleNoun = HEATMAP_CALL_TYPE === 'total' ? 'IB Total Calls' : 'IB Calls Offered';
+  const sectionNoun = HEATMAP_CALL_TYPE === 'total' ? 'Total Calls' : 'Calls Offered';
+  document.getElementById('heatmap-title').textContent = `${useAvg?'Average':'Total'} ${titleNoun}`;
+  document.getElementById('heatmap-section-title').textContent = `${sectionNoun} · ${useAvg?'Avg per Hour':'Total per Hour'} by Day of Week`;
   document.getElementById('heatmap-sub').textContent =
     `Last ${HEATMAP_DAYS} complete days · ${fmtMD(cutoffStr)} – ${fmtMD(lastDate)} · ${totalDates} dates · times Central`;
   document.getElementById('heatmap-cell-note').textContent =
-    useAvg ? 'Each cell = avg offered for that hour on that day of week' : 'Each cell = total offered for that hour across all matching weekdays in window';
+    useAvg ? `Each cell = avg ${callNounLower} for that hour on that day of week` : `Each cell = total ${callNounLower} for that hour across all matching weekdays in window`;
 
   // Top 5 hottest cells
   const flat = [];
   for (let d=0; d<7; d++) for (const h of hours) { const v=data[d][h]||0; if (v>0) flat.push({d,h,v}); }
   flat.sort((a,b)=>b.v-a.v);
   document.getElementById('heatmap-top-title').textContent = `Top 5 Hottest Cells (${metricLabel})`;
+  const pillLabel = HEATMAP_CALL_TYPE === 'total' ? 'total' : 'offered';
   document.getElementById('heatmap-top-cells').innerHTML = (flat.length===0
-    ? `<div class="insight-row"><span class="lbl">No offered calls in window</span></div>`
+    ? `<div class="insight-row"><span class="lbl">No ${callNounLower} in window</span></div>`
     : flat.slice(0,5).map(c => `
         <div class="insight-row">
           <span class="lbl">${HM_DOW[c.d]} · ${hmFmtHour(c.h)}</span>
-          <span class="v">${useAvg ? c.v.toFixed(1) : Math.round(c.v).toLocaleString()} <span class="pill">offered</span></span>
+          <span class="v">${useAvg ? c.v.toFixed(1) : Math.round(c.v).toLocaleString()} <span class="pill">${pillLabel}</span></span>
         </div>`).join(''));
 
   // Calls Offered by Day of Week (bar chart)
@@ -1043,8 +1054,8 @@ function renderHeatmap() {
   });
   const dowMax = Math.max(1, ...dowTotals.map(x=>x.sum));
   document.getElementById('heatmap-dow-title').textContent = useAvg
-    ? `Calls Offered by Day of Week (Daily Avg${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`
-    : `Calls Offered by Day of Week (Window Total${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`;
+    ? `${sectionNoun} by Day of Week (Daily Avg${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`
+    : `${sectionNoun} by Day of Week (Window Total${HEATMAP_HOURS_MODE==='business'?', 7a–8p':''})`;
   document.getElementById('heatmap-by-dow').innerHTML = dowTotals.map(x => {
     const pct = (x.sum/dowMax*100).toFixed(1);
     const valDisplay = x.sum>0 ? Math.round(x.sum).toLocaleString() : '–';
@@ -1077,6 +1088,12 @@ document.querySelectorAll('[data-hm-hours]').forEach(b => b.addEventListener('cl
 document.querySelectorAll('[data-hm-metric]').forEach(b => b.addEventListener('click', () => {
   HEATMAP_METRIC = b.dataset.hmMetric;
   document.querySelectorAll('[data-hm-metric]').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  if (rawRows.length>0) renderHeatmap();
+}));
+document.querySelectorAll('[data-hm-calltype]').forEach(b => b.addEventListener('click', () => {
+  HEATMAP_CALL_TYPE = b.dataset.hmCalltype;
+  document.querySelectorAll('[data-hm-calltype]').forEach(x => x.classList.remove('active'));
   b.classList.add('active');
   if (rawRows.length>0) renderHeatmap();
 }));
