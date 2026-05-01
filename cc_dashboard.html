@@ -533,8 +533,6 @@ tbody tr:last-child td{border-bottom:none;}
 
 <script>
 const PROXY_URL    = 'https://script.google.com/macros/s/AKfycbxBcttPgoFDa3RUDnAlBHIa0qdXfrboGD3xKPv1BNW82CbMaCA1JumO14qKm9Y7GBrb/exec';
-// Date on/after which the upstream HOO subtraction from Offered is reversed.
-const HOO_OFFERED_CUTOFF = '2026-04-30';
 let DAILY_DAYS = 30;
 let WEEKLY_WEEKS = 8;
 let HEATMAP_DAYS = 30;
@@ -677,15 +675,6 @@ function setWeeklyWeeks(n, btn) {
   if (rawRows.length > 0) renderWeekly();
 }
 
-// Reverse the upstream HOO subtraction from ib_offered for calls on/after the cutoff.
-function applyOfferedHooFix(rows) {
-  for (const r of rows) {
-    if (r.call_date && r.call_date >= HOO_OFFERED_CUTOFF) {
-      r.ib_offered = String(n(r.ib_offered) + n(r.ib_during_hoo));
-    }
-  }
-}
-
 // ── Load data ──
 async function loadData() {
   document.getElementById('lastUpdated').textContent='Loading…';
@@ -697,7 +686,6 @@ async function loadData() {
     const res=await fetch(PROXY_URL);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     rawRows=Papa.parse(await res.text(),{header:true,skipEmptyLines:true}).data;
-    applyOfferedHooFix(rawRows);
     document.getElementById('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     // Default hourly to today CT
     const today = new Date().toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
