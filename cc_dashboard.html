@@ -290,11 +290,11 @@ tbody tr:last-child td{border-bottom:none;}
       <!-- Charts: IB left, OB right, stacked vertically as pairs -->
       <div class="chart-grid">
         <div class="chart-card">
-          <div class="chart-title">IB · Offered &amp; Answer Rate</div>
+          <div class="chart-title">Inbound</div>
           <div class="chart-wrap"><canvas id="c-hr-ib-offer"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">OB · Calls &amp; Conversations</div>
+          <div class="chart-title">Outbound</div>
           <div class="chart-wrap"><canvas id="c-hr-ob-calls"></canvas></div>
         </div>
         <div class="chart-card">
@@ -305,6 +305,31 @@ tbody tr:last-child td{border-bottom:none;}
           <div class="chart-title">OB · Appointments &amp; Opportunities</div>
           <div class="chart-wrap"><canvas id="c-hr-ob-appt"></canvas></div>
         </div>
+      </div>
+
+      <!-- Hour-over-Hour Comparison Table -->
+      <div class="sec-head"><h2>Hour Comparison · vs Same DOW &amp; Hour</h2><div class="sec-line"></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2" style="text-align:left;vertical-align:bottom">Hour (CT)</th>
+              <th colspan="3" class="g-ib">IB Total</th>
+              <th colspan="3" class="g-ib sect-start">IB Offered</th>
+              <th colspan="3" class="g-ib sect-start">IB FTIBC</th>
+              <th colspan="3" class="g-ob sect-start">OB Calls</th>
+              <th colspan="3" class="g-ob sect-start">OB Contacted</th>
+            </tr>
+            <tr>
+              <th>Today</th><th>vs 7d ago</th><th>vs 4w avg</th>
+              <th class="sect-start">Today</th><th>vs 7d ago</th><th>vs 4w avg</th>
+              <th class="sect-start">Today</th><th>vs 7d ago</th><th>vs 4w avg</th>
+              <th class="sect-start">Today</th><th>vs 7d ago</th><th>vs 4w avg</th>
+              <th class="sect-start">Today</th><th>vs 7d ago</th><th>vs 4w avg</th>
+            </tr>
+          </thead>
+          <tbody id="hourly-compare-tbody"></tbody>
+        </table>
       </div>
 
       <!-- Hourly Table -->
@@ -389,6 +414,15 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="view" id="view-weekly">
     <div class="loading" id="weekly-loading"><div class="spinner"></div><p>Building weekly view…</p></div>
     <div id="weekly-content" style="display:none">
+      <div class="day-selector">
+        <label>Show</label>
+        <button class="day-btn" onclick="setWeeklyWeeks(4,this)">4w</button>
+        <button class="day-btn active" onclick="setWeeklyWeeks(8,this)">8w</button>
+        <button class="day-btn" onclick="setWeeklyWeeks(12,this)">12w</button>
+        <button class="day-btn" onclick="setWeeklyWeeks(26,this)">26w</button>
+        <button class="day-btn" onclick="setWeeklyWeeks(52,this)">52w</button>
+        <button class="day-btn" onclick="setWeeklyWeeks(78,this)">78w</button>
+      </div>
       <div class="kpi-section" id="weekly-kpis"></div>
       <div class="chart-grid">
         <div class="chart-card">
@@ -499,8 +533,10 @@ tbody tr:last-child td{border-bottom:none;}
 
 <script>
 const PROXY_URL    = 'https://script.google.com/macros/s/AKfycbxBcttPgoFDa3RUDnAlBHIa0qdXfrboGD3xKPv1BNW82CbMaCA1JumO14qKm9Y7GBrb/exec';
+// Date on/after which the upstream HOO subtraction from Offered is reversed.
+const HOO_OFFERED_CUTOFF = '2026-04-30';
 let DAILY_DAYS = 30;
-const WEEKLY_WEEKS = 52;
+let WEEKLY_WEEKS = 8;
 let HEATMAP_DAYS = 30;
 let HEATMAP_HOURS_MODE = 'business'; // 'business' | 'all'
 let HEATMAP_METRIC = 'avg';            // 'avg' | 'total'
@@ -633,6 +669,23 @@ function setDailyDays(n, btn) {
   if (rawRows.length > 0) renderDaily();
 }
 
+// ── Week range setter ──
+function setWeeklyWeeks(n, btn) {
+  WEEKLY_WEEKS = n;
+  document.querySelectorAll('#view-weekly .day-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (rawRows.length > 0) renderWeekly();
+}
+
+// Reverse the upstream HOO subtraction from ib_offered for calls on/after the cutoff.
+function applyOfferedHooFix(rows) {
+  for (const r of rows) {
+    if (r.call_date && r.call_date >= HOO_OFFERED_CUTOFF) {
+      r.ib_offered = String(n(r.ib_offered) + n(r.ib_during_hoo));
+    }
+  }
+}
+
 // ── Load data ──
 async function loadData() {
   document.getElementById('lastUpdated').textContent='Loading…';
@@ -644,6 +697,7 @@ async function loadData() {
     const res=await fetch(PROXY_URL);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     rawRows=Papa.parse(await res.text(),{header:true,skipEmptyLines:true}).data;
+    applyOfferedHooFix(rawRows);
     document.getElementById('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     // Default hourly to today CT
     const today = new Date().toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
@@ -742,10 +796,9 @@ function renderHourly() {
 
   // Table
   document.getElementById('hourly-tbody').innerHTML = hours.map(h => {
-    const inHoo = h.hour>=7 && h.hour<19;
     const empty = h.ib_total_calls===0 && h.ob_total_calls===0;
-    if(empty && !inHoo) return '';
-    return `<tr class="${!inHoo?'wknd':''}">
+    if(empty) return '';
+    return `<tr>
       <td>${fmt.hour(h.hour)}</td>
       <td>${fmt.num(h.ib_total_calls)}</td>
       <td>${fmt.num(h.ib_offered)}</td>
@@ -766,8 +819,84 @@ function renderHourly() {
     </tr>`;
   }).join('');
 
+  // Hour-over-Hour Comparison Table
+  renderHourlyComparison(dateInput, hours);
+
   document.getElementById('hourly-loading').style.display='none';
   document.getElementById('hourly-content').style.display='block';
+}
+
+// ── Hour Comparison helpers ──
+function addDays(dateStr, days) {
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+days);
+  return d.toLocaleDateString('en-CA');
+}
+
+function aggHour(date, hour) {
+  const rows = rawRows.filter(r => r.call_date === date && parseInt(r.call_hour) === hour);
+  return rows.length ? agg(rows) : null;
+}
+
+function deltaCell(curr, base, isFirst) {
+  const sectCls = isFirst ? 'sect-start' : '';
+  if (base == null || isNaN(base)) return `<td class="${sectCls}">—</td>`;
+  if (base === 0) {
+    if (curr === 0) return `<td class="${sectCls}">—</td>`;
+    return `<td class="${sectCls} good">+${fmt.num(curr)}</td>`;
+  }
+  const diff = curr - base;
+  if (diff === 0) return `<td class="${sectCls}">0 (0%)</td>`;
+  const pct = (diff/base)*100;
+  const sign = diff > 0 ? '+' : '−';
+  const dispDiff = Math.abs(diff).toLocaleString();
+  const dispPct = Math.abs(pct).toFixed(0);
+  const cssCls = diff > 0 ? 'good' : 'bad';
+  return `<td class="${sectCls} ${cssCls}">${sign}${dispDiff} (${sign}${dispPct}%)</td>`;
+}
+
+function renderHourlyComparison(dateStr, hours) {
+  const tbody = document.getElementById('hourly-compare-tbody');
+  if (!tbody) return;
+
+  // Pull base values for each hour: today, 7d ago, and 4w avg (7,14,21,28d ago)
+  const d7  = addDays(dateStr, -7);
+  const d14 = addDays(dateStr, -14);
+  const d21 = addDays(dateStr, -21);
+  const d28 = addDays(dateStr, -28);
+
+  const fields = [
+    {key:'ib_total_calls'},
+    {key:'ib_offered'},
+    {key:'ib_ftibc'},
+    {key:'ob_total_calls'},
+    {key:'ob_answered'},
+  ];
+
+  const rows = hours.map(h => {
+    const empty = h.ib_total_calls===0 && h.ob_total_calls===0;
+    if(empty) return '';
+    const a7  = aggHour(d7,  h.hour);
+    const a14 = aggHour(d14, h.hour);
+    const a21 = aggHour(d21, h.hour);
+    const a28 = aggHour(d28, h.hour);
+
+    let cells = `<td>${fmt.hour(h.hour)}</td>`;
+    fields.forEach((f, idx) => {
+      const cur = h[f.key]||0;
+      const v7  = a7  ? a7[f.key]  : null;
+      const samples = [a7,a14,a21,a28].filter(x => x);
+      const avg4 = samples.length
+        ? samples.reduce((s,x)=>s+(x[f.key]||0),0) / samples.length
+        : null;
+      cells += `<td class="${idx===0?'':'sect-start'}">${fmt.num(cur)}</td>`;
+      cells += deltaCell(cur, v7,   false);
+      cells += deltaCell(cur, avg4, false);
+    });
+    return `<tr>${cells}</tr>`;
+  }).filter(Boolean).join('');
+
+  tbody.innerHTML = rows || '<tr><td colspan="16" style="text-align:center;color:var(--text-dim);padding:24px">No hourly data</td></tr>';
 }
 
 // ── Render Daily ──
@@ -848,28 +977,29 @@ function renderDaily() {
 // ── Render Weekly ──
 function renderWeekly() {
   const weeks=groupBy(rawRows,r=>r.week_start).slice(0,WEEKLY_WEEKS);
-  const cutoff8=new Date(); cutoff8.setDate(cutoff8.getDate()-56);
-  const last8=agg(rawRows.filter(r=>new Date(r.week_start+'T00:00:00')>=cutoff8));
+  const weekKeys = new Set(weeks.map(w=>w.key));
+  const totals=agg(rawRows.filter(r=>weekKeys.has(r.week_start)));
+  const wkLabel = `${WEEKLY_WEEKS} wk`;
 
   document.getElementById('weekly-kpis').innerHTML = kpiHTML([
     {
-      side:'ib', label:'Inbound (8 wk)', cards:[
+      side:'ib', label:`Inbound (${wkLabel})`, cards:[
         {label:'IB Calls', accent:'var(--blue)', rows:[
-          {label:'Total',   val:fmt.num(last8.ib_total_calls)},
-          {label:'Offered', val:last8.ib_offered.toLocaleString()},
-          {label:'FTIBC',   val:last8.ib_ftibc.toLocaleString()},
+          {label:'Total',   val:fmt.num(totals.ib_total_calls)},
+          {label:'Offered', val:totals.ib_offered.toLocaleString()},
+          {label:'FTIBC',   val:totals.ib_ftibc.toLocaleString()},
         ]},
-        {label:'Ans Rate',      val:fmt.pct(last8.ib_answered_pct),     sub:`Adj: ${fmt.pct(last8.ib_adj_answered_pct)}`,                accent:'var(--blue)', cls:cls(last8.ib_answered_pct,T.ans)},
-        {label:'Avg Talk', val:fmt.talk(last8.ib_avg_talk_secs),   accent:'var(--teal)'},
-        {label:'Conv Rate',val:fmt.pct(last8.ib_positive_pct),     accent:'var(--teal)'},
+        {label:'Ans Rate',      val:fmt.pct(totals.ib_answered_pct),     sub:`Adj: ${fmt.pct(totals.ib_adj_answered_pct)}`,                accent:'var(--blue)', cls:cls(totals.ib_answered_pct,T.ans)},
+        {label:'Avg Talk', val:fmt.talk(totals.ib_avg_talk_secs),   accent:'var(--teal)'},
+        {label:'Conv Rate',val:fmt.pct(totals.ib_positive_pct),     accent:'var(--teal)'},
       ]
     },
     {
-      side:'ob', label:'Outbound (8 wk)', cards:[
-        {label:'OB Calls',      val:last8.ob_total_calls.toLocaleString(), accent:'var(--orange)'},
-        {label:'Contact %',     val:fmt.pct(last8.ob_answered_pct), sub:`${fmt.num(last8.ob_answered)} contacted`, accent:'var(--orange)'},
-        {label:'Avg Talk', val:fmt.talk(last8.ob_avg_talk_secs), accent:'var(--orange)'},
-        {label:'Conv Rate',val:fmt.pct(last8.ob_conversation_pct),    sub:`${fmt.num(last8.ob_conversations)} convs`, accent:'var(--orange)'},
+      side:'ob', label:`Outbound (${wkLabel})`, cards:[
+        {label:'OB Calls',      val:totals.ob_total_calls.toLocaleString(), accent:'var(--orange)'},
+        {label:'Contact %',     val:fmt.pct(totals.ob_answered_pct), sub:`${fmt.num(totals.ob_answered)} contacted`, accent:'var(--orange)'},
+        {label:'Avg Talk', val:fmt.talk(totals.ob_avg_talk_secs), accent:'var(--orange)'},
+        {label:'Conv Rate',val:fmt.pct(totals.ob_conversation_pct),    sub:`${fmt.num(totals.ob_conversations)} convs`, accent:'var(--orange)'},
       ]
     }
   ]);
