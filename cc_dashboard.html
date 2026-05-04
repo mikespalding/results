@@ -393,13 +393,13 @@ tbody tr:last-child td{border-bottom:none;}
           <thead>
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Date</th>
-              <th colspan="8" class="g-ib">Inbound</th>
+              <th colspan="9" class="g-ib">Inbound</th>
               <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
-              <th>Total</th><th>After Hrs</th><th>HOO</th>
-              <th>Offered</th><th>Answered</th><th>Ans %</th><th>Adj %</th><th>QCBs</th>
+              <th>Total</th>
+              <th>Offered</th><th>FTIBC</th><th>Answered</th><th>Avg Talk</th><th>Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
               <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
@@ -448,13 +448,13 @@ tbody tr:last-child td{border-bottom:none;}
           <thead>
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Week Of</th>
-              <th colspan="7" class="g-ib">Inbound</th>
+              <th colspan="9" class="g-ib">Inbound</th>
               <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
-              <th>Total</th><th>After Hrs</th><th>HOO</th><th>Pre-Q Abn</th><th>Robo</th>
-              <th>Offered</th><th>Answered</th>
+              <th>Total</th>
+              <th>Offered</th><th>FTIBC</th><th>Answered</th><th>Avg Talk</th><th>Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
               <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
@@ -946,11 +946,13 @@ function renderDaily() {
   document.getElementById('daily-tbody').innerHTML=days.map(d=>`
     <tr class="${isWeekend(d.key)?'wknd':''}">
       <td>${fmt.date(d.key)}</td>
-      <td>${fmt.num(d.ib_total_calls)}</td><td>${fmt.num(d.ib_after_hours)}</td><td>${fmt.num(d.ib_during_hoo)}</td>
-      <td>${fmt.num(d.ib_offered)}</td><td>${fmt.num(d.ib_answered)}</td>
+      <td>${fmt.num(d.ib_total_calls)}</td>
+      <td>${fmt.num(d.ib_offered)}</td><td>${fmt.num(d.ib_ftibc)}</td>
+      <td>${fmt.num(d.ib_answered)}</td><td>${fmt.talk(d.ib_avg_talk_secs)}</td>
       <td class="${cls(d.ib_answered_pct,T.ans)}">${fmt.pct(d.ib_answered_pct)}</td>
       <td class="${cls(d.ib_adj_answered_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_pct)}</td>
       <td>${fmt.num(d.ib_qcb_registered)}</td>
+      <td>${fmt.pct(d.ib_positive_pct)}</td>
       <td class="sect-start">${fmt.num(d.ob_total_calls)}</td><td>${fmt.num(d.ob_answered)}</td>
       <td>${fmt.talk(d.ob_avg_talk_secs)}</td>
       <td class="${cls(d.ob_conversation_pct,T.conv)}">${fmt.pct(d.ob_conversation_pct)}</td>
@@ -1021,9 +1023,13 @@ function renderWeekly() {
   document.getElementById('weekly-tbody').innerHTML=weeks.map(w=>`
     <tr>
       <td>Wk ${fmt.week(w.key)}</td>
-      <td>${fmt.num(w.ib_total_calls)}</td><td>${fmt.num(w.ib_after_hours)}</td><td>${fmt.num(w.ib_during_hoo)}</td>
-      <td>${fmt.num(w.ib_pre_queue_abandon)}</td><td>${fmt.num(w.ib_robo_calls)}</td>
-      <td>${fmt.num(w.ib_offered)}</td><td>${fmt.num(w.ib_answered)}</td>
+      <td>${fmt.num(w.ib_total_calls)}</td>
+      <td>${fmt.num(w.ib_offered)}</td><td>${fmt.num(w.ib_ftibc)}</td>
+      <td>${fmt.num(w.ib_answered)}</td><td>${fmt.talk(w.ib_avg_talk_secs)}</td>
+      <td class="${cls(w.ib_answered_pct,T.ans)}">${fmt.pct(w.ib_answered_pct)}</td>
+      <td class="${cls(w.ib_adj_answered_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_pct)}</td>
+      <td>${fmt.num(w.ib_qcb_registered)}</td>
+      <td>${fmt.pct(w.ib_positive_pct)}</td>
       <td class="sect-start">${fmt.num(w.ob_total_calls)}</td><td>${fmt.num(w.ob_answered)}</td>
       <td>${fmt.talk(w.ob_avg_talk_secs)}</td>
       <td class="${cls(w.ob_conversation_pct,T.conv)}">${fmt.pct(w.ob_conversation_pct)}</td>
