@@ -339,13 +339,13 @@ tbody tr:last-child td{border-bottom:none;}
           <thead>
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Hour (CT)</th>
-              <th colspan="8" class="g-ib">Inbound</th>
+              <th colspan="10" class="g-ib">Inbound</th>
               <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
               <th>Total</th><th>Offered</th><th>FTIBC</th><th>Answered</th>
-              <th>Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
+              <th>Ttl Ans %</th><th>HOO Ans %</th><th>After HOO Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
               <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
@@ -393,13 +393,13 @@ tbody tr:last-child td{border-bottom:none;}
           <thead>
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Date</th>
-              <th colspan="9" class="g-ib">Inbound</th>
+              <th colspan="11" class="g-ib">Inbound</th>
               <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
               <th>Total</th>
-              <th>Offered</th><th>FTIBC</th><th>Answered</th><th>Avg Talk</th><th>Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
+              <th>Offered</th><th>FTIBC</th><th>Answered</th><th>Avg Talk</th><th>Ttl Ans %</th><th>HOO Ans %</th><th>After HOO Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
               <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
@@ -448,13 +448,13 @@ tbody tr:last-child td{border-bottom:none;}
           <thead>
             <tr>
               <th rowspan="2" style="text-align:left;vertical-align:bottom">Week Of</th>
-              <th colspan="9" class="g-ib">Inbound</th>
+              <th colspan="11" class="g-ib">Inbound</th>
               <th colspan="4" class="g-ob sect-start">Outbound</th>
               <th colspan="4" class="g-appt sect-start">Appointments</th>
             </tr>
             <tr>
               <th>Total</th>
-              <th>Offered</th><th>FTIBC</th><th>Answered</th><th>Avg Talk</th><th>Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
+              <th>Offered</th><th>FTIBC</th><th>Answered</th><th>Avg Talk</th><th>Ttl Ans %</th><th>HOO Ans %</th><th>After HOO Ans %</th><th>Adj %</th><th>QCBs</th><th>Conv %</th>
               <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
@@ -568,6 +568,7 @@ const isWeekend = d => { const dow=new Date(d+'T00:00:00').getDay(); return dow=
 // ── Aggregate ──
 const KEYS = ['ib_total_calls','ib_after_hours','ib_during_hoo','ib_pre_queue_abandon','ib_robo_calls',
   'ib_offered','ib_answered','ib_qcb_registered','ib_qcb_connected','ib_dnc_count',
+  'ib_offered_hoo','ib_answered_hoo','ib_offered_after_hoo','ib_answered_after_hoo',
   'ib_talk_secs_total','ib_ftibc','ib_appt_set','ib_opportunity',
   'ib_14day_followup','ib_30day_followup','ib_60day_followup',
   'ob_total_calls','ob_answered','ob_conversations','ob_appt_set','ob_opportunity',
@@ -579,6 +580,8 @@ function agg(rows) {
   s.ib_not_answered     = s.ib_offered - s.ib_answered;
   s.ib_answered_pct     = pct(s.ib_answered, s.ib_offered);
   s.ib_adj_answered_pct = pct(s.ib_answered + s.ib_qcb_connected, s.ib_offered);
+  s.ib_answered_hoo_pct       = pct(s.ib_answered_hoo,       s.ib_offered_hoo);
+  s.ib_answered_after_hoo_pct = pct(s.ib_answered_after_hoo, s.ib_offered_after_hoo);
   s.ib_avg_talk_secs    = s.ib_answered>0 ? s.ib_talk_secs_total/s.ib_answered : 0;
   s.ib_positive_pct     = pct(s.ib_appt_set+s.ib_opportunity, s.ib_offered);
   s.ib_ans_rate         = s.ib_answered_pct;
@@ -713,7 +716,7 @@ function renderHourly() {
   const rows = rawRows.filter(r => r.call_date === dateInput);
 
   if (rows.length===0) {
-    document.getElementById('hourly-tbody').innerHTML='<tr><td colspan="17" style="text-align:center;color:var(--text-dim);padding:24px">No data for this date</td></tr>';
+    document.getElementById('hourly-tbody').innerHTML='<tr><td colspan="19" style="text-align:center;color:var(--text-dim);padding:24px">No data for this date</td></tr>';
     document.getElementById('hourly-kpis').innerHTML='';
     document.getElementById('hourly-loading').style.display='none';
     document.getElementById('hourly-content').style.display='block';
@@ -736,7 +739,12 @@ function renderHourly() {
           {label:'Offered', val:fmt.num(tot.ib_offered)},
           {label:'FTIBC',   val:fmt.num(tot.ib_ftibc)},
         ]},
-        {label:'Ans Rate',      val:fmt.pct(tot.ib_answered_pct),  sub:`Adj: ${fmt.pct(tot.ib_adj_answered_pct)}`,   accent:'var(--blue)', cls:cls(tot.ib_answered_pct,T.ans)},
+        {label:'Ans Rate', accent:'var(--blue)', rows:[
+          {label:'Ttl Ans %',       val:fmt.pct(tot.ib_answered_pct),           cls:cls(tot.ib_answered_pct,T.ans)},
+          {label:'Ttl Adj Ans %',   val:fmt.pct(tot.ib_adj_answered_pct),       cls:cls(tot.ib_adj_answered_pct,T.adj)},
+          {label:'HOO Ans %',       val:fmt.pct(tot.ib_answered_hoo_pct),       cls:cls(tot.ib_answered_hoo_pct,T.ans)},
+          {label:'After HOO Ans %', val:fmt.pct(tot.ib_answered_after_hoo_pct)},
+        ]},
         {label:'Avg Talk', val:fmt.talk(tot.ib_avg_talk_secs),accent:'var(--teal)'},
         {label:'Conv Rate',val:fmt.pct(tot.ib_positive_pct), sub:`${fmt.num(tot.ib_appt_set+tot.ib_opportunity)} convs`, accent:'var(--teal)'},
       ]
@@ -759,8 +767,8 @@ function renderHourly() {
     {type:'bar', label:'Total',   data:active.map(h=>h.ib_total_calls), backgroundColor:'rgba(33,169,225,0.15)',yAxisID:'y',order:3,stack:'ib'},
     {type:'bar', label:'Offered', data:active.map(h=>h.ib_offered),     backgroundColor:'rgba(33,169,225,0.50)',yAxisID:'y',order:2,stack:'ib'},
     {type:'bar', label:'FTIBC',   data:active.map(h=>h.ib_ftibc),       backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ib'},
-    {type:'line',label:'Ans %',     data:active.map(h=>h.ib_answered_pct),   borderColor:'#f5831f',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
-    {type:'line',label:'Adj Ans %', data:active.map(h=>h.ib_adj_answered_pct),borderColor:'#f5c842',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
+    {type:'line',label:'Ttl Ans %',     data:active.map(h=>h.ib_answered_pct),   borderColor:'#f5831f',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
+    {type:'line',label:'Ttl Adj Ans %', data:active.map(h=>h.ib_adj_answered_pct),borderColor:'#f5c842',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Conv %',    data:active.map(h=>h.ib_positive_pct),    borderColor:'#0f696e',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
   ],lb,'Calls','Rate %',true);
 
@@ -793,6 +801,8 @@ function renderHourly() {
       <td>${fmt.num(h.ib_ftibc)}</td>
       <td>${fmt.num(h.ib_answered)}</td>
       <td class="${cls(h.ib_answered_pct,T.ans)}">${fmt.pct(h.ib_answered_pct)}</td>
+      <td class="${cls(h.ib_answered_hoo_pct,T.ans)}">${fmt.pct(h.ib_answered_hoo_pct)}</td>
+      <td>${fmt.pct(h.ib_answered_after_hoo_pct)}</td>
       <td class="${cls(h.ib_adj_answered_pct,T.adj)}">${fmt.pct(h.ib_adj_answered_pct)}</td>
       <td>${fmt.num(h.ib_qcb_registered)}</td>
       <td>${fmt.pct(h.ib_positive_pct)}</td>
@@ -902,7 +912,12 @@ function renderDaily() {
           {label:'Offered', val:fmt.num(tot.ib_offered)},
           {label:'FTIBC',   val:fmt.num(tot.ib_ftibc)},
         ]},
-        {label:'Ans Rate',      val:fmt.pct(tot.ib_answered_pct),  sub:`Adj: ${fmt.pct(tot.ib_adj_answered_pct)}`,   accent:'var(--blue)', cls:cls(tot.ib_answered_pct,T.ans)},
+        {label:'Ans Rate', accent:'var(--blue)', rows:[
+          {label:'Ttl Ans %',       val:fmt.pct(tot.ib_answered_pct),           cls:cls(tot.ib_answered_pct,T.ans)},
+          {label:'Ttl Adj Ans %',   val:fmt.pct(tot.ib_adj_answered_pct),       cls:cls(tot.ib_adj_answered_pct,T.adj)},
+          {label:'HOO Ans %',       val:fmt.pct(tot.ib_answered_hoo_pct),       cls:cls(tot.ib_answered_hoo_pct,T.ans)},
+          {label:'After HOO Ans %', val:fmt.pct(tot.ib_answered_after_hoo_pct)},
+        ]},
         {label:'Avg Talk', val:fmt.talk(tot.ib_avg_talk_secs),accent:'var(--teal)'},
         {label:'Conv Rate',val:fmt.pct(tot.ib_positive_pct), sub:`${fmt.num(tot.ib_appt_set+tot.ib_opportunity)} convs`, accent:'var(--teal)'},
       ]
@@ -923,8 +938,8 @@ function renderDaily() {
     {type:'bar', label:'Total',   data:ch.map(d=>d.ib_total_calls), backgroundColor:'rgba(33,169,225,0.15)',yAxisID:'y',order:3,stack:'ib'},
     {type:'bar', label:'Offered', data:ch.map(d=>d.ib_offered),     backgroundColor:'rgba(33,169,225,0.50)',yAxisID:'y',order:2,stack:'ib'},
     {type:'bar', label:'FTIBC',   data:ch.map(d=>d.ib_ftibc),       backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ib'},
-    {type:'line',label:'Ans %',    data:ch.map(d=>d.ib_answered_pct),     borderColor:'#f5831f',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
-    {type:'line',label:'Adj Ans %',data:ch.map(d=>d.ib_adj_answered_pct), borderColor:'#f5c842',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
+    {type:'line',label:'Ttl Ans %',    data:ch.map(d=>d.ib_answered_pct),     borderColor:'#f5831f',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
+    {type:'line',label:'Ttl Adj Ans %',data:ch.map(d=>d.ib_adj_answered_pct), borderColor:'#f5c842',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Conv %',   data:ch.map(d=>d.ib_positive_pct),     borderColor:'#0f696e',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
   ],lb,'Calls','Rate %',true);
   mkChart('c-ib-appt',[
@@ -950,6 +965,8 @@ function renderDaily() {
       <td>${fmt.num(d.ib_offered)}</td><td>${fmt.num(d.ib_ftibc)}</td>
       <td>${fmt.num(d.ib_answered)}</td><td>${fmt.talk(d.ib_avg_talk_secs)}</td>
       <td class="${cls(d.ib_answered_pct,T.ans)}">${fmt.pct(d.ib_answered_pct)}</td>
+      <td class="${cls(d.ib_answered_hoo_pct,T.ans)}">${fmt.pct(d.ib_answered_hoo_pct)}</td>
+      <td>${fmt.pct(d.ib_answered_after_hoo_pct)}</td>
       <td class="${cls(d.ib_adj_answered_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_pct)}</td>
       <td>${fmt.num(d.ib_qcb_registered)}</td>
       <td>${fmt.pct(d.ib_positive_pct)}</td>
@@ -979,7 +996,12 @@ function renderWeekly() {
           {label:'Offered', val:totals.ib_offered.toLocaleString()},
           {label:'FTIBC',   val:totals.ib_ftibc.toLocaleString()},
         ]},
-        {label:'Ans Rate',      val:fmt.pct(totals.ib_answered_pct),     sub:`Adj: ${fmt.pct(totals.ib_adj_answered_pct)}`,                accent:'var(--blue)', cls:cls(totals.ib_answered_pct,T.ans)},
+        {label:'Ans Rate', accent:'var(--blue)', rows:[
+          {label:'Ttl Ans %',       val:fmt.pct(totals.ib_answered_pct),           cls:cls(totals.ib_answered_pct,T.ans)},
+          {label:'Ttl Adj Ans %',   val:fmt.pct(totals.ib_adj_answered_pct),       cls:cls(totals.ib_adj_answered_pct,T.adj)},
+          {label:'HOO Ans %',       val:fmt.pct(totals.ib_answered_hoo_pct),       cls:cls(totals.ib_answered_hoo_pct,T.ans)},
+          {label:'After HOO Ans %', val:fmt.pct(totals.ib_answered_after_hoo_pct)},
+        ]},
         {label:'Avg Talk', val:fmt.talk(totals.ib_avg_talk_secs),   accent:'var(--teal)'},
         {label:'Conv Rate',val:fmt.pct(totals.ib_positive_pct),     accent:'var(--teal)'},
       ]
@@ -1000,8 +1022,8 @@ function renderWeekly() {
     {type:'bar', label:'Total',   data:cw.map(w=>w.ib_total_calls), backgroundColor:'rgba(33,169,225,0.15)',yAxisID:'y',order:3,stack:'ib'},
     {type:'bar', label:'Offered', data:cw.map(w=>w.ib_offered),     backgroundColor:'rgba(33,169,225,0.50)',yAxisID:'y',order:2,stack:'ib'},
     {type:'bar', label:'FTIBC',   data:cw.map(w=>w.ib_ftibc),       backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ib'},
-    {type:'line',label:'Ans %',    data:cw.map(w=>w.ib_answered_pct),     borderColor:'#f5831f',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
-    {type:'line',label:'Adj Ans %',data:cw.map(w=>w.ib_adj_answered_pct), borderColor:'#f5c842',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
+    {type:'line',label:'Ttl Ans %',    data:cw.map(w=>w.ib_answered_pct),     borderColor:'#f5831f',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
+    {type:'line',label:'Ttl Adj Ans %',data:cw.map(w=>w.ib_adj_answered_pct), borderColor:'#f5c842',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Conv %',   data:cw.map(w=>w.ib_positive_pct),     borderColor:'#0f696e',pointRadius:3,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
   ],lb,'Calls','Rate %',true);
   mkChart('c-wib-appt',[
@@ -1027,6 +1049,8 @@ function renderWeekly() {
       <td>${fmt.num(w.ib_offered)}</td><td>${fmt.num(w.ib_ftibc)}</td>
       <td>${fmt.num(w.ib_answered)}</td><td>${fmt.talk(w.ib_avg_talk_secs)}</td>
       <td class="${cls(w.ib_answered_pct,T.ans)}">${fmt.pct(w.ib_answered_pct)}</td>
+      <td class="${cls(w.ib_answered_hoo_pct,T.ans)}">${fmt.pct(w.ib_answered_hoo_pct)}</td>
+      <td>${fmt.pct(w.ib_answered_after_hoo_pct)}</td>
       <td class="${cls(w.ib_adj_answered_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_pct)}</td>
       <td>${fmt.num(w.ib_qcb_registered)}</td>
       <td>${fmt.pct(w.ib_positive_pct)}</td>
