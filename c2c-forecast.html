@@ -518,16 +518,16 @@ function renderDashboard() {
   document.getElementById('dashboard-content').style.display = 'block';
   var d = currentData, p = priorData;
 
-  // APRIL TARGETS: 64 trans / $817.8k fees / $736k GP
+  // MAY TARGETS: 68 trans / $868.9k fees / $782k GP
   var metrics = [
     { label: 'Closed deals',    value: d.mtdCount,
-      sub: 'of 64 target (' + Math.round(d.mtdCount/64*100) + '%)',
+      sub: 'of 68 target (' + Math.round(d.mtdCount/68*100) + '%)',
       delta: p ? fmtDelta(d.mtdCount - p.mtdCount) : null, pos: d.mtdCount >= (p ? p.mtdCount : 0) },
     { label: 'Assignment fees', value: fmt(d.mtdFees),
-      sub: 'of $817.8k target (' + Math.round(d.mtdFees/817800*100) + '%)',
+      sub: 'of $868.9k target (' + Math.round(d.mtdFees/868900*100) + '%)',
       delta: p ? fmtDelta(d.mtdFees - p.mtdFees, true) : null, pos: d.mtdFees >= (p ? p.mtdFees : 0) },
     { label: 'Gross profit',    value: fmt(d.mtdGP),
-      sub: 'of $736k target (' + Math.round(d.mtdGP/736000*100) + '%)', delta: null },
+      sub: 'of $782k target (' + Math.round(d.mtdGP/782000*100) + '%)', delta: null },
     { label: 'GP margin',       value: (d.gpRatio*100).toFixed(1) + '%',
       sub: 'vs 90.0% target', delta: null },
   ];
@@ -608,8 +608,8 @@ function renderDoDChart(d) {
   var dim = new Date(d.CY, d.CM, 0).getDate();
   var labels = Array.from({length: dim}, function(_,i) { return d.CM + '/' + (i+1); });
   var cFees = new Array(dim).fill(null), cGP = new Array(dim).fill(null), sched = new Array(dim).fill(null);
-  // APRIL TARGET: 64 trans
-  var target = labels.map(function(_,i) { return Math.round(64/dim*(i+1)*10)/10; });
+  // MAY TARGET: 68 trans
+  var target = labels.map(function(_,i) { return Math.round(68/dim*(i+1)*10)/10; });
   Object.entries(d.closedByDate).forEach(function(kv) {
     var day = parseInt(kv[0].split('-')[2]);
     if (day >= 1 && day <= dim) { cFees[day-1] = Math.round(kv[1].fees/1000); cGP[day-1] = Math.round(kv[1].gp/1000); }
@@ -656,10 +656,10 @@ function renderForecastChart(d) {
         y: { grid:{color:C.grid}, ticks:{color:C.tick,font:{size:9},callback:function(v){return '$'+v+'k';}}, max:900 }
       }
     },
-    // APRIL TARGETS: $817.8k fees / $736k GP
+    // MAY TARGETS: $868.9k fees / $782k GP
     plugins: [{ id: 'fcLines', afterDraw: function(chart) {
       var ctx=chart.ctx, left=chart.chartArea.left, right=chart.chartArea.right, y=chart.scales.y;
-      [[817.8, C.blue, 'Fee target $818k'], [736, C.tealD, 'GP target $736k']].forEach(function(t) {
+      [[868.9, C.blue, 'Fee target $869k'], [782, C.tealD, 'GP target $782k']].forEach(function(t) {
         var yp = y.getPixelForValue(t[0]);
         ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle=t[1]; ctx.lineWidth=1.2; ctx.globalAlpha=0.5;
         ctx.beginPath(); ctx.moveTo(left,yp); ctx.lineTo(right,yp); ctx.stroke(); ctx.restore();
@@ -698,14 +698,14 @@ function renderWoWChart() {
         yF: { position:'right', grid:{display:false}, ticks:{color:C.tick,font:{size:9},callback:function(v){return '$'+v+'k';}}, min:0, max:900 }
       }
     },
-    // APRIL TARGET: 64 trans
-    plugins: [{ id: 'target64', afterDraw: function(chart) {
+    // MAY TARGET: 68 trans
+    plugins: [{ id: 'target68', afterDraw: function(chart) {
       var ctx=chart.ctx, left=chart.chartArea.left, right=chart.chartArea.right, yT=chart.scales.yT;
-      var yp = yT.getPixelForValue(64);
+      var yp = yT.getPixelForValue(68);
       ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle=C.orange; ctx.lineWidth=1; ctx.globalAlpha=0.35;
       ctx.beginPath(); ctx.moveTo(left,yp); ctx.lineTo(right,yp); ctx.stroke(); ctx.restore();
       ctx.save(); ctx.fillStyle=C.orange; ctx.globalAlpha=0.55; ctx.font='9px sans-serif';
-      ctx.fillText('Target 64', right-52, yp-4); ctx.restore();
+      ctx.fillText('Target 68', right-52, yp-4); ctx.restore();
     }}]
   });
 }
@@ -785,7 +785,7 @@ function renderSlack() {
   var bestD = p ? '(trans '+transDelta(d.bestC,p.bestC)+', fees ('+feesDelta(d.bestF,p.bestF)+'))' : '';
   var futLines = Object.entries(d.futureByMonth).sort(function(a,b){return a[0].localeCompare(b[0]);})
     .map(function(kv){return '  - '+fmtMonth(kv[0])+' - '+kv[1].count+' for '+fmt(kv[1].fees)+' fees';}).join('\n');
-  // APRIL TARGET: 64 trans / $736k GP / $817.8k fees
+  // MAY TARGET: 68 trans / $782k GP / $868.9k fees
   document.getElementById('slack-text').textContent = [
     '@here C2C Update - ' + date,
     '<Deals: Rebuilt Closings> - all deals in Buyer Assigned, sorted by Projected Closing Date',
@@ -793,7 +793,7 @@ function renderSlack() {
     '',
     '*MTD:*',
     '  Closed - ' + d.mtdCount + ' for ' + fmt(d.mtdFees) + ' fees / ' + fmt(d.mtdGP) + ' GP',
-    '  Target - 64 trans, $736k GP (~$817.8k fees assuming 10%)',
+    '  Target - 68 trans, $782k GP (~$868.9k fees assuming 10%)',
     '',
     '*Forecasts* (change from last update):',
     '  *MINIMUM CASE* (Status: Current Month, Pending Funding)',
