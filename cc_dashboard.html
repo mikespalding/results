@@ -586,12 +586,12 @@ const cls = (v,t) => { if(v==null||!t) return ''; if(v>=t.good) return 'good'; i
 const isWeekend = d => { const dow=new Date(d+'T00:00:00').getDay(); return dow===0||dow===6; };
 
 // ── Aggregate ──
-const KEYS = ['ib_total_calls','ib_total_calls_hoo','ib_total_calls_non_hoo',
+const KEYS = ['ib_total_calls','ib_total_calls_hoo','ib_total_calls_after_hoo',
   'ib_after_hours','ib_during_hoo','ib_pre_queue_abandon','ib_robo_calls',
   'ib_offered','ib_answered','ib_qcb_registered','ib_qcb_connected','ib_dnc_count',
   'ib_offered_hoo','ib_answered_hoo','ib_qcb_connected_hoo',
-  'ib_offered_non_hoo','ib_answered_non_hoo','ib_qcb_connected_non_hoo',
-  'ib_talk_secs_total','ib_ftibc','ib_ftibc_hoo','ib_ftibc_non_hoo',
+  'ib_offered_after_hoo','ib_answered_after_hoo','ib_qcb_connected_after_hoo',
+  'ib_talk_secs_total','ib_ftibc','ib_ftibc_hoo','ib_ftibc_after_hoo',
   'ib_appt_set','ib_opportunity',
   'ib_14day_followup','ib_30day_followup','ib_60day_followup',
   'ob_total_calls','ob_answered','ob_conversations','ob_appt_set','ob_opportunity',
@@ -605,8 +605,8 @@ function agg(rows) {
   s.ib_adj_answered_pct = pct(s.ib_answered + s.ib_qcb_connected, s.ib_offered);
   s.ib_answered_hoo_pct           = pct(s.ib_answered_hoo,       s.ib_offered_hoo);
   s.ib_adj_answered_hoo_pct       = pct(s.ib_answered_hoo + s.ib_qcb_connected_hoo,             s.ib_offered_hoo);
-  s.ib_answered_non_hoo_pct     = pct(s.ib_answered_non_hoo, s.ib_offered_non_hoo);
-  s.ib_adj_answered_non_hoo_pct = pct(s.ib_answered_non_hoo + s.ib_qcb_connected_non_hoo, s.ib_offered_non_hoo);
+  s.ib_answered_after_hoo_pct     = pct(s.ib_answered_after_hoo, s.ib_offered_after_hoo);
+  s.ib_adj_answered_after_hoo_pct = pct(s.ib_answered_after_hoo + s.ib_qcb_connected_after_hoo, s.ib_offered_after_hoo);
   s.ib_avg_talk_secs    = s.ib_answered>0 ? s.ib_talk_secs_total/s.ib_answered : 0;
   s.ib_positive_pct     = pct(s.ib_appt_set+s.ib_opportunity, s.ib_offered);
   s.ib_ans_rate         = s.ib_answered_pct;
@@ -777,15 +777,15 @@ function renderHourly() {
         {label:'IB Calls', accent:'var(--blue)', cols:['','HOO','Non HOO'], rows:[
           {label:'Total',   vals:[
             {val:fmt.num(tot.ib_total_calls_hoo)},
-            {val:fmt.num(tot.ib_total_calls_non_hoo)},
+            {val:fmt.num(tot.ib_total_calls_after_hoo)},
           ]},
           {label:'Offered', vals:[
             {val:fmt.num(tot.ib_offered_hoo)},
-            {val:fmt.num(tot.ib_offered_non_hoo)},
+            {val:fmt.num(tot.ib_offered_after_hoo)},
           ]},
           {label:'FTIBC',   vals:[
             {val:fmt.num(tot.ib_ftibc_hoo)},
-            {val:fmt.num(tot.ib_ftibc_non_hoo)},
+            {val:fmt.num(tot.ib_ftibc_after_hoo)},
           ]},
         ]},
         {label:'Ans Rate', accent:'var(--blue)', wide:true, cols:['','Reg','Adj'], rows:[
@@ -798,8 +798,8 @@ function renderHourly() {
             {val:fmt.pct(tot.ib_adj_answered_hoo_pct), cls:cls(tot.ib_adj_answered_hoo_pct,T.adj)},
           ]},
           {label:'Non HOO Ans %', vals:[
-            {val:fmt.pct(tot.ib_answered_non_hoo_pct),     cls:cls(tot.ib_answered_non_hoo_pct,T.ans)},
-            {val:fmt.pct(tot.ib_adj_answered_non_hoo_pct), cls:cls(tot.ib_adj_answered_non_hoo_pct,T.adj)},
+            {val:fmt.pct(tot.ib_answered_after_hoo_pct),     cls:cls(tot.ib_answered_after_hoo_pct,T.ans)},
+            {val:fmt.pct(tot.ib_adj_answered_after_hoo_pct), cls:cls(tot.ib_adj_answered_after_hoo_pct,T.adj)},
           ]},
         ]},
         {label:'Avg Talk', val:fmt.talk(tot.ib_avg_talk_secs),accent:'var(--teal)', narrow:true},
@@ -861,8 +861,8 @@ function renderHourly() {
       <td class="${cls(h.ib_adj_answered_pct,T.adj)}">${fmt.pct(h.ib_adj_answered_pct)}</td>
       <td class="${cls(h.ib_answered_hoo_pct,T.ans)}">${fmt.pct(h.ib_answered_hoo_pct)}</td>
       <td class="${cls(h.ib_adj_answered_hoo_pct,T.adj)}">${fmt.pct(h.ib_adj_answered_hoo_pct)}</td>
-      <td class="${cls(h.ib_answered_non_hoo_pct,T.ans)}">${fmt.pct(h.ib_answered_non_hoo_pct)}</td>
-      <td class="${cls(h.ib_adj_answered_non_hoo_pct,T.adj)}">${fmt.pct(h.ib_adj_answered_non_hoo_pct)}</td>
+      <td class="${cls(h.ib_answered_after_hoo_pct,T.ans)}">${fmt.pct(h.ib_answered_after_hoo_pct)}</td>
+      <td class="${cls(h.ib_adj_answered_after_hoo_pct,T.adj)}">${fmt.pct(h.ib_adj_answered_after_hoo_pct)}</td>
       <td>${fmt.num(h.ib_qcb_registered)}</td>
       <td>${fmt.pct(h.ib_positive_pct)}</td>
       <td class="sect-start">${fmt.num(h.ob_total_calls)}</td>
@@ -969,15 +969,15 @@ function renderDaily() {
         {label:'IB Calls', accent:'var(--blue)', cols:['','HOO','Non HOO'], rows:[
           {label:'Total',   vals:[
             {val:fmt.num(tot.ib_total_calls_hoo)},
-            {val:fmt.num(tot.ib_total_calls_non_hoo)},
+            {val:fmt.num(tot.ib_total_calls_after_hoo)},
           ]},
           {label:'Offered', vals:[
             {val:fmt.num(tot.ib_offered_hoo)},
-            {val:fmt.num(tot.ib_offered_non_hoo)},
+            {val:fmt.num(tot.ib_offered_after_hoo)},
           ]},
           {label:'FTIBC',   vals:[
             {val:fmt.num(tot.ib_ftibc_hoo)},
-            {val:fmt.num(tot.ib_ftibc_non_hoo)},
+            {val:fmt.num(tot.ib_ftibc_after_hoo)},
           ]},
         ]},
         {label:'Ans Rate', accent:'var(--blue)', wide:true, cols:['','Reg','Adj'], rows:[
@@ -990,8 +990,8 @@ function renderDaily() {
             {val:fmt.pct(tot.ib_adj_answered_hoo_pct), cls:cls(tot.ib_adj_answered_hoo_pct,T.adj)},
           ]},
           {label:'Non HOO Ans %', vals:[
-            {val:fmt.pct(tot.ib_answered_non_hoo_pct),     cls:cls(tot.ib_answered_non_hoo_pct,T.ans)},
-            {val:fmt.pct(tot.ib_adj_answered_non_hoo_pct), cls:cls(tot.ib_adj_answered_non_hoo_pct,T.adj)},
+            {val:fmt.pct(tot.ib_answered_after_hoo_pct),     cls:cls(tot.ib_answered_after_hoo_pct,T.ans)},
+            {val:fmt.pct(tot.ib_adj_answered_after_hoo_pct), cls:cls(tot.ib_adj_answered_after_hoo_pct,T.adj)},
           ]},
         ]},
         {label:'Avg Talk', val:fmt.talk(tot.ib_avg_talk_secs),accent:'var(--teal)', narrow:true},
@@ -1044,8 +1044,8 @@ function renderDaily() {
       <td class="${cls(d.ib_adj_answered_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_pct)}</td>
       <td class="${cls(d.ib_answered_hoo_pct,T.ans)}">${fmt.pct(d.ib_answered_hoo_pct)}</td>
       <td class="${cls(d.ib_adj_answered_hoo_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_hoo_pct)}</td>
-      <td class="${cls(d.ib_answered_non_hoo_pct,T.ans)}">${fmt.pct(d.ib_answered_non_hoo_pct)}</td>
-      <td class="${cls(d.ib_adj_answered_non_hoo_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_non_hoo_pct)}</td>
+      <td class="${cls(d.ib_answered_after_hoo_pct,T.ans)}">${fmt.pct(d.ib_answered_after_hoo_pct)}</td>
+      <td class="${cls(d.ib_adj_answered_after_hoo_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_after_hoo_pct)}</td>
       <td>${fmt.num(d.ib_qcb_registered)}</td>
       <td>${fmt.pct(d.ib_positive_pct)}</td>
       <td class="sect-start">${fmt.num(d.ob_total_calls)}</td><td>${fmt.num(d.ob_answered)}</td>
@@ -1072,15 +1072,15 @@ function renderWeekly() {
         {label:'IB Calls', accent:'var(--blue)', cols:['','HOO','Non HOO'], rows:[
           {label:'Total',   vals:[
             {val:fmt.num(totals.ib_total_calls_hoo)},
-            {val:fmt.num(totals.ib_total_calls_non_hoo)},
+            {val:fmt.num(totals.ib_total_calls_after_hoo)},
           ]},
           {label:'Offered', vals:[
             {val:fmt.num(totals.ib_offered_hoo)},
-            {val:fmt.num(totals.ib_offered_non_hoo)},
+            {val:fmt.num(totals.ib_offered_after_hoo)},
           ]},
           {label:'FTIBC',   vals:[
             {val:fmt.num(totals.ib_ftibc_hoo)},
-            {val:fmt.num(totals.ib_ftibc_non_hoo)},
+            {val:fmt.num(totals.ib_ftibc_after_hoo)},
           ]},
         ]},
         {label:'Ans Rate', accent:'var(--blue)', wide:true, cols:['','Reg','Adj'], rows:[
@@ -1093,8 +1093,8 @@ function renderWeekly() {
             {val:fmt.pct(totals.ib_adj_answered_hoo_pct), cls:cls(totals.ib_adj_answered_hoo_pct,T.adj)},
           ]},
           {label:'Non HOO Ans %', vals:[
-            {val:fmt.pct(totals.ib_answered_non_hoo_pct),     cls:cls(totals.ib_answered_non_hoo_pct,T.ans)},
-            {val:fmt.pct(totals.ib_adj_answered_non_hoo_pct), cls:cls(totals.ib_adj_answered_non_hoo_pct,T.adj)},
+            {val:fmt.pct(totals.ib_answered_after_hoo_pct),     cls:cls(totals.ib_answered_after_hoo_pct,T.ans)},
+            {val:fmt.pct(totals.ib_adj_answered_after_hoo_pct), cls:cls(totals.ib_adj_answered_after_hoo_pct,T.adj)},
           ]},
         ]},
         {label:'Avg Talk', val:fmt.talk(totals.ib_avg_talk_secs),   accent:'var(--teal)', narrow:true},
@@ -1147,8 +1147,8 @@ function renderWeekly() {
       <td class="${cls(w.ib_adj_answered_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_pct)}</td>
       <td class="${cls(w.ib_answered_hoo_pct,T.ans)}">${fmt.pct(w.ib_answered_hoo_pct)}</td>
       <td class="${cls(w.ib_adj_answered_hoo_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_hoo_pct)}</td>
-      <td class="${cls(w.ib_answered_non_hoo_pct,T.ans)}">${fmt.pct(w.ib_answered_non_hoo_pct)}</td>
-      <td class="${cls(w.ib_adj_answered_non_hoo_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_non_hoo_pct)}</td>
+      <td class="${cls(w.ib_answered_after_hoo_pct,T.ans)}">${fmt.pct(w.ib_answered_after_hoo_pct)}</td>
+      <td class="${cls(w.ib_adj_answered_after_hoo_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_after_hoo_pct)}</td>
       <td>${fmt.num(w.ib_qcb_registered)}</td>
       <td>${fmt.pct(w.ib_positive_pct)}</td>
       <td class="sect-start">${fmt.num(w.ob_total_calls)}</td><td>${fmt.num(w.ob_answered)}</td>
