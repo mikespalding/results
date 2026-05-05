@@ -599,7 +599,24 @@ const KEYS = ['ib_total_calls','ib_total_calls_hoo','ib_total_calls_after_hoo',
 
 function agg(rows) {
   const s = Object.fromEntries(KEYS.map(k=>[k,0]));
-  for (const r of rows) KEYS.forEach(k => s[k]+=n(r[k]));
+  // Per-row HOO classification accumulators (used as fallback when feed
+  // doesn't supply ib_total_calls_hoo / ib_ftibc_hoo split columns).
+  let derTcHoo = 0, derTcAfter = 0, derFtHoo = 0, derFtAfter = 0;
+  for (const r of rows) {
+    KEYS.forEach(k => s[k]+=n(r[k]));
+    const offH = n(r.ib_offered_hoo);
+    const offA = n(r.ib_offered_after_hoo);
+    let isHOO;
+    if (offH > 0 || offA > 0) {
+      isHOO = offH >= offA;
+    } else {
+      const h = parseInt(r.call_hour);
+      isHOO = h >= 7 && h <= 20;
+    }
+    const tc = n(r.ib_total_calls), ft = n(r.ib_ftibc);
+    if (isHOO) { derTcHoo += tc; derFtHoo += ft; }
+    else       { derTcAfter += tc; derFtAfter += ft; }
+  }
   s.ib_not_answered     = s.ib_offered - s.ib_answered;
   s.ib_answered_pct     = pct(s.ib_answered, s.ib_offered);
   s.ib_adj_answered_pct = pct(s.ib_answered + s.ib_qcb_connected, s.ib_offered);
@@ -612,14 +629,14 @@ function agg(rows) {
   s.ib_ans_rate         = s.ib_answered_pct;
   s.ib_conv_rate        = pct(s.ib_appt_set+s.ib_opportunity+s.ib_14day_followup+s.ib_30day_followup+s.ib_60day_followup, s.ib_offered);
   // IB Calls HOO/Non HOO breakdown: prefer dedicated split fields, otherwise
-  // fall back to ib_during_hoo / ib_after_hours and assume FTIBC is HOO-only.
+  // use the per-row classification accumulated above.
   if (!s.ib_total_calls_hoo && !s.ib_total_calls_after_hoo) {
-    s.ib_total_calls_hoo       = s.ib_during_hoo;
-    s.ib_total_calls_after_hoo = s.ib_after_hours;
+    s.ib_total_calls_hoo       = derTcHoo;
+    s.ib_total_calls_after_hoo = derTcAfter;
   }
   if (!s.ib_ftibc_hoo && !s.ib_ftibc_after_hoo) {
-    s.ib_ftibc_hoo       = s.ib_ftibc;
-    s.ib_ftibc_after_hoo = 0;
+    s.ib_ftibc_hoo       = derFtHoo;
+    s.ib_ftibc_after_hoo = derFtAfter;
   }
   s.ob_answered_pct     = pct(s.ob_answered, s.ob_total_calls);
   s.ob_conversation_pct = pct(s.ob_conversations, s.ob_total_calls);
