@@ -232,6 +232,41 @@ tbody tr:last-child td{border-bottom:none;}
 .dow-bar:hover{opacity:.82;}
 .dow-bar-label{font-size:11px;font-weight:700;color:#5a7888;letter-spacing:.5px;margin-top:6px;padding-top:5px;border-top:1px solid rgba(31,53,64,.08);width:100%;text-align:center;}
 .dow-bar-label.weekend{color:var(--orange);}
+
+/* ── USER INFO ── */
+.ui-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:18px;}
+@media(max-width:960px){.ui-grid{grid-template-columns:1fr;}}
+.ui-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:18px 20px;box-shadow:0 1px 4px rgba(31,53,64,0.07);}
+.ui-card-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;margin-bottom:14px;}
+.ui-me-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.ui-me-avatar{width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;letter-spacing:.5px;flex-shrink:0;}
+.ui-me-meta{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.ui-me-name{font-size:15px;font-weight:800;color:var(--navy);}
+.ui-me-email{font-size:11px;color:#7a8a94;font-weight:600;}
+.ui-me-profile{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.ui-me-profile-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#7a8a94;}
+.ui-profile-chip{display:inline-block;background:rgba(33,169,225,.12);color:var(--blue);font-size:12px;font-weight:800;padding:4px 11px;border-radius:5px;letter-spacing:.2px;}
+.ui-profile-chip.target{background:rgba(46,204,113,.14);color:#1e8c4f;}
+.ui-profile-chip.missing{background:rgba(231,76,60,.10);color:var(--red);}
+.ui-me-extra{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(31,53,64,0.08);}
+.ui-me-field-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7a8a94;margin-bottom:3px;}
+.ui-me-field-val{font-size:12px;font-weight:700;color:var(--navy);word-break:break-word;}
+.ui-prof-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(31,53,64,0.06);font-size:12px;gap:10px;}
+.ui-prof-row:last-child{border-bottom:none;}
+.ui-prof-name{color:var(--navy);font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ui-prof-name.target::before{content:'★';color:#1e8c4f;margin-right:6px;font-size:10px;}
+.ui-prof-count{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;background:var(--offwhite);padding:2px 9px;border-radius:4px;font-size:11px;}
+.ui-prof-row.miss .ui-prof-name{color:#7a8a94;font-style:italic;}
+.ui-prof-row.miss .ui-prof-count{background:rgba(231,76,60,.08);color:var(--red);}
+.ui-search{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.ui-search input[type=text]{background:#fff;border:1px solid rgba(31,53,64,0.20);color:var(--navy);padding:7px 12px;border-radius:6px;font-size:12px;font-family:var(--font);font-weight:600;min-width:220px;}
+.ui-search input[type=text]:focus{outline:none;border-color:var(--blue);}
+.ui-search-count{font-size:10px;font-weight:700;color:#7a8a94;text-transform:uppercase;letter-spacing:.9px;}
+.ui-table tbody td{text-align:left;}
+.ui-table tbody td.num{text-align:right;}
+.ui-empty{padding:30px;text-align:center;color:var(--text-dim);font-size:12px;font-weight:600;background:rgba(31,53,64,0.03);border-radius:8px;}
+.ui-empty strong{color:var(--navy);}
+.ui-empty code{background:#fff;border:1px solid rgba(31,53,64,0.10);padding:2px 6px;border-radius:4px;font-size:11px;}
 </style>
 <script src="gate.js" defer></script>
 </head>
@@ -280,6 +315,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="tab" data-view="daily">Daily</div>
   <div class="tab" data-view="weekly">Weekly</div>
   <div class="tab" data-view="heatmap">IB Heatmaps</div>
+  <div class="tab" data-view="user-info">User Info</div>
 </nav>
 
 <main class="main">
@@ -549,10 +585,55 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
+  <!-- ══ USER INFO VIEW ══ -->
+  <div class="view" id="view-user-info">
+    <div class="loading" id="user-info-loading"><div class="spinner"></div><p>Loading user profiles…</p></div>
+    <div id="user-info-content" style="display:none">
+      <div class="ui-grid">
+        <div class="ui-card" id="ui-me-card">
+          <div class="ui-card-title">Your Profile</div>
+          <div id="ui-me-body"></div>
+        </div>
+        <div class="ui-card">
+          <div class="ui-card-title">Profile Distribution</div>
+          <div id="ui-profile-dist"></div>
+        </div>
+      </div>
+
+      <div class="sec-head"><h2>User Directory</h2><div class="sec-line"></div></div>
+      <div class="ui-search">
+        <input type="text" id="ui-search-input" placeholder="Search name, email, or profile…" oninput="renderUserDirectory()">
+        <span class="ui-search-count" id="ui-search-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="ui-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Name</th>
+              <th style="text-align:left">Email / Username</th>
+              <th style="text-align:left">Profile</th>
+              <th style="text-align:left">Active</th>
+              <th style="text-align:left">Federation ID</th>
+            </tr>
+          </thead>
+          <tbody id="ui-directory-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
 const PROXY_URL    = 'https://script.google.com/macros/s/AKfycbxBcttPgoFDa3RUDnAlBHIa0qdXfrboGD3xKPv1BNW82CbMaCA1JumO14qKm9Y7GBrb/exec';
+// GAS endpoint that proxies Five9 SOAP getUsersInfo and returns JSON.
+// Expected shape: array of user objects, or {users:[...]}, where each user has at minimum
+// userName (login email) and userProfileName, plus optional fullName/firstName/lastName/EMail/active/federationId.
+const USER_INFO_URL = '';
+// Five9 profile names we want to track. Fill in the 15 once finalized.
+const TARGET_PROFILES = [];
+let userInfoData = null;
+let userInfoLoaded = false;
 let DAILY_DAYS = 30;
 let WEEKLY_WEEKS = 8;
 let HEATMAP_DAYS = 30;
@@ -1370,6 +1451,216 @@ document.querySelectorAll('[data-hm-calltype]').forEach(b => b.addEventListener(
   if (rawRows.length>0) renderHeatmap();
 }));
 
+// ── User Info ──
+function uiNorm(s) { return (s || '').toString().toLowerCase().trim(); }
+function uiPickEmail(u) {
+  return uiNorm(u.userName || u.username || u.EMail || u.email || u.Email);
+}
+function uiPickName(u) {
+  const full = u.fullName || u.full_name || [u.firstName, u.lastName].filter(Boolean).join(' ');
+  return (full || '').trim() || u.userName || u.email || '—';
+}
+function uiPickProfile(u) {
+  const g = u.generalInfo || u.general_info || {};
+  return (u.userProfileName || u.profileName || u.profile || g.userProfileName || '').trim();
+}
+function uiInitials(name) {
+  const parts = name.split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length-1][0] : '')).toUpperCase();
+}
+function uiEsc(s) {
+  return (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+async function loadUserInfo() {
+  if (userInfoLoaded) return;
+  userInfoLoaded = true;
+  const loading = document.getElementById('user-info-loading');
+  const content = document.getElementById('user-info-content');
+  loading.style.display = 'flex';
+  content.style.display = 'none';
+
+  if (!USER_INFO_URL) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    document.getElementById('ui-me-body').innerHTML =
+      '<div class="ui-empty">User Info endpoint not configured yet.<br>Set <code>USER_INFO_URL</code> to the GAS web-app URL that returns Five9 user data as JSON.</div>';
+    document.getElementById('ui-profile-dist').innerHTML = '<div class="ui-empty">No data.</div>';
+    document.getElementById('ui-directory-tbody').innerHTML =
+      '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:24px">Awaiting data source.</td></tr>';
+    document.getElementById('ui-search-count').textContent = '';
+    return;
+  }
+
+  try {
+    const res = await fetch(USER_INFO_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const payload = await res.json();
+    const users = Array.isArray(payload) ? payload : (payload.users || payload.data || []);
+    if (payload && Array.isArray(payload.target_profiles) && !TARGET_PROFILES.length) {
+      // Allow the GAS payload to declare target profiles if the constant isn't set client-side.
+      payload.target_profiles.forEach(p => TARGET_PROFILES.push(p));
+    }
+    userInfoData = users;
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    renderUserInfoMe();
+    renderProfileDistribution();
+    renderUserDirectory();
+  } catch (err) {
+    console.error(err);
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    document.getElementById('ui-me-body').innerHTML =
+      '<div class="error-box">Failed to load user data: ' + uiEsc(err.message) + '</div>';
+    document.getElementById('ui-profile-dist').innerHTML = '';
+    document.getElementById('ui-directory-tbody').innerHTML = '';
+    document.getElementById('ui-search-count').textContent = '';
+  }
+}
+
+function renderUserInfoMe() {
+  const meEmail = (window.RebuiltGate && window.RebuiltGate.getEmail && window.RebuiltGate.getEmail()) || '';
+  const me = userInfoData && userInfoData.find(u => uiPickEmail(u) === uiNorm(meEmail));
+  const body = document.getElementById('ui-me-body');
+
+  if (!meEmail) {
+    body.innerHTML = '<div class="ui-empty">Sign in required to see your profile.</div>';
+    return;
+  }
+  if (!me) {
+    body.innerHTML =
+      '<div class="ui-me-row">' +
+        '<div class="ui-me-avatar">' + uiEsc(uiInitials(meEmail.split('@')[0])) + '</div>' +
+        '<div class="ui-me-meta">' +
+          '<div class="ui-me-name">Not found in Five9 user list</div>' +
+          '<div class="ui-me-email">' + uiEsc(meEmail) + '</div>' +
+        '</div>' +
+        '<div class="ui-me-profile">' +
+          '<span class="ui-me-profile-lbl">Profile</span>' +
+          '<span class="ui-profile-chip missing">No match</span>' +
+        '</div>' +
+      '</div>';
+    return;
+  }
+
+  const name = uiPickName(me);
+  const profile = uiPickProfile(me) || '—';
+  const isTarget = TARGET_PROFILES.includes(profile);
+  const chipClass = profile === '—' ? 'missing' : (isTarget ? 'target' : '');
+  const g = me.generalInfo || me.general_info || {};
+  const fields = [
+    ['First Name', me.firstName || g.firstName],
+    ['Last Name',  me.lastName  || g.lastName],
+    ['Username',   me.userName  || g.userName || me.username],
+    ['Federation ID', me.federationId || g.federationId],
+    ['Active',     (me.active != null ? me.active : g.active)],
+    ['Extension',  me.extension || g.extension],
+  ].filter(([_, v]) => v != null && v !== '');
+
+  body.innerHTML =
+    '<div class="ui-me-row">' +
+      '<div class="ui-me-avatar">' + uiEsc(uiInitials(name)) + '</div>' +
+      '<div class="ui-me-meta">' +
+        '<div class="ui-me-name">' + uiEsc(name) + '</div>' +
+        '<div class="ui-me-email">' + uiEsc(uiPickEmail(me) || meEmail) + '</div>' +
+      '</div>' +
+      '<div class="ui-me-profile">' +
+        '<span class="ui-me-profile-lbl">Five9 Profile</span>' +
+        '<span class="ui-profile-chip ' + chipClass + '">' + uiEsc(profile) + '</span>' +
+      '</div>' +
+    '</div>' +
+    (fields.length ?
+      '<div class="ui-me-extra">' +
+        fields.map(([lbl, v]) =>
+          '<div><div class="ui-me-field-lbl">' + uiEsc(lbl) + '</div>' +
+          '<div class="ui-me-field-val">' + uiEsc(String(v)) + '</div></div>'
+        ).join('') +
+      '</div>'
+    : '');
+}
+
+function renderProfileDistribution() {
+  const dist = document.getElementById('ui-profile-dist');
+  if (!userInfoData || !userInfoData.length) {
+    dist.innerHTML = '<div class="ui-empty">No users returned.</div>';
+    return;
+  }
+  const counts = {};
+  for (const u of userInfoData) {
+    const p = uiPickProfile(u) || '(none)';
+    counts[p] = (counts[p] || 0) + 1;
+  }
+  const targets = TARGET_PROFILES.slice();
+  const targetSet = new Set(targets);
+  const targetRows = targets.map(p => {
+    const c = counts[p] || 0;
+    return '<div class="ui-prof-row' + (c === 0 ? ' miss' : '') + '">' +
+      '<span class="ui-prof-name target">' + uiEsc(p) + '</span>' +
+      '<span class="ui-prof-count">' + c + '</span>' +
+    '</div>';
+  }).join('');
+  const others = Object.entries(counts)
+    .filter(([p]) => !targetSet.has(p))
+    .sort((a, b) => b[1] - a[1])
+    .map(([p, c]) =>
+      '<div class="ui-prof-row">' +
+        '<span class="ui-prof-name">' + uiEsc(p) + '</span>' +
+        '<span class="ui-prof-count">' + c + '</span>' +
+      '</div>'
+    ).join('');
+
+  dist.innerHTML =
+    (targets.length ?
+      '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#1e8c4f;margin-bottom:6px">Target Profiles · ' + targets.length + '</div>' +
+      targetRows +
+      (others ? '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#7a8a94;margin:14px 0 6px">Other Profiles</div>' : '')
+    : '') +
+    others;
+}
+
+function renderUserDirectory() {
+  const tbody = document.getElementById('ui-directory-tbody');
+  const countEl = document.getElementById('ui-search-count');
+  if (!userInfoData) { tbody.innerHTML = ''; countEl.textContent = ''; return; }
+  const q = uiNorm((document.getElementById('ui-search-input') || {}).value || '');
+  const meEmail = (window.RebuiltGate && window.RebuiltGate.getEmail && window.RebuiltGate.getEmail()) || '';
+  const targetSet = new Set(TARGET_PROFILES);
+
+  const rows = userInfoData
+    .map(u => ({
+      name: uiPickName(u),
+      email: uiPickEmail(u),
+      profile: uiPickProfile(u),
+      active: u.active != null ? u.active : (u.generalInfo && u.generalInfo.active),
+      fed: u.federationId || (u.generalInfo && u.generalInfo.federationId) || '',
+    }))
+    .filter(r => !q || r.name.toLowerCase().includes(q) || r.email.includes(q) || r.profile.toLowerCase().includes(q))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  countEl.textContent = rows.length + ' / ' + userInfoData.length + ' users';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:24px">No users match.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => {
+    const isMe = r.email && r.email === uiNorm(meEmail);
+    const profCls = !r.profile ? 'missing' : (targetSet.has(r.profile) ? 'target' : '');
+    const profHtml = r.profile
+      ? '<span class="ui-profile-chip ' + profCls + '">' + uiEsc(r.profile) + '</span>'
+      : '<span class="ui-profile-chip missing">—</span>';
+    const active = r.active === true || r.active === 'true' ? 'Yes' : (r.active === false || r.active === 'false' ? 'No' : '—');
+    return '<tr' + (isMe ? ' style="background:rgba(33,169,225,0.06)"' : '') + '>' +
+      '<td>' + uiEsc(r.name) + (isMe ? ' <span style="font-size:9px;font-weight:800;color:var(--blue);margin-left:6px">YOU</span>' : '') + '</td>' +
+      '<td>' + uiEsc(r.email) + '</td>' +
+      '<td>' + profHtml + '</td>' +
+      '<td>' + uiEsc(active) + '</td>' +
+      '<td>' + uiEsc(r.fed) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
 // ── Tabs ──
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
@@ -1377,6 +1668,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('view-'+tab.dataset.view).classList.add('active');
+    if (tab.dataset.view === 'user-info') loadUserInfo();
   });
 });
 
