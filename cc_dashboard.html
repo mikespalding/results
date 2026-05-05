@@ -611,6 +611,16 @@ function agg(rows) {
   s.ib_positive_pct     = pct(s.ib_appt_set+s.ib_opportunity, s.ib_offered);
   s.ib_ans_rate         = s.ib_answered_pct;
   s.ib_conv_rate        = pct(s.ib_appt_set+s.ib_opportunity+s.ib_14day_followup+s.ib_30day_followup+s.ib_60day_followup, s.ib_offered);
+  // IB Calls HOO/Non HOO breakdown: prefer dedicated split fields, otherwise
+  // fall back to ib_during_hoo / ib_after_hours and assume FTIBC is HOO-only.
+  if (!s.ib_total_calls_hoo && !s.ib_total_calls_after_hoo) {
+    s.ib_total_calls_hoo       = s.ib_during_hoo;
+    s.ib_total_calls_after_hoo = s.ib_after_hours;
+  }
+  if (!s.ib_ftibc_hoo && !s.ib_ftibc_after_hoo) {
+    s.ib_ftibc_hoo       = s.ib_ftibc;
+    s.ib_ftibc_after_hoo = 0;
+  }
   s.ob_answered_pct     = pct(s.ob_answered, s.ob_total_calls);
   s.ob_conversation_pct = pct(s.ob_conversations, s.ob_total_calls);
   s.ob_positive_pct     = pct(s.ob_appt_set+s.ob_opportunity, s.ob_conversations);
