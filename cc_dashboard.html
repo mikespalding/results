@@ -270,21 +270,21 @@ tbody tr:last-child td{border-bottom:none;}
 
 /* ── ROUTING FIDELITY ── */
 .rf-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:18px 20px;box-shadow:0 1px 4px rgba(31,53,64,0.07);margin-bottom:18px;}
-.rf-card-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;margin-bottom:4px;}
-.rf-card-sub{font-size:10px;color:#7a8a94;font-weight:600;margin-bottom:14px;}
+.rf-card-title{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy);margin-bottom:6px;}
+.rf-card-sub{font-size:11px;color:#7a8a94;font-weight:600;margin-bottom:16px;line-height:1.4;}
 .rf-matrix-wrap{overflow-x:auto;}
 .rf-matrix{border-collapse:separate;border-spacing:3px;font-family:var(--font);}
 .rf-matrix th, .rf-matrix td{padding:0;}
 .rf-matrix th.rf-corner{background:transparent;}
 .rf-matrix th.rf-skill-h{
-  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
-  color:#5a7888;text-align:center;padding:0 4px 8px;min-width:74px;max-width:90px;
-  white-space:normal;line-height:1.2;
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:#5a7888;text-align:center;padding:8px 6px 10px;min-width:84px;max-width:110px;
+  white-space:normal;line-height:1.25;
   border-bottom:1px solid rgba(31,53,64,0.10);
 }
 .rf-matrix th.rf-total-h{
-  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
-  color:var(--navy);text-align:center;padding:0 4px 8px;border-bottom:1px solid rgba(31,53,64,0.10);
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--navy);text-align:center;padding:8px 6px 10px;border-bottom:1px solid rgba(31,53,64,0.10);
   background:rgba(31,53,64,0.04);
 }
 .rf-matrix td.rf-camp{
@@ -1938,18 +1938,13 @@ async function loadRoutingFidelity() {
 function rfInitDateRange() {
   const fromEl = document.getElementById('rf-date-from');
   const toEl   = document.getElementById('rf-date-to');
-  if (!fromEl || !toEl || !routingRows) return;
+  if (!fromEl || !toEl) return;
   if (fromEl.value && toEl.value) return;
-  const dates = routingRows.map(r => r.call_date).filter(Boolean).sort();
-  if (!dates.length) return;
-  const last  = dates[dates.length-1];
-  const first = dates[0];
-  // Default window: last 30 days within available data, clipped to data extents.
-  const lastD = new Date(last+'T00:00:00');
-  const startD = new Date(lastD); startD.setDate(startD.getDate()-29);
-  const startStr = startD.toLocaleDateString('en-CA');
-  fromEl.value = startStr < first ? first : startStr;
-  toEl.value   = last;
+  // Default to today (Central) — viewers usually want the current day's
+  // routing snapshot. Use the date range picker to widen.
+  const today = new Date().toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
+  fromEl.value = today;
+  toEl.value   = today;
 }
 
 function renderRoutingFidelity() {
