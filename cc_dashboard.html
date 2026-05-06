@@ -267,6 +267,94 @@ tbody tr:last-child td{border-bottom:none;}
 .ui-empty{padding:30px;text-align:center;color:var(--text-dim);font-size:12px;font-weight:600;background:rgba(31,53,64,0.03);border-radius:8px;}
 .ui-empty strong{color:var(--navy);}
 .ui-empty code{background:#fff;border:1px solid rgba(31,53,64,0.10);padding:2px 6px;border-radius:4px;font-size:11px;}
+
+/* ── ROUTING FIDELITY ── */
+.rf-card{background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:10px;padding:18px 20px;box-shadow:0 1px 4px rgba(31,53,64,0.07);margin-bottom:18px;}
+.rf-card-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#5a7888;margin-bottom:4px;}
+.rf-card-sub{font-size:10px;color:#7a8a94;font-weight:600;margin-bottom:14px;}
+.rf-matrix-wrap{overflow-x:auto;}
+.rf-matrix{border-collapse:separate;border-spacing:3px;font-family:var(--font);}
+.rf-matrix th, .rf-matrix td{padding:0;}
+.rf-matrix th.rf-corner{background:transparent;}
+.rf-matrix th.rf-skill-h{
+  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:#5a7888;text-align:center;padding:0 4px 8px;min-width:74px;max-width:90px;
+  white-space:normal;line-height:1.2;
+  border-bottom:1px solid rgba(31,53,64,0.10);
+}
+.rf-matrix th.rf-total-h{
+  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--navy);text-align:center;padding:0 4px 8px;border-bottom:1px solid rgba(31,53,64,0.10);
+  background:rgba(31,53,64,0.04);
+}
+.rf-matrix td.rf-camp{
+  font-size:11px;font-weight:700;color:var(--navy);
+  padding:6px 10px;text-align:left;white-space:nowrap;
+  background:#fff;
+}
+.rf-cell{
+  position:relative;height:46px;min-width:74px;
+  border-radius:6px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+  font-variant-numeric:tabular-nums;cursor:default;
+  transition:transform .12s, box-shadow .12s;
+}
+.rf-cell:hover{transform:scale(1.04);box-shadow:0 4px 12px rgba(31,53,64,0.15);z-index:5;}
+.rf-cell .rf-n{font-size:13px;font-weight:800;line-height:1;}
+.rf-cell .rf-p{font-size:10px;font-weight:600;line-height:1;opacity:0.78;}
+.rf-cell.zero{background:#f3f1ef;color:#c4ccd1;}
+.rf-cell.zero .rf-n{font-weight:500;}
+.rf-cell.zero .rf-p{display:none;}
+.rf-cell.primary{background:rgba(46,204,113,0.18);color:#1a6b3a;border:1.5px solid rgba(46,204,113,0.55);}
+.rf-cell.overflow{background:rgba(245,200,66,0.20);color:#7a5f10;}
+.rf-cell.qcb{background:rgba(33,169,225,0.16);color:#0c5e7a;}
+.rf-cell.offpath{background:rgba(231,76,60,0.16);color:#8a2418;}
+.rf-cell .rf-tag{
+  position:absolute;top:2px;right:4px;
+  font-size:8px;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;opacity:0.62;
+}
+.rf-cell.total{background:rgba(31,53,64,0.05);color:var(--navy);font-weight:800;}
+.rf-cell.total .rf-n{font-size:13px;}
+.rf-cell.total .rf-p{font-size:9px;color:#7a8a94;font-weight:700;}
+.rf-cell.fid-good{background:rgba(46,204,113,0.16);color:#1a6b3a;}
+.rf-cell.fid-warn{background:rgba(245,200,66,0.22);color:#7a5f10;}
+.rf-cell.fid-bad{background:rgba(231,76,60,0.18);color:#8a2418;}
+.rf-tooltip{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--navy);color:#fff;font-size:10px;font-weight:600;
+  padding:7px 10px;border-radius:5px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);line-height:1.4;
+}
+.rf-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--navy);}
+.rf-cell:hover .rf-tooltip{opacity:1;}
+.rf-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(31,53,64,0.08);font-size:10px;}
+.rf-legend-item{display:flex;align-items:center;gap:6px;color:#5a7888;font-weight:600;}
+.rf-legend-swatch{width:14px;height:14px;border-radius:3px;}
+.rf-path-table{width:100%;border-collapse:collapse;font-size:11px;}
+.rf-path-table th{
+  background:rgba(31,53,64,0.05);padding:7px 10px;text-align:left;
+  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:#5a7888;border-bottom:1px solid rgba(31,53,64,0.10);
+}
+.rf-path-table td{padding:7px 10px;border-bottom:1px solid rgba(31,53,64,0.06);color:#4a6478;font-weight:600;}
+.rf-path-table tr:last-child td{border-bottom:none;}
+.rf-path-table tr:hover td{background:rgba(31,53,64,0.03);}
+.rf-skill-chip{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;font-family:var(--font);white-space:nowrap;
+}
+.rf-skill-chip.primary{background:rgba(46,204,113,0.18);color:#1a6b3a;}
+.rf-skill-chip.ov1{background:rgba(33,169,225,0.16);color:#0c5e7a;}
+.rf-skill-chip.ov2{background:rgba(245,131,31,0.18);color:#8a4d10;}
+.rf-skill-chip.qcb{background:rgba(192,57,43,0.14);color:#7a1d12;}
+.rf-note{
+  background:rgba(33,169,225,0.06);border-left:3px solid var(--blue);
+  padding:10px 14px;border-radius:0 6px 6px 0;font-size:11px;line-height:1.5;
+  color:#4a6478;margin-bottom:14px;
+}
+.rf-note strong{color:var(--navy);}
 </style>
 <script src="gate.js" defer></script>
 </head>
@@ -315,6 +403,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="tab" data-view="daily">Daily</div>
   <div class="tab" data-view="weekly">Weekly</div>
   <div class="tab" data-view="heatmap">IB Heatmaps</div>
+  <div class="tab" data-view="routing">Routing Fidelity</div>
   <div class="tab" data-view="user-info">User Info</div>
 </nav>
 
@@ -581,6 +670,49 @@ tbody tr:last-child td{border-bottom:none;}
           <div class="insight-title" id="heatmap-top-title">Top 5 Hottest Cells</div>
           <div id="heatmap-top-cells"></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ROUTING FIDELITY VIEW ══ -->
+  <div class="view" id="view-routing">
+    <div class="loading" id="routing-loading"><div class="spinner"></div><p>Building routing matrix…</p></div>
+    <div id="routing-content" style="display:none">
+      <div class="date-bar">
+        <label>From</label>
+        <input type="date" id="rf-date-from" onchange="renderRoutingFidelity()">
+        <label>To</label>
+        <input type="date" id="rf-date-to" onchange="renderRoutingFidelity()">
+      </div>
+
+      <div class="rf-note" id="rf-source-note">
+        <strong>Sample data shown.</strong> Wire <code>ROUTING_FEED_URL</code> to a Metabase question (or extend the existing Apps Script proxy with a <code>routing_fidelity</code> feed) to populate from the warehouse. SQL skeleton in the README.
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-section" id="rf-kpis"></div>
+
+      <!-- Matrix -->
+      <div class="rf-card">
+        <div class="rf-card-title">Campaign × Skill — Human-Answered Calls</div>
+        <div class="rf-card-sub" id="rf-matrix-sub">Rows = campaign the call entered on. Columns = skill that ultimately answered. Each cell = call count and % of campaign row total.</div>
+        <div class="rf-matrix-wrap">
+          <table class="rf-matrix" id="rf-matrix"></table>
+        </div>
+        <div class="rf-legend">
+          <div class="rf-legend-item"><span class="rf-legend-swatch" style="background:rgba(46,204,113,0.55)"></span>Primary skill (designed landing)</div>
+          <div class="rf-legend-item"><span class="rf-legend-swatch" style="background:rgba(245,200,66,0.55)"></span>Expected overflow (1st / 2nd waterfall)</div>
+          <div class="rf-legend-item"><span class="rf-legend-swatch" style="background:rgba(33,169,225,0.45)"></span>QCB fallback</div>
+          <div class="rf-legend-item"><span class="rf-legend-swatch" style="background:rgba(231,76,60,0.45)"></span>Off-path (unexpected skill)</div>
+          <div class="rf-legend-item"><span class="rf-legend-swatch" style="background:#f3f1ef;border:1px solid rgba(31,53,64,0.10)"></span>No calls</div>
+        </div>
+      </div>
+
+      <!-- Routing path reference -->
+      <div class="rf-card">
+        <div class="rf-card-title">Routing Path Reference — As-Designed</div>
+        <div class="rf-card-sub">Defines which cell colors apply in the matrix above. Edit <code>ROUTING_PATHS</code> if the design changes.</div>
+        <table class="rf-path-table" id="rf-path-table"></table>
       </div>
     </div>
   </div>
@@ -1666,8 +1798,281 @@ document.querySelectorAll('.tab').forEach(tab=>{
     tab.classList.add('active');
     document.getElementById('view-'+tab.dataset.view).classList.add('active');
     if (tab.dataset.view === 'user-info') loadUserInfo();
+    if (tab.dataset.view === 'routing')   loadRoutingFidelity();
   });
 });
+
+// ════════════════════════════════════════════════════════════
+// ROUTING FIDELITY
+// ════════════════════════════════════════════════════════════
+//
+// Data feed format expected (long, one row per campaign × skill × date):
+//   call_date,campaign,skill,calls
+//   2026-05-05,IB_Acq_Tier-A,IB_Acq_Tier-A,18
+//   2026-05-05,IB_Acq_Tier-A,IB_Acq_Tier-B,8
+//   ...
+// SQL (Metabase against the warehouse — pulls the last 365 days; the
+// dashboard's From/To picker filters client-side):
+//   SELECT call_date, campaign, skill, COUNT(*) AS calls
+//   FROM salmar.five9_call_data
+//   WHERE call_type = 'Inbound'
+//     AND contacted = 1
+//     AND call_date >= CURRENT_DATE - INTERVAL '1 year'
+//   GROUP BY 1,2,3 ORDER BY 1,2,3;
+//
+// Routes through the same CC-dashboard GAS proxy used for the main feed
+// (PROXY_URL above). The script needs a `routing_fidelity` entry in its
+// FEEDS map pointing at the Metabase question
+//   https://rebuilt.metabaseapp.com/public/question/7b4b560d-6646-4c01-80bd-a9537f69f8ce.csv
+// Falls back to ROUTING_SAMPLE if blank.
+const ROUTING_FEED_URL = PROXY_URL + '?feed=routing_fidelity';
+
+// As-designed routing path per campaign — drives the matrix color classes.
+// primary    = green  | overflow[0..1] = amber | qcb = blue | unlisted = red.
+const ROUTING_PATHS = {
+  'IB_Acq_Tier-A':          { primary:'IB_Acq_Tier-A',          overflow:['IB_Acq_Tier-B','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_Tier-B':          { primary:'IB_Acq_Tier-B',          overflow:['IB_Acq_Tier-A','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_Tier-C':          { primary:'IB_Acq_Tier-C',          overflow:['IB_Acq_Tier-B','IB_Acq_Tier-A'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_KY-A':            { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-A','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_KY-B':            { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-B','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_KY-C':            { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-C','IB_Acq_Tier-A'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_Contact-Center':  { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-C','IB_Acq_Tier-B'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_ISA':             { primary:'IB_Acq_ISA',             overflow:['IB_Acq_Contact-Center'],         qcb:'IB_Acq_QCB' },
+  'IB_Acq_Offerpad-Leads':  { primary:'IB_Acq_Tier-B',          overflow:['IB_Acq_Tier-A','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
+  'IB_Acq_Follow-Up':       { primary:'IB_Acq_Follow-Ups',      overflow:[],                                qcb:'IB_Acq_QCB' },
+};
+
+// Fixed column order. Add/remove skills here to change matrix columns.
+const ROUTING_SKILL_COLS = [
+  'IB_Acq_Tier-A','IB_Acq_Tier-B','IB_Acq_Tier-C',
+  'IB_Acq_Contact-Center','IB_Acq_ISA','IB_Acq_Follow-Ups','IB_Acq_QCB','Other'
+];
+
+// SAMPLE data — replace with feed. Numbers reflect the May 5 routing analysis;
+// distribution within a campaign row is illustrative.
+const ROUTING_SAMPLE = [
+  // call_date, campaign, skill, calls
+  ['2026-05-05','IB_Acq_Tier-A','IB_Acq_Tier-A',18],
+  ['2026-05-05','IB_Acq_Tier-A','IB_Acq_Tier-B',8],
+  ['2026-05-05','IB_Acq_Tier-A','IB_Acq_Tier-C',4],
+  ['2026-05-05','IB_Acq_Tier-B','IB_Acq_Tier-B',52],
+  ['2026-05-05','IB_Acq_Tier-B','IB_Acq_Tier-A',10],
+  ['2026-05-05','IB_Acq_Tier-B','IB_Acq_Tier-C',12],
+  ['2026-05-05','IB_Acq_Tier-B','IB_Acq_QCB',2],
+  ['2026-05-05','IB_Acq_Tier-C','IB_Acq_Tier-C',36],
+  ['2026-05-05','IB_Acq_KY-A','IB_Acq_Contact-Center',8],
+  ['2026-05-05','IB_Acq_KY-A','IB_Acq_Tier-A',3],
+  ['2026-05-05','IB_Acq_KY-A','IB_Acq_Tier-C',1],
+  ['2026-05-05','IB_Acq_KY-B','IB_Acq_Contact-Center',2],
+  ['2026-05-05','IB_Acq_KY-B','IB_Acq_Tier-B',1],
+  ['2026-05-05','IB_Acq_KY-B','IB_Acq_Tier-C',1],
+  ['2026-05-05','IB_Acq_KY-C','IB_Acq_Contact-Center',6],
+  ['2026-05-05','IB_Acq_KY-C','IB_Acq_Tier-C',2],
+  ['2026-05-05','IB_Acq_Contact-Center','IB_Acq_Contact-Center',5],
+  ['2026-05-05','IB_Acq_Contact-Center','IB_Acq_Tier-C',1],
+  ['2026-05-05','IB_Acq_ISA','IB_Acq_ISA',6],
+  ['2026-05-05','IB_Acq_Offerpad-Leads','IB_Acq_Tier-B',2],
+  ['2026-05-05','IB_Acq_Acq_Contact-Center','IB_Acq_Contact-Center',4],
+];
+
+let routingRows = null;
+let routingLoaded = false;
+
+function rfClassifyCell(campaign, skill) {
+  const path = ROUTING_PATHS[campaign];
+  if (!path) return 'offpath';
+  if (skill === path.primary)        return 'primary';
+  if (path.overflow.includes(skill)) return 'overflow';
+  if (skill === path.qcb)            return 'qcb';
+  return 'offpath';
+}
+
+function rfFidelityClass(p) {
+  if (p == null) return '';
+  if (p >= 90) return 'fid-good';
+  if (p >= 70) return 'fid-warn';
+  return 'fid-bad';
+}
+
+async function loadRoutingFidelity() {
+  if (routingLoaded) { renderRoutingFidelity(); return; }
+  routingLoaded = true;
+  const loading = document.getElementById('routing-loading');
+  const content = document.getElementById('routing-content');
+  loading.style.display = 'flex';
+  content.style.display = 'none';
+
+  if (!ROUTING_FEED_URL) {
+    routingRows = ROUTING_SAMPLE.map(r => ({
+      call_date: r[0], campaign_name: r[1], skill_name: r[2], calls: r[3]
+    }));
+    rfInitDateRange();
+    renderRoutingFidelity();
+    return;
+  }
+  try {
+    const res = await fetch(ROUTING_FEED_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const parsed = Papa.parse(txt, { header:true, skipEmptyLines:true }).data;
+    routingRows = parsed.map(r => ({
+      call_date: r.call_date,
+      campaign_name: r.campaign_name || r.campaign,
+      skill_name: r.skill_name || r.skill,
+      calls: n(r.calls),
+    }));
+    rfInitDateRange();
+    renderRoutingFidelity();
+  } catch (err) {
+    console.error(err);
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = '<div class="error-box">Failed to load routing data: ' + (err.message||err) + '</div>';
+  }
+}
+
+// Default the date pickers to the data's available range when first opened.
+function rfInitDateRange() {
+  const fromEl = document.getElementById('rf-date-from');
+  const toEl   = document.getElementById('rf-date-to');
+  if (!fromEl || !toEl || !routingRows) return;
+  if (fromEl.value && toEl.value) return;
+  const dates = routingRows.map(r => r.call_date).filter(Boolean).sort();
+  if (!dates.length) return;
+  const last  = dates[dates.length-1];
+  const first = dates[0];
+  // Default window: last 30 days within available data, clipped to data extents.
+  const lastD = new Date(last+'T00:00:00');
+  const startD = new Date(lastD); startD.setDate(startD.getDate()-29);
+  const startStr = startD.toLocaleDateString('en-CA');
+  fromEl.value = startStr < first ? first : startStr;
+  toEl.value   = last;
+}
+
+function renderRoutingFidelity() {
+  const loading = document.getElementById('routing-loading');
+  const content = document.getElementById('routing-content');
+  if (!routingRows) return;
+
+  // Filter by selected date range (inclusive). Empty inputs = unbounded.
+  const fromVal = (document.getElementById('rf-date-from')||{}).value || '';
+  const toVal   = (document.getElementById('rf-date-to')  ||{}).value || '';
+  const rows = routingRows.filter(r => {
+    if (!r.call_date) return true;
+    if (fromVal && r.call_date < fromVal) return false;
+    if (toVal   && r.call_date > toVal)   return false;
+    return true;
+  });
+
+  // Build pivot: campaign -> { skill: count, total: count }
+  const pivot = {}; let grandTotal = 0;
+  for (const r of rows) {
+    const camp = r.campaign_name || '(Unknown)';
+    if (!pivot[camp]) pivot[camp] = { _total: 0 };
+    const skillBucket = ROUTING_SKILL_COLS.includes(r.skill_name) ? r.skill_name : 'Other';
+    pivot[camp][skillBucket] = (pivot[camp][skillBucket] || 0) + n(r.calls);
+    pivot[camp]._total += n(r.calls);
+    grandTotal += n(r.calls);
+  }
+
+  // KPIs
+  let primaryHits = 0, overflowHits = 0, qcbHits = 0, offpathHits = 0;
+  for (const camp of Object.keys(pivot)) {
+    for (const skill of ROUTING_SKILL_COLS) {
+      const v = pivot[camp][skill] || 0;
+      if (!v) continue;
+      const c = rfClassifyCell(camp, skill);
+      if (c === 'primary')  primaryHits  += v;
+      if (c === 'overflow') overflowHits += v;
+      if (c === 'qcb')      qcbHits      += v;
+      if (c === 'offpath')  offpathHits  += v;
+    }
+  }
+  const fidelityPct = grandTotal>0 ? (primaryHits/grandTotal*100) : null;
+
+  document.getElementById('rf-kpis').innerHTML = kpiHTML([
+    { side:'ib', label:'Routing Fidelity', cards:[
+      { label:'Calls Analyzed', val:fmt.num(grandTotal), accent:'var(--blue)' },
+      { label:'Primary Hit %',  val:fmt.pct(fidelityPct), sub:`${fmt.num(primaryHits)} on primary skill`, accent:'var(--blue)', cls:cls(fidelityPct,{good:90,warn:75}) },
+      { label:'Overflow',       val:fmt.num(overflowHits), sub:'expected waterfall', accent:'var(--teal)' },
+      { label:'QCB Fallback',   val:fmt.num(qcbHits),      sub:'callback offered',   accent:'var(--teal)' },
+      { label:'Off-Path',       val:fmt.num(offpathHits),  sub:'unexpected skill',   accent:'var(--orange)' },
+    ]},
+  ]);
+
+  // Matrix table
+  const campaignOrder = [
+    ...Object.keys(ROUTING_PATHS).filter(c => pivot[c]),
+    ...Object.keys(pivot).filter(c => !ROUTING_PATHS[c]),
+  ];
+
+  let html = '<thead><tr>';
+  html += '<th class="rf-corner"></th>';
+  ROUTING_SKILL_COLS.forEach(s => {
+    html += `<th class="rf-skill-h">${s.replace(/^IB_Acq_/,'')}</th>`;
+  });
+  html += '<th class="rf-total-h">Total</th>';
+  html += '<th class="rf-total-h">Fidelity %</th>';
+  html += '</tr></thead><tbody>';
+
+  for (const camp of campaignOrder) {
+    const total = pivot[camp]._total;
+    if (!total) continue;
+    html += `<tr><td class="rf-camp">${camp}</td>`;
+    for (const skill of ROUTING_SKILL_COLS) {
+      const v = pivot[camp][skill] || 0;
+      const p = total>0 ? (v/total*100) : 0;
+      const cellCls = v===0 ? 'zero' : rfClassifyCell(camp, skill);
+      const path = ROUTING_PATHS[camp];
+      const tag = (path && skill===path.primary) ? '<span class="rf-tag">P</span>' : '';
+      const tipPath = !path ? 'no defined path'
+        : (skill===path.primary ? 'PRIMARY skill'
+        : (path.overflow.indexOf(skill)>=0 ? `Overflow #${path.overflow.indexOf(skill)+1}`
+        : (skill===path.qcb ? 'QCB fallback' : 'Off-path')));
+      const tip = `${camp}<br>→ ${skill}<br>${v} calls (${p.toFixed(1)}%)<br>${tipPath}`;
+      html += `<td><div class="rf-cell ${cellCls}">${tag}<span class="rf-n">${v||'–'}</span><span class="rf-p">${v?p.toFixed(0)+'%':''}</span><div class="rf-tooltip">${tip}</div></div></td>`;
+    }
+    html += `<td><div class="rf-cell total"><span class="rf-n">${total}</span><span class="rf-p">100%</span></div></td>`;
+    const path = ROUTING_PATHS[camp];
+    const primarySkill = path && path.primary;
+    const primaryCalls = primarySkill ? (pivot[camp][primarySkill]||0) : 0;
+    const fid = total>0 ? (primaryCalls/total*100) : null;
+    const fidCls = rfFidelityClass(fid);
+    html += `<td><div class="rf-cell ${fidCls}"><span class="rf-n">${fid==null?'—':fid.toFixed(0)+'%'}</span><span class="rf-p">${primarySkill?primarySkill.replace(/^IB_Acq_/,''):''}</span></div></td>`;
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  document.getElementById('rf-matrix').innerHTML = html;
+
+  // Path reference table
+  let pathHtml = '<thead><tr>'
+    + '<th>Campaign</th>'
+    + '<th>Primary</th>'
+    + '<th>1st Overflow (~30s)</th>'
+    + '<th>2nd Overflow (~+15s)</th>'
+    + '<th>QCB</th>'
+    + '</tr></thead><tbody>';
+  for (const [camp, path] of Object.entries(ROUTING_PATHS)) {
+    pathHtml += `<tr><td>${camp}</td>`;
+    pathHtml += `<td><span class="rf-skill-chip primary">${path.primary.replace(/^IB_Acq_/,'')}</span></td>`;
+    pathHtml += `<td>${path.overflow[0] ? `<span class="rf-skill-chip ov1">${path.overflow[0].replace(/^IB_Acq_/,'')}</span>` : '—'}</td>`;
+    pathHtml += `<td>${path.overflow[1] ? `<span class="rf-skill-chip ov2">${path.overflow[1].replace(/^IB_Acq_/,'')}</span>` : '—'}</td>`;
+    pathHtml += `<td><span class="rf-skill-chip qcb">${(path.qcb||'').replace(/^IB_Acq_/,'') || '—'}</span></td>`;
+    pathHtml += '</tr>';
+  }
+  pathHtml += '</tbody>';
+  document.getElementById('rf-path-table').innerHTML = pathHtml;
+
+  // Subtitle window
+  const rangeLbl = (fromVal && toVal)
+    ? `${fmt.date(fromVal)} – ${fmt.date(toVal)}`
+    : (fromVal ? `from ${fmt.date(fromVal)}` : (toVal ? `through ${fmt.date(toVal)}` : 'all dates'));
+  document.getElementById('rf-matrix-sub').textContent =
+    `${rangeLbl} · ${fmt.num(grandTotal)} answered calls · rows = entry campaign, cols = answering skill, cell = count + % of row.`;
+
+  loading.style.display = 'none';
+  content.style.display = 'block';
+}
 
 loadData();
 </script>
