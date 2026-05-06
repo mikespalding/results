@@ -1811,12 +1811,13 @@ document.querySelectorAll('.tab').forEach(tab=>{
 //   2026-05-05,IB_Acq_Tier-A,IB_Acq_Tier-A,18
 //   2026-05-05,IB_Acq_Tier-A,IB_Acq_Tier-B,8
 //   ...
-// SQL (Metabase against the warehouse):
+// SQL (Metabase against the warehouse — pulls the last 365 days; the
+// dashboard's From/To picker filters client-side):
 //   SELECT call_date, campaign, skill, COUNT(*) AS calls
 //   FROM salmar.five9_call_data
 //   WHERE call_type = 'Inbound'
 //     AND contacted = 1
-//     AND call_date BETWEEN {{from}} AND {{to}}
+//     AND call_date >= CURRENT_DATE - INTERVAL '1 year'
 //   GROUP BY 1,2,3 ORDER BY 1,2,3;
 //
 // Set ROUTING_FEED_URL to a Metabase public-question CSV or an Apps Script
