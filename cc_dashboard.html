@@ -451,8 +451,8 @@ tbody tr:last-child td{border-bottom:none;}
               <th class="wrap">Ttl Ans %</th><th class="wrap">Adj Ttl %</th>
               <th class="wrap">HOO Ans %</th><th class="wrap">Adj HOO Ans %</th>
               <th class="wrap">Non HOO Ans %</th><th class="wrap">Adj Non HOO Ans %</th>
-              <th>QCBs</th><th>Conv %</th>
-              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
+              <th>QCBs</th><th>Conv</th>
+              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
           </thead>
@@ -510,8 +510,8 @@ tbody tr:last-child td{border-bottom:none;}
               <th class="wrap">Ttl Ans %</th><th class="wrap">Adj Ttl %</th>
               <th class="wrap">HOO Ans %</th><th class="wrap">Adj HOO Ans %</th>
               <th class="wrap">Non HOO Ans %</th><th class="wrap">Adj Non HOO Ans %</th>
-              <th>QCBs</th><th>Conv %</th>
-              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv %</th>
+              <th>QCBs</th><th>Conv</th>
+              <th class="sect-start">OB Calls</th><th>Contacted</th><th>Avg Talk</th><th>Conv</th>
               <th class="sect-start">IB Appt</th><th>IB Oppty</th><th>OB Appt</th><th>OB Oppty</th>
             </tr>
           </thead>
@@ -1153,10 +1153,10 @@ function renderDaily() {
       <td class="${cls(d.ib_answered_after_hoo_pct,T.ans)}">${fmt.pct(d.ib_answered_after_hoo_pct)}</td>
       <td class="${cls(d.ib_adj_answered_after_hoo_pct,T.adj)}">${fmt.pct(d.ib_adj_answered_after_hoo_pct)}</td>
       <td>${fmt.num(d.ib_qcb_registered)}</td>
-      <td>${fmt.pct(d.ib_positive_pct)}</td>
+      <td>${fmt.num(d.ib_appt_set+d.ib_opportunity)}</td>
       <td class="sect-start">${fmt.num(d.ob_total_calls)}</td><td>${fmt.num(d.ob_answered)}</td>
       <td>${fmt.talk(d.ob_avg_talk_secs)}</td>
-      <td class="${cls(d.ob_conversation_pct,T.conv)}">${fmt.pct(d.ob_conversation_pct)}</td>
+      <td>${fmt.num(d.ob_conversations)}</td>
       <td class="sect-start">${fmt.num(d.ib_appt_set)}</td><td>${fmt.num(d.ib_opportunity)}</td>
       <td>${fmt.num(d.ob_appt_set)}</td><td>${fmt.num(d.ob_opportunity)}</td>
     </tr>`).join('');
@@ -1255,10 +1255,10 @@ function renderWeekly() {
       <td class="${cls(w.ib_answered_after_hoo_pct,T.ans)}">${fmt.pct(w.ib_answered_after_hoo_pct)}</td>
       <td class="${cls(w.ib_adj_answered_after_hoo_pct,T.adj)}">${fmt.pct(w.ib_adj_answered_after_hoo_pct)}</td>
       <td>${fmt.num(w.ib_qcb_registered)}</td>
-      <td>${fmt.pct(w.ib_positive_pct)}</td>
+      <td>${fmt.num(w.ib_appt_set+w.ib_opportunity)}</td>
       <td class="sect-start">${fmt.num(w.ob_total_calls)}</td><td>${fmt.num(w.ob_answered)}</td>
       <td>${fmt.talk(w.ob_avg_talk_secs)}</td>
-      <td class="${cls(w.ob_conversation_pct,T.conv)}">${fmt.pct(w.ob_conversation_pct)}</td>
+      <td>${fmt.num(w.ob_conversations)}</td>
       <td class="sect-start">${fmt.num(w.ib_appt_set)}</td><td>${fmt.num(w.ib_opportunity)}</td>
       <td>${fmt.num(w.ob_appt_set)}</td><td>${fmt.num(w.ob_opportunity)}</td>
     </tr>`).join('');
