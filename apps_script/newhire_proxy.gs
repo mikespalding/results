@@ -20,6 +20,9 @@ const FEEDS = {
 
   // ── QUALITY ──
   prospect_creation_rate: 'https://rebuilt.metabaseapp.com/public/question/3a722788-60fe-4e13-aa5c-82637b6135d1.csv',
+
+  // ── CC DASHBOARD ── Routing Fidelity (campaign × skill, last 1y of inbound human-answered calls)
+  routing_fidelity:       'https://rebuilt.metabaseapp.com/public/question/7b4b560d-6646-4c01-80bd-a9537f69f8ce.csv',
 };
 
 // ── ACCESS LOGGING ── (shared with pacesetter)

@@ -1820,9 +1820,10 @@ document.querySelectorAll('.tab').forEach(tab=>{
 //     AND call_date >= CURRENT_DATE - INTERVAL '1 year'
 //   GROUP BY 1,2,3 ORDER BY 1,2,3;
 //
-// Set ROUTING_FEED_URL to a Metabase public-question CSV or an Apps Script
-// endpoint that returns the same shape. Falls back to ROUTING_SAMPLE if blank.
-const ROUTING_FEED_URL = '';
+// Routes through the shared GAS proxy (same deployment as the pacesetter
+// dashboard) — the feed is configured in apps_script/newhire_proxy.gs as
+// `routing_fidelity`. Falls back to ROUTING_SAMPLE if blank.
+const ROUTING_FEED_URL = 'https://script.google.com/macros/s/AKfycbwXVXMT8n3pYitrU7e2OZ3JLkey-PXXPRfDKeh2sa1DGUc51r39CytWiZkMWPMWUTc3dw/exec?feed=routing_fidelity';
 
 // As-designed routing path per campaign — drives the matrix color classes.
 // primary    = green  | overflow[0..1] = amber | qcb = blue | unlisted = red.
