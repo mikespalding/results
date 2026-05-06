@@ -931,8 +931,8 @@ function renderHourly() {
   mkChart('c-hr-ib-offer',[
     {type:'bar', label:'Total',   data:active.map(h=>h.ib_total_calls), backgroundColor:'rgba(33,169,225,0.15)',yAxisID:'y',order:3,stack:'ib'},
     {type:'bar', label:'Offered', data:active.map(h=>h.ib_offered),     backgroundColor:'rgba(33,169,225,0.50)',yAxisID:'y',order:2,stack:'ib'},
-    {type:'bar', label:'FTIBC',   data:active.map(h=>h.ib_ftibc),       backgroundColor:'rgba(100,180,183,0.70)',yAxisID:'y',order:1,stack:'ib'},
-    {type:'bar', label:'Conv',    data:active.map(h=>h.ib_appt_set+h.ib_opportunity), backgroundColor:'rgba(15,105,110,0.85)',yAxisID:'y',order:1,stack:'ib-conv'},
+    {type:'bar', label:'Conv',    data:active.map(h=>h.ib_appt_set+h.ib_opportunity), backgroundColor:'rgba(15,105,110,0.85)',yAxisID:'y',order:1,stack:'ib'},
+    {type:'line',label:'FTIBC',   data:active.map(h=>h.ib_ftibc),       borderColor:'#64b4b7',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y',order:0},
     {type:'line',label:'Ttl Ans %',     data:active.map(h=>h.ib_answered_pct),   borderColor:'#f5831f',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
     {type:'line',label:'Ttl Adj Ans %', data:active.map(h=>h.ib_adj_answered_pct),borderColor:'#f5c842',pointRadius:4,tension:0.3,backgroundColor:'transparent',yAxisID:'y2',order:0},
   ],lb,'Calls','Rate %',true);
