@@ -685,8 +685,8 @@ tbody tr:last-child td{border-bottom:none;}
         <input type="date" id="rf-date-to" onchange="renderRoutingFidelity()">
       </div>
 
-      <div class="rf-note" id="rf-source-note">
-        <strong>Sample data shown.</strong> Wire <code>ROUTING_FEED_URL</code> to a Metabase question (or extend the existing Apps Script proxy with a <code>routing_fidelity</code> feed) to populate from the warehouse. SQL skeleton in the README.
+      <div class="rf-note" id="rf-source-note" style="display:none">
+        <strong>Sample data shown.</strong> The <code>routing_fidelity</code> feed didn't load — falling back to baked-in sample.
       </div>
 
       <!-- KPIs -->
@@ -710,8 +710,8 @@ tbody tr:last-child td{border-bottom:none;}
 
       <!-- Routing path reference -->
       <div class="rf-card">
-        <div class="rf-card-title">Routing Path Reference — As-Designed</div>
-        <div class="rf-card-sub">Defines which cell colors apply in the matrix above. Edit <code>ROUTING_PATHS</code> if the design changes.</div>
+        <div class="rf-card-title">Routing Path Reference — As-Designed · Effective 5/5/2026</div>
+        <div class="rf-card-sub">Routing design effective 5/5/2026. Defines which cell colors apply in the matrix above; calls answered before this date will follow the prior routing rules. Edit <code>ROUTING_PATHS</code> if the design changes.</div>
         <table class="rf-path-table" id="rf-path-table"></table>
       </div>
     </div>
@@ -1877,6 +1877,7 @@ const ROUTING_SAMPLE = [
 
 let routingRows = null;
 let routingLoaded = false;
+let routingUsedSample = false;
 
 function rfClassifyCell(campaign, skill) {
   const path = ROUTING_PATHS[campaign];
@@ -1902,14 +1903,16 @@ async function loadRoutingFidelity() {
   loading.style.display = 'flex';
   content.style.display = 'none';
 
-  if (!ROUTING_FEED_URL) {
+  const useSample = () => {
+    routingUsedSample = true;
     routingRows = ROUTING_SAMPLE.map(r => ({
       call_date: r[0], campaign_name: r[1], skill_name: r[2], calls: r[3]
     }));
     rfInitDateRange();
     renderRoutingFidelity();
-    return;
-  }
+  };
+
+  if (!ROUTING_FEED_URL) { useSample(); return; }
   try {
     const res = await fetch(ROUTING_FEED_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1921,13 +1924,13 @@ async function loadRoutingFidelity() {
       skill_name: r.skill_name || r.skill,
       calls: n(r.calls),
     }));
+    if (!routingRows.length) { useSample(); return; }
+    routingUsedSample = false;
     rfInitDateRange();
     renderRoutingFidelity();
   } catch (err) {
     console.error(err);
-    loading.style.display = 'none';
-    content.style.display = 'block';
-    content.innerHTML = '<div class="error-box">Failed to load routing data: ' + (err.message||err) + '</div>';
+    useSample();
   }
 }
 
@@ -2069,6 +2072,9 @@ function renderRoutingFidelity() {
     : (fromVal ? `from ${fmt.date(fromVal)}` : (toVal ? `through ${fmt.date(toVal)}` : 'all dates'));
   document.getElementById('rf-matrix-sub').textContent =
     `${rangeLbl} · ${fmt.num(grandTotal)} answered calls · rows = entry campaign, cols = answering skill, cell = count + % of row.`;
+
+  const note = document.getElementById('rf-source-note');
+  if (note) note.style.display = routingUsedSample ? 'block' : 'none';
 
   loading.style.display = 'none';
   content.style.display = 'block';
