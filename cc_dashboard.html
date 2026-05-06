@@ -1807,10 +1807,18 @@ document.querySelectorAll('.tab').forEach(tab=>{
 // ════════════════════════════════════════════════════════════
 //
 // Data feed format expected (long, one row per campaign × skill × date):
-//   call_date,campaign_name,skill_name,calls
+//   call_date,campaign,skill,calls
 //   2026-05-05,IB_Acq_Tier-A,IB_Acq_Tier-A,18
 //   2026-05-05,IB_Acq_Tier-A,IB_Acq_Tier-B,8
 //   ...
+// SQL (Metabase against the warehouse):
+//   SELECT call_date, campaign, skill, COUNT(*) AS calls
+//   FROM salmar.five9_call_data
+//   WHERE call_type = 'Inbound'
+//     AND contacted = 1
+//     AND call_date BETWEEN {{from}} AND {{to}}
+//   GROUP BY 1,2,3 ORDER BY 1,2,3;
+//
 // Set ROUTING_FEED_URL to a Metabase public-question CSV or an Apps Script
 // endpoint that returns the same shape. Falls back to ROUTING_SAMPLE if blank.
 const ROUTING_FEED_URL = '';
