@@ -1820,10 +1820,12 @@ document.querySelectorAll('.tab').forEach(tab=>{
 //     AND call_date >= CURRENT_DATE - INTERVAL '1 year'
 //   GROUP BY 1,2,3 ORDER BY 1,2,3;
 //
-// Routes through the shared GAS proxy (same deployment as the pacesetter
-// dashboard) — the feed is configured in apps_script/newhire_proxy.gs as
-// `routing_fidelity`. Falls back to ROUTING_SAMPLE if blank.
-const ROUTING_FEED_URL = 'https://script.google.com/macros/s/AKfycbwXVXMT8n3pYitrU7e2OZ3JLkey-PXXPRfDKeh2sa1DGUc51r39CytWiZkMWPMWUTc3dw/exec?feed=routing_fidelity';
+// Routes through the same CC-dashboard GAS proxy used for the main feed
+// (PROXY_URL above). The script needs a `routing_fidelity` entry in its
+// FEEDS map pointing at the Metabase question
+//   https://rebuilt.metabaseapp.com/public/question/7b4b560d-6646-4c01-80bd-a9537f69f8ce.csv
+// Falls back to ROUTING_SAMPLE if blank.
+const ROUTING_FEED_URL = PROXY_URL + '?feed=routing_fidelity';
 
 // As-designed routing path per campaign — drives the matrix color classes.
 // primary    = green  | overflow[0..1] = amber | qcb = blue | unlisted = red.
