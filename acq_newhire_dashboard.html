@@ -312,16 +312,6 @@
   <!-- ═══ COHORT ═══ -->
   <div id="tab-cohort" class="tab-panel">
     <div class="kpi-row" id="cohort-kpi-row"></div>
-    <div class="two-col">
-      <div class="card">
-        <div class="section-head"><div class="section-title">Avg Weekly RTS by Cohort</div><div class="section-note">By week-in-tenure</div></div>
-        <div class="chart-wrap-tall"><canvas id="chart-cohort-rts"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="section-head"><div class="section-title">Retention by Cohort</div></div>
-        <div class="chart-wrap-tall"><canvas id="chart-cohort-retention"></canvas></div>
-      </div>
-    </div>
     <div class="card">
       <div class="section-head"><div class="section-title">Cohort Performance Summary</div></div>
       <table class="perf-table" id="cohort-summary-table"></table>
@@ -987,36 +977,6 @@ function buildCohort(){
       <div class="kpi-value">${cohortActive[i]}/${cohortSizes[i]}</div>
       <div class="kpi-sub">${Math.round(cohortActive[i]/cohortSizes[i]*100)}% retained</div>
     </div>`).join('');
-
-  const maxWkNum=Math.max(...DATA.reps.flatMap(r=>r.weeks.map(w=>w.week_num)));
-  const wkNums=Array.from({length:maxWkNum-1},(_,i)=>i+2);
-  const cohortDatasets=cohorts.map((c,i)=>({
-    label:c,
-    data:wkNums.map(n=>{
-      const vals=cohortReps[i].flatMap(r=>r.weeks.filter(w=>w.week_num===n).map(w=>w.rts_hrs)).filter(v=>v!=null);
-      return vals.length?vals.reduce((s,v)=>s+v,0)/vals.length:null;
-    }),
-    borderColor:COHORT_COLORS[c],backgroundColor:COHORT_COLORS[c]+'40',tension:.3,pointRadius:4,borderWidth:2,spanGaps:true
-  }));
-  cohortDatasets.push({label:'Min',data:wkNums.map(n=>n===2?12:n===3?20:n===4?22:25),borderColor:'#e05252',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false});
-
-  new Chart(document.getElementById('chart-cohort-rts'),{
-    type:'line',
-    data:{labels:wkNums.map(n=>'Wk '+n),datasets:cohortDatasets},
-    options:{plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10}}},scales:{x:{ticks:{font:{size:11}}},y:{beginAtZero:true,ticks:{font:{size:11}},grid:{color:'#f0ece8'}}}}
-  });
-
-  new Chart(document.getElementById('chart-cohort-retention'),{
-    type:'bar',
-    data:{
-      labels:cohorts,
-      datasets:[
-        {label:'Active',data:cohortActive,backgroundColor:cohorts.map(c=>COHORT_COLORS[c]),borderRadius:4},
-        {label:'Exited',data:cohortSizes.map((s,i)=>s-cohortActive[i]),backgroundColor:cohorts.map(c=>COHORT_COLORS[c]+'88'),borderRadius:4}
-      ]
-    },
-    options:{plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{stacked:true,ticks:{font:{size:11}}},y:{stacked:true,ticks:{stepSize:1,font:{size:11}}}}}
-  });
 
   document.getElementById('cohort-summary-table').innerHTML=`
     <thead><tr><th>Cohort</th><th>Hired</th><th>Active</th><th>Exited</th><th>Retention</th><th>Avg Exit Wk</th><th>Total Contracts</th><th>To Mktg</th><th>Pos Spread</th><th>Assignments</th><th>Fees</th></tr></thead>
