@@ -2232,6 +2232,7 @@ let agentStateIntervals = null;   // { agent_lc: [{startMs, endMs, state, reason
 const WF_STATE_COLORS = {
   'ready':'good','available':'good','idle':'good','logged in':'good','on queue':'good',
   'on call':'busy','on a call':'busy','in call':'busy','talking':'busy','active call':'busy',
+  'ringing':'busy','did ringing':'busy',
   'after call work':'wrap','acw':'wrap','wrap':'wrap','wrap-up':'wrap','wrapping up':'wrap',
   'not ready':'away','unavailable':'away','aux':'away','break':'away','lunch':'away','meeting':'away',
   'logged out':'offline','offline':'offline','logout':'offline','signed out':'offline',
@@ -2242,16 +2243,18 @@ function wfStateClass(state) {
 }
 
 // Pull the first non-empty value from `row` matching any candidate key
-// (case-insensitive). Used to absorb the variation in Five9 export
-// column names without forcing a manual mapping step.
+// (case-insensitive, ignoring spaces/punctuation). Used to absorb the
+// variation in Five9 export column names (e.g. "AGENT STATE TIME"
+// vs "agent_state_time") without forcing a manual mapping step.
 function wfPick(row, keys) {
   for (const k of keys) {
     if (row[k] != null && row[k] !== '') return row[k];
   }
-  const lcMap = {};
-  for (const rk of Object.keys(row)) lcMap[rk.toLowerCase()] = rk;
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const map = {};
+  for (const rk of Object.keys(row)) map[norm(rk)] = rk;
   for (const k of keys) {
-    const rk = lcMap[k.toLowerCase()];
+    const rk = map[norm(k)];
     if (rk && row[rk] != null && row[rk] !== '') return row[rk];
   }
   return '';
@@ -2315,7 +2318,13 @@ function wfHandleStateUpload(ev) {
   Papa.parse(file, {
     header:true, skipEmptyLines:true,
     complete: (res) => {
-      const rows = res.data.map(wfNormalizeStateRow).filter(r => r.agent && r.start);
+      // Drop session-marker Login rows: their duration spans the whole
+      // session and would shadow finer-grained states (Ready, On Call …)
+      // in state-at-time lookups. Logout rows are kept — they correctly
+      // mark the agent as offline during the gap between sessions.
+      const rows = res.data
+        .map(wfNormalizeStateRow)
+        .filter(r => r.agent && r.start && r.state && r.state.toLowerCase() !== 'login');
       if (!rows.length) {
         status.textContent = 'No usable rows. Check that the CSV has agent/user, start time, and state columns.';
         return;
@@ -2341,14 +2350,32 @@ function wfClearState() {
 }
 
 function wfNormalizeStateRow(r) {
-  const start = wfPick(r, ['start_timestamp','start_time','start','interval_start_time','timestamp','date_time']);
-  const end   = wfPick(r, ['end_timestamp','end_time','end','interval_end_time']);
-  const dur   = wfPick(r, ['duration','duration_seconds','duration_sec','seconds','elapsed_seconds']);
+  // Some Five9 exports (the in-house Agent State Log among them) split the
+  // timestamp into separate DATE and TIME columns; recombine when there's
+  // no single column.
+  let start = wfPick(r, ['start_timestamp','start_time','start','interval_start_time','timestamp','date_time']);
+  if (!start) {
+    const d = wfPick(r, ['date','call_date']);
+    const t = wfPick(r, ['time','call_time']);
+    if (d && t) start = `${d} ${t}`;
+  }
+  const end = wfPick(r, ['end_timestamp','end_time','end','interval_end_time']);
+  // Duration may come as HH:MM:SS (e.g. "AGENT STATE TIME"); detect that
+  // pattern *before* falling through to numeric parsing — parseFloat
+  // happily reads "36:16:02" as 36 and would silently lose the minutes
+  // and seconds.
+  const durRaw = wfPick(r, ['duration','duration_seconds','duration_sec','seconds','elapsed_seconds','agent_state_time']);
+  let dur = 0;
+  if (durRaw) {
+    const m = String(durRaw).match(/^(\d+):(\d{2}):(\d{2})$/);
+    if (m) dur = (+m[1])*3600 + (+m[2])*60 + (+m[3]);
+    else dur = n(durRaw);
+  }
   return {
     agent:  String(wfPick(r, ['agent_email','user_name','agent','agent_name','user','username','email'])).toLowerCase().trim(),
     start:  String(start || '').trim(),
     end:    String(end || '').trim(),
-    dur:    n(dur),
+    dur:    dur,
     state:  String(wfPick(r, ['state','status','agent_state'])).trim(),
     reason: String(wfPick(r, ['reason_code','not_ready_reason','reason','not_ready_reason_code','sub_state'])).trim(),
   };
@@ -2358,10 +2385,18 @@ function wfNormalizeStateRow(r) {
 // (matching how the call data carries it). Empty strings → 0.
 function wfParseTs(s) {
   if (!s) return 0;
-  // Already ISO-like ("YYYY-MM-DD HH:MM:SS") — let Date handle it.
+  s = String(s).trim();
+  // Agent State Log format: "M/D/YY[YY] H:MM[:SS]" — explicit parse, two-digit
+  // year normalized (00-49 → 2000s, 50-99 → 1900s).
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (m) {
+    let [, mo, dy, yr, h, mi, se] = m;
+    if (yr.length === 2) yr = String(+yr < 50 ? 2000 + +yr : 1900 + +yr);
+    return new Date(+yr, +mo-1, +dy, +h, +mi, +(se||0)).getTime();
+  }
+  // ISO-like ("YYYY-MM-DD HH:MM:SS") — let Date handle it.
   const ms = Date.parse(s.includes('T') ? s : s.replace(' ', 'T'));
-  if (!isNaN(ms)) return ms;
-  return 0;
+  return isNaN(ms) ? 0 : ms;
 }
 
 function wfBuildIntervals(rows) {
