@@ -1839,7 +1839,9 @@ const ROUTING_PATHS = {
   'IB_Acq_Contact-Center':  { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-C','IB_Acq_Tier-B'], qcb:'IB_Acq_QCB' },
   'IB_Acq_ISA':             { primary:'IB_Acq_ISA',             overflow:['IB_Acq_Contact-Center'],         qcb:'IB_Acq_QCB' },
   'IB_Acq_Offerpad-Leads':  { primary:'IB_Acq_Tier-B',          overflow:['IB_Acq_Tier-A','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
-  'IB_Acq_Follow-Up':       { primary:'IB_Acq_Follow-Ups',      overflow:[],                                qcb:'IB_Acq_QCB' },
+  // QCB on this campaign loops back to IB_Acq_Follow-Ups after 60s in queue —
+  // it's a queue-callback, not a fallback to the IB_Acq_QCB skill.
+  'IB_Acq_Follow-Up':       { primary:'IB_Acq_Follow-Ups',      overflow:[],                                qcb:null },
 };
 
 // Fixed column order. Add/remove skills here to change matrix columns.
