@@ -22,9 +22,8 @@ const FEEDS = {
   // Campaign Calls Hourly Detail — one row per (call_date, call_hour, campaign),
   // last 60 days. Drives the Campaign Calls Hourly Detail table on the Hourly
   // tab. SQL for the Metabase question lives in cc_dashboard.html (search for
-  // "SQL · Campaign · Hourly Detail"). Paste the public CSV URL here after
-  // publishing the question.
-  campaign_hourly: '',
+  // "SQL · Campaign · Hourly Detail").
+  campaign_hourly: 'https://rebuilt.metabaseapp.com/public/question/161e4362-ff2d-4868-a9b3-9ad06f8838da.csv',
 };
 
 function doGet(e) {
