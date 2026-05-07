@@ -355,6 +355,52 @@ tbody tr:last-child td{border-bottom:none;}
   color:#4a6478;margin-bottom:14px;
 }
 .rf-note strong{color:var(--navy);}
+
+/* ══ Waterfall Root Cause ══ */
+.wf-optional{font-size:10px;font-weight:700;color:#9aa8b1;letter-spacing:0.6px;}
+.wf-upload-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.wf-upload-row input[type=file]{
+  font:inherit;font-size:12px;padding:6px 10px;border:1px solid rgba(31,53,64,0.18);
+  border-radius:6px;background:#fff;color:var(--navy);
+}
+.wf-clear-btn{
+  background:#fff;border:1px solid rgba(31,53,64,0.18);color:var(--navy);
+  font:inherit;font-size:11px;font-weight:700;padding:6px 14px;border-radius:6px;
+  cursor:pointer;letter-spacing:.5px;text-transform:uppercase;
+}
+.wf-clear-btn:hover{border-color:var(--blue);color:var(--blue);}
+.wf-status{font-size:11px;color:#7a8a94;font-weight:600;}
+.wf-event-table tbody tr{cursor:pointer;}
+.wf-event-table tbody tr:hover{background:rgba(33,169,225,0.05);}
+.wf-event-table tbody tr.expanded{background:rgba(33,169,225,0.08);}
+.wf-event-table .wf-detail-row td{
+  background:rgba(243,241,239,0.6);padding:14px 18px;
+  border-top:1px solid rgba(31,53,64,0.10);
+}
+.wf-state-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.wf-state-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;
+  border:1px solid transparent;
+}
+.wf-state-chip.good   {background:rgba(46,204,113,0.16); color:#1a6b3a; border-color:rgba(46,204,113,0.40);}
+.wf-state-chip.busy   {background:rgba(245,131,31,0.18); color:#8a4d10; border-color:rgba(245,131,31,0.40);}
+.wf-state-chip.wrap   {background:rgba(33,169,225,0.16); color:#0c5e7a; border-color:rgba(33,169,225,0.40);}
+.wf-state-chip.away   {background:rgba(231,76,60,0.18);  color:#8a2418; border-color:rgba(231,76,60,0.40);}
+.wf-state-chip.offline{background:rgba(31,53,64,0.10);   color:#3b5765; border-color:rgba(31,53,64,0.20);}
+.wf-state-chip.other  {background:rgba(31,53,64,0.04);   color:#3b5765; border-color:rgba(31,53,64,0.12);}
+.wf-state-chip.unknown{background:#f3f1ef; color:#9aa8b1; border-color:rgba(31,53,64,0.10);}
+.wf-state-chip .wf-state-name{font-weight:700;}
+.wf-state-chip .wf-state-reason{font-weight:500;opacity:0.8;}
+.wf-pool-summary{
+  display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:#5a7888;font-weight:600;
+}
+.wf-pool-summary span{
+  background:#fff;border:1px solid rgba(31,53,64,0.10);border-radius:14px;
+  padding:3px 10px;
+}
+.wf-pool-summary .wf-pool-good{color:#1a6b3a;}
+.wf-pool-summary .wf-pool-bad{color:#8a2418;}
 </style>
 <script src="gate.js" defer></script>
 </head>
@@ -404,6 +450,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="tab" data-view="weekly">Weekly</div>
   <div class="tab" data-view="heatmap">IB Heatmaps</div>
   <div class="tab" data-view="routing">Routing Fidelity</div>
+  <div class="tab" data-view="waterfall">Waterfall Root Cause</div>
   <div class="tab" data-view="user-info">User Info</div>
 </nav>
 
@@ -713,6 +760,73 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="rf-card-title">Routing Path Reference — As-Designed · Effective 5/5/2026</div>
         <div class="rf-card-sub">Routing design effective 5/5/2026. Defines which cell colors apply in the matrix above; calls answered before this date will follow the prior routing rules. Edit <code>ROUTING_PATHS</code> if the design changes.</div>
         <table class="rf-path-table" id="rf-path-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WATERFALL ROOT CAUSE VIEW ══ -->
+  <div class="view" id="view-waterfall">
+    <div class="loading" id="waterfall-loading"><div class="spinner"></div><p>Loading waterfall events…</p></div>
+    <div id="waterfall-content" style="display:none">
+      <div class="date-bar">
+        <label>From</label>
+        <input type="date" id="wf-date-from" onchange="renderWaterfall()">
+        <label>To</label>
+        <input type="date" id="wf-date-to" onchange="renderWaterfall()">
+      </div>
+
+      <div class="rf-note" id="wf-feed-note" style="display:none">
+        <strong>No waterfall data loaded.</strong> The <code>waterfall_events</code> feed returned no rows for the selected range.
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-section" id="wf-kpis"></div>
+
+      <!-- Agent state log upload -->
+      <div class="rf-card">
+        <div class="rf-card-title">Agent State Log Upload <span class="wf-optional">— Optional</span></div>
+        <div class="rf-card-sub">
+          Upload the Five9 Agent State Log CSV covering this date range to see each agent's status at the moment of every waterfall event.
+          Common column names (AGENT/USER, START_TIMESTAMP/START_TIME, STATE, REASON, END_TIMESTAMP) are auto-detected.
+          The file stays in your browser — nothing is uploaded.
+        </div>
+        <div class="wf-upload-row">
+          <input type="file" id="wf-state-file" accept=".csv,text/csv" onchange="wfHandleStateUpload(event)">
+          <button class="wf-clear-btn" onclick="wfClearState()">Clear</button>
+          <span id="wf-state-status" class="wf-status">No file loaded</span>
+        </div>
+      </div>
+
+      <!-- Tally: campaign × answering skill -->
+      <div class="rf-card">
+        <div class="rf-card-title">Waterfall Tally — Where Did Off-Primary Calls Land?</div>
+        <div class="rf-card-sub" id="wf-tally-sub">Each row = campaign whose calls overflowed off the primary skill. Each column = the skill that ultimately answered.</div>
+        <div class="rf-matrix-wrap">
+          <table class="rf-matrix" id="wf-tally"></table>
+        </div>
+      </div>
+
+      <!-- Per-event detail -->
+      <div class="rf-card">
+        <div class="rf-card-title">Per-Event Detail</div>
+        <div class="rf-card-sub" id="wf-events-sub">Every individual waterfall event in the selected range. Click an event to see the state of every primary-tier agent at the call's connect time (requires agent state log upload).</div>
+        <div class="table-wrap">
+          <table class="ui-table wf-event-table">
+            <thead>
+              <tr>
+                <th style="text-align:left">Date</th>
+                <th style="text-align:left">Time (CT)</th>
+                <th style="text-align:left">Campaign</th>
+                <th style="text-align:left">Primary Skill</th>
+                <th style="text-align:left">Answered By</th>
+                <th style="text-align:right">Queue Wait</th>
+                <th style="text-align:left">Agent</th>
+                <th style="text-align:left">Pool Snapshot</th>
+              </tr>
+            </thead>
+            <tbody id="wf-event-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -1799,6 +1913,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     document.getElementById('view-'+tab.dataset.view).classList.add('active');
     if (tab.dataset.view === 'user-info') loadUserInfo();
     if (tab.dataset.view === 'routing')   loadRoutingFidelity();
+    if (tab.dataset.view === 'waterfall') loadWaterfall();
   });
 });
 
@@ -1829,6 +1944,11 @@ const ROUTING_FEED_URL = PROXY_URL + '?feed=routing_fidelity';
 
 // As-designed routing path per campaign — drives the matrix color classes.
 // primary    = green  | overflow[0..1] = amber | qcb = blue | unlisted = red.
+//
+// `historical_primary` = retired/renamed skills that historically served as
+// the campaign's primary destination. Calls answered on these skills are
+// classified as "primary" rather than off-path so the year-long range view
+// doesn't paint old, legitimate routing as waterfalls.
 const ROUTING_PATHS = {
   'IB_Acq_Tier-A':          { primary:'IB_Acq_Tier-A',          overflow:['IB_Acq_Tier-B','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
   'IB_Acq_Tier-B':          { primary:'IB_Acq_Tier-B',          overflow:['IB_Acq_Tier-A','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
@@ -1837,11 +1957,13 @@ const ROUTING_PATHS = {
   'IB_Acq_KY-B':            { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-B','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
   'IB_Acq_KY-C':            { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-C','IB_Acq_Tier-A'], qcb:'IB_Acq_QCB' },
   'IB_Acq_Contact-Center':  { primary:'IB_Acq_Contact-Center',  overflow:['IB_Acq_Tier-C','IB_Acq_Tier-B'], qcb:'IB_Acq_QCB' },
-  'IB_Acq_ISA':             { primary:'IB_Acq_ISA',             overflow:['IB_Acq_Contact-Center'],         qcb:'IB_Acq_QCB' },
+  'IB_Acq_ISA':             { primary:'IB_Acq_ISA',             overflow:['IB_Acq_Contact-Center'],         qcb:'IB_Acq_QCB',
+                              historical_primary:['IB_Acq_Inside-Sales'] },
   'IB_Acq_Offerpad-Leads':  { primary:'IB_Acq_Tier-B',          overflow:['IB_Acq_Tier-A','IB_Acq_Tier-C'], qcb:'IB_Acq_QCB' },
   // QCB on this campaign loops back to IB_Acq_Follow-Ups after 60s in queue —
   // it's a queue-callback, not a fallback to the IB_Acq_QCB skill.
-  'IB_Acq_Follow-Up':       { primary:'IB_Acq_Follow-Ups',      overflow:[],                                qcb:null },
+  'IB_Acq_Follow-Up':       { primary:'IB_Acq_Follow-Ups',      overflow:[],                                qcb:null,
+                              historical_primary:['OB - Direct Answer - Follow Ups - T1','OB_Direct-Answer_Follow-Ups_T1'] },
 };
 
 // Fixed column order. Add/remove skills here to change matrix columns.
@@ -1885,6 +2007,7 @@ function rfClassifyCell(campaign, skill) {
   const path = ROUTING_PATHS[campaign];
   if (!path) return 'offpath';
   if (skill === path.primary)        return 'primary';
+  if (path.historical_primary && path.historical_primary.includes(skill)) return 'primary';
   if (path.overflow.includes(skill)) return 'overflow';
   if (skill === path.qcb)            return 'qcb';
   return 'offpath';
@@ -2075,6 +2198,384 @@ function renderRoutingFidelity() {
 
   loading.style.display = 'none';
   content.style.display = 'block';
+}
+
+// ════════════════════════════════════════════════════════════
+// WATERFALL ROOT CAUSE
+// ════════════════════════════════════════════════════════════
+//
+// Two data sources combine to attribute each waterfall event to a cause:
+//
+// 1. waterfall_events feed (Metabase via GAS proxy) — one row per call
+//    that did not land on its primary skill. SQL lives in the Metabase
+//    question; expected columns (auto-detected): call_date, time/timestamp,
+//    campaign, primary_skill, skill (answered), agent, queue_sec.
+//
+// 2. Agent state log CSV (manual upload) — Five9 export of the agent
+//    status timeline for the same date range. Auto-detects column names
+//    AGENT/USER, START_TIMESTAMP/START_TIME, STATE, REASON, END_TIMESTAMP.
+//    Building intervals lets us look up every agent's state at the moment
+//    a waterfall event occurred without relying on a server.
+//
+// Tier membership for the "pool snapshot" is inferred from ROUTING_PATHS:
+// the primary skill of the campaign is treated as the tier whose state we
+// snapshot. Membership of agents in that tier is determined from who has
+// answered calls on that skill within the loaded window (no Five9
+// getAgentSkills SOAP call required).
+const WATERFALL_FEED_URL = PROXY_URL + '?feed=waterfall_events';
+
+let waterfallRows = null;
+let waterfallLoaded = false;
+let agentStateRows = null;
+let agentStateIntervals = null;   // { agent_lc: [{startMs, endMs, state, reason}] sorted }
+
+const WF_STATE_COLORS = {
+  'ready':'good','available':'good','idle':'good','logged in':'good','on queue':'good',
+  'on call':'busy','on a call':'busy','in call':'busy','talking':'busy','active call':'busy',
+  'after call work':'wrap','acw':'wrap','wrap':'wrap','wrap-up':'wrap','wrapping up':'wrap',
+  'not ready':'away','unavailable':'away','aux':'away','break':'away','lunch':'away','meeting':'away',
+  'logged out':'offline','offline':'offline','logout':'offline','signed out':'offline',
+};
+function wfStateClass(state) {
+  if (!state) return 'unknown';
+  return WF_STATE_COLORS[String(state).toLowerCase().trim()] || 'other';
+}
+
+// Pull the first non-empty value from `row` matching any candidate key
+// (case-insensitive). Used to absorb the variation in Five9 export
+// column names without forcing a manual mapping step.
+function wfPick(row, keys) {
+  for (const k of keys) {
+    if (row[k] != null && row[k] !== '') return row[k];
+  }
+  const lcMap = {};
+  for (const rk of Object.keys(row)) lcMap[rk.toLowerCase()] = rk;
+  for (const k of keys) {
+    const rk = lcMap[k.toLowerCase()];
+    if (rk && row[rk] != null && row[rk] !== '') return row[rk];
+  }
+  return '';
+}
+
+function wfNormalizeEventRow(r) {
+  const ts = String(wfPick(r, ['call_timestamp','timestamp','start_time','call_time','time'])).trim();
+  const date = String(wfPick(r, ['call_date','date'])).trim();
+  return {
+    call_date: date || (ts ? ts.slice(0,10) : ''),
+    call_time: ts,
+    campaign:  String(wfPick(r, ['campaign','campaign_name'])).trim(),
+    primary_skill: String(wfPick(r, ['primary_skill','expected_skill'])).trim(),
+    skill:     String(wfPick(r, ['skill','skill_name','answering_skill'])).trim(),
+    agent:     String(wfPick(r, ['agent_email','agent','agent_name','user_name','user'])).trim(),
+    queue_sec: n(wfPick(r, ['queue_sec','queue_seconds','queue_time','hold_time','wait_time','time_in_queue'])),
+    call_id:   String(wfPick(r, ['call_id','session_id','id'])).trim(),
+  };
+}
+
+async function loadWaterfall() {
+  if (waterfallLoaded) { renderWaterfall(); return; }
+  waterfallLoaded = true;
+  const loading = document.getElementById('waterfall-loading');
+  const content = document.getElementById('waterfall-content');
+  loading.style.display = 'flex';
+  content.style.display = 'none';
+
+  try {
+    const res = await fetch(WATERFALL_FEED_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const parsed = Papa.parse(txt, { header:true, skipEmptyLines:true }).data;
+    waterfallRows = parsed.map(wfNormalizeEventRow).filter(r => r.call_date);
+  } catch (err) {
+    console.error('Waterfall feed error:', err);
+    waterfallRows = [];
+  }
+  wfInitDateRange();
+  renderWaterfall();
+  loading.style.display = 'none';
+  content.style.display = 'block';
+}
+
+function wfInitDateRange() {
+  const fromEl = document.getElementById('wf-date-from');
+  const toEl   = document.getElementById('wf-date-to');
+  if (!fromEl || !toEl || (fromEl.value && toEl.value)) return;
+  const today = new Date().toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
+  // Default to last 7 days so the matrix has enough events to inspect.
+  const weekAgo = new Date(Date.now() - 7*86400000).toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
+  fromEl.value = weekAgo;
+  toEl.value   = today;
+}
+
+function wfHandleStateUpload(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  const status = document.getElementById('wf-state-status');
+  if (!file) return;
+  status.textContent = 'Parsing ' + file.name + '…';
+  Papa.parse(file, {
+    header:true, skipEmptyLines:true,
+    complete: (res) => {
+      const rows = res.data.map(wfNormalizeStateRow).filter(r => r.agent && r.start);
+      if (!rows.length) {
+        status.textContent = 'No usable rows. Check that the CSV has agent/user, start time, and state columns.';
+        return;
+      }
+      agentStateRows = rows;
+      agentStateIntervals = wfBuildIntervals(rows);
+      const dates = [...new Set(rows.map(r => r.start.slice(0,10)))].sort();
+      const agents = Object.keys(agentStateIntervals).length;
+      status.textContent = `${rows.length.toLocaleString()} state rows · ${agents} agents · ${dates[0]||'?'} – ${dates.slice(-1)[0]||'?'}`;
+      renderWaterfall();
+    },
+    error: (err) => { status.textContent = 'Parse error: ' + err.message; }
+  });
+}
+
+function wfClearState() {
+  agentStateRows = null;
+  agentStateIntervals = null;
+  const fileEl = document.getElementById('wf-state-file');
+  if (fileEl) fileEl.value = '';
+  document.getElementById('wf-state-status').textContent = 'No file loaded';
+  renderWaterfall();
+}
+
+function wfNormalizeStateRow(r) {
+  const start = wfPick(r, ['start_timestamp','start_time','start','interval_start_time','timestamp','date_time']);
+  const end   = wfPick(r, ['end_timestamp','end_time','end','interval_end_time']);
+  const dur   = wfPick(r, ['duration','duration_seconds','duration_sec','seconds','elapsed_seconds']);
+  return {
+    agent:  String(wfPick(r, ['agent_email','user_name','agent','agent_name','user','username','email'])).toLowerCase().trim(),
+    start:  String(start || '').trim(),
+    end:    String(end || '').trim(),
+    dur:    n(dur),
+    state:  String(wfPick(r, ['state','status','agent_state'])).trim(),
+    reason: String(wfPick(r, ['reason_code','not_ready_reason','reason','not_ready_reason_code','sub_state'])).trim(),
+  };
+}
+
+// Parse a Five9 timestamp tolerantly. Returns ms since epoch in local time
+// (matching how the call data carries it). Empty strings → 0.
+function wfParseTs(s) {
+  if (!s) return 0;
+  // Already ISO-like ("YYYY-MM-DD HH:MM:SS") — let Date handle it.
+  const ms = Date.parse(s.includes('T') ? s : s.replace(' ', 'T'));
+  if (!isNaN(ms)) return ms;
+  return 0;
+}
+
+function wfBuildIntervals(rows) {
+  const byAgent = {};
+  for (const r of rows) (byAgent[r.agent] = byAgent[r.agent] || []).push(r);
+  for (const agent of Object.keys(byAgent)) {
+    const arr = byAgent[agent];
+    arr.forEach(r => {
+      r.startMs = wfParseTs(r.start);
+      if (r.end) r.endMs = wfParseTs(r.end);
+      else if (r.dur) r.endMs = r.startMs + r.dur*1000;
+      else r.endMs = 0;
+    });
+    arr.sort((a,b) => a.startMs - b.startMs);
+    // Backfill missing end times from the next row's start (or +8h cap).
+    for (let i = 0; i < arr.length; i++) {
+      if (!arr[i].endMs || arr[i].endMs <= arr[i].startMs) {
+        arr[i].endMs = (i+1 < arr.length) ? arr[i+1].startMs : arr[i].startMs + 8*3600*1000;
+      }
+    }
+  }
+  return byAgent;
+}
+
+function wfStateAt(agentEmail, tsMs) {
+  if (!agentStateIntervals || !tsMs) return null;
+  const arr = agentStateIntervals[String(agentEmail||'').toLowerCase().trim()];
+  if (!arr) return null;
+  for (const r of arr) {
+    if (tsMs >= r.startMs && tsMs < r.endMs) return r;
+  }
+  return null;
+}
+
+// Which agents belong to the primary tier for `campaign`? Inferred from
+// who has answered calls on that primary skill within the visible window.
+function wfTierAgentsFor(campaign, eventsInWindow) {
+  const path = ROUTING_PATHS[campaign];
+  if (!path) return [];
+  const target = new Set([path.primary, ...(path.historical_primary || [])]);
+  // Pull agents from BOTH the waterfall_events feed (where they answered
+  // off-primary calls) and any callers in agentStateIntervals who carry
+  // matching skill metadata. For now we use the cross-event agent pool.
+  const agents = new Set();
+  for (const ev of eventsInWindow) {
+    if (target.has(ev.skill) && ev.agent) agents.add(ev.agent.toLowerCase());
+  }
+  // Also include anyone in this window who answered a call on the primary
+  // skill regardless of campaign (so empty waterfall rows still show pool).
+  for (const ev of (waterfallRows || [])) {
+    if (target.has(ev.skill) && ev.agent) agents.add(ev.agent.toLowerCase());
+  }
+  return [...agents];
+}
+
+function renderWaterfall() {
+  if (!waterfallRows) return;
+
+  const fromVal = (document.getElementById('wf-date-from')||{}).value || '';
+  const toVal   = (document.getElementById('wf-date-to')  ||{}).value || '';
+  const events = waterfallRows.filter(r => {
+    if (!r.call_date) return false;
+    if (fromVal && r.call_date < fromVal) return false;
+    if (toVal   && r.call_date > toVal)   return false;
+    // Drop events where the answering skill is a historical primary for the
+    // campaign — these were the legitimate primary at the time the call was
+    // answered, just under a now-retired skill name.
+    const path = ROUTING_PATHS[r.campaign];
+    if (path && path.historical_primary && path.historical_primary.includes(r.skill)) return false;
+    return true;
+  });
+
+  document.getElementById('wf-feed-note').style.display = events.length ? 'none' : 'block';
+
+  // KPIs
+  const total = events.length;
+  const avgQueue = total ? (events.reduce((s,e)=>s+(e.queue_sec||0),0) / total) : null;
+  const byCampaign = {};
+  events.forEach(e => byCampaign[e.campaign] = (byCampaign[e.campaign]||0) + 1);
+  const topCamp = Object.entries(byCampaign).sort((a,b)=>b[1]-a[1])[0];
+  const stateCoverage = (() => {
+    if (!agentStateIntervals) return null;
+    let withState = 0;
+    for (const e of events) {
+      if (e.agent && wfStateAt(e.agent, wfParseTs(e.call_time))) withState++;
+    }
+    return total ? withState/total*100 : 0;
+  })();
+
+  document.getElementById('wf-kpis').innerHTML = kpiHTML([
+    { side:'ib', label:'Waterfall Root Cause', cards:[
+      { label:'Waterfall Events', val:fmt.num(total), accent:'var(--blue)' },
+      { label:'Avg Queue Wait',   val:avgQueue==null?'—':`${avgQueue.toFixed(0)}s`, sub:'before answered', accent:'var(--teal)' },
+      { label:'Top Campaign',     val:topCamp ? topCamp[0].replace(/^IB_Acq_/,'') : '—', sub:topCamp ? `${topCamp[1]} events` : '', accent:'var(--orange)' },
+      { label:'State Coverage',   val:stateCoverage==null?'—':fmt.pct(stateCoverage), sub:stateCoverage==null?'upload state CSV':'events with agent state', accent:'var(--blue)', cls:cls(stateCoverage,{good:90,warn:60}) },
+    ]},
+  ]);
+
+  // Tally: campaign × answering skill (for waterfall-only events)
+  const skillCols = [...new Set(events.map(e => e.skill).filter(Boolean))].sort();
+  const tallyPivot = {};
+  events.forEach(e => {
+    if (!tallyPivot[e.campaign]) tallyPivot[e.campaign] = { _total:0 };
+    tallyPivot[e.campaign][e.skill] = (tallyPivot[e.campaign][e.skill]||0) + 1;
+    tallyPivot[e.campaign]._total++;
+  });
+  let tallyHtml = '<thead><tr><th class="rf-corner"></th>';
+  skillCols.forEach(s => { tallyHtml += `<th class="rf-skill-h">${s.replace(/^IB_Acq_/,'')}</th>`; });
+  tallyHtml += '<th class="rf-total-h">Total</th></tr></thead><tbody>';
+  const campOrder = [
+    ...Object.keys(ROUTING_PATHS).filter(c => tallyPivot[c]),
+    ...Object.keys(tallyPivot).filter(c => !ROUTING_PATHS[c]),
+  ];
+  for (const camp of campOrder) {
+    const t = tallyPivot[camp]._total; if (!t) continue;
+    tallyHtml += `<tr><td class="rf-camp">${camp}</td>`;
+    for (const s of skillCols) {
+      const v = tallyPivot[camp][s] || 0;
+      const cellCls = v===0 ? 'zero' : rfClassifyCell(camp, s);
+      const p = t>0 ? (v/t*100) : 0;
+      tallyHtml += `<td><div class="rf-cell ${cellCls}"><span class="rf-n">${v||'–'}</span><span class="rf-p">${v?p.toFixed(0)+'%':''}</span></div></td>`;
+    }
+    tallyHtml += `<td><div class="rf-cell total"><span class="rf-n">${t}</span><span class="rf-p">100%</span></div></td></tr>`;
+  }
+  tallyHtml += '</tbody>';
+  document.getElementById('wf-tally').innerHTML = tallyHtml;
+
+  // Per-event detail
+  const sorted = [...events].sort((a,b) => (a.call_time < b.call_time ? -1 : a.call_time > b.call_time ? 1 : 0));
+  let evHtml = '';
+  sorted.forEach((e, idx) => {
+    const ts = wfParseTs(e.call_time);
+    const timeStr = ts ? new Date(ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/Chicago'}) : (e.call_time || '—');
+    const tier = wfTierAgentsFor(e.campaign, sorted);
+    let poolSummary = '<span style="color:#9aa8b1;font-size:11px">upload state log</span>';
+    if (agentStateIntervals && tier.length) {
+      const counts = { good:0, busy:0, wrap:0, away:0, offline:0, other:0, unknown:0 };
+      tier.forEach(a => {
+        const st = wfStateAt(a, ts);
+        counts[wfStateClass(st && st.state)]++;
+      });
+      const order = [
+        ['good','ready'],['busy','on call'],['wrap','wrap'],
+        ['away','not ready'],['offline','offline'],['unknown','no data'],
+      ];
+      poolSummary = '<div class="wf-pool-summary">' + order
+        .filter(([k]) => counts[k] > 0)
+        .map(([k,lbl]) => `<span class="wf-pool-${k==='good'?'good':k==='busy'||k==='away'?'bad':''}">${lbl}: ${counts[k]}</span>`)
+        .join('') + '</div>';
+    }
+    evHtml += `<tr data-evidx="${idx}" onclick="wfToggleEvent(${idx})">
+      <td>${e.call_date}</td>
+      <td>${timeStr}</td>
+      <td>${e.campaign}</td>
+      <td>${e.primary_skill || (ROUTING_PATHS[e.campaign]?.primary || '—')}</td>
+      <td>${e.skill || '—'}</td>
+      <td style="text-align:right">${e.queue_sec ? e.queue_sec+'s' : '—'}</td>
+      <td>${e.agent || '—'}</td>
+      <td>${poolSummary}</td>
+    </tr>`;
+  });
+  if (!sorted.length) evHtml = `<tr><td colspan="8" style="text-align:center;padding:20px;color:#9aa8b1">No waterfall events in selected range.</td></tr>`;
+  document.getElementById('wf-event-tbody').innerHTML = evHtml;
+  // Stash sorted events for the click handler.
+  window._wfSortedEvents = sorted;
+
+  const rangeLbl = (fromVal && toVal)
+    ? `${fmt.date(fromVal)} – ${fmt.date(toVal)}`
+    : (fromVal ? `from ${fmt.date(fromVal)}` : (toVal ? `through ${fmt.date(toVal)}` : 'all dates'));
+  document.getElementById('wf-tally-sub').textContent =
+    `${rangeLbl} · ${fmt.num(total)} waterfall events.`;
+  document.getElementById('wf-events-sub').textContent =
+    agentStateIntervals
+      ? `Click any row to expand the agent-by-agent state snapshot at the call's connect time.`
+      : `Upload an Agent State Log above to see per-agent state at each event's connect time.`;
+}
+
+// Expand/collapse a per-event row to show every primary-tier agent's state.
+function wfToggleEvent(idx) {
+  const tbody = document.getElementById('wf-event-tbody');
+  const row = tbody.querySelector(`tr[data-evidx="${idx}"]`);
+  if (!row) return;
+  const next = row.nextElementSibling;
+  if (next && next.classList.contains('wf-detail-row')) {
+    next.remove();
+    row.classList.remove('expanded');
+    return;
+  }
+  const ev = (window._wfSortedEvents || [])[idx];
+  if (!ev) return;
+  const ts = wfParseTs(ev.call_time);
+  const tier = wfTierAgentsFor(ev.campaign, window._wfSortedEvents || []);
+  let body;
+  if (!agentStateIntervals) {
+    body = `<em>Agent state log not loaded.</em> Upload the Five9 Agent State Log CSV at the top of this view to populate per-agent snapshots.`;
+  } else if (!tier.length) {
+    body = `<em>No agents identified for this campaign's primary tier in the loaded data.</em>`;
+  } else {
+    const chips = tier.map(a => {
+      const st = wfStateAt(a, ts);
+      const cls = wfStateClass(st && st.state);
+      const stateLbl = st ? st.state : 'no data';
+      const reason = st && st.reason ? ` · ${st.reason}` : '';
+      return `<span class="wf-state-chip ${cls}"><span class="wf-state-name">${a}</span><span class="wf-state-reason">${stateLbl}${reason}</span></span>`;
+    }).join('');
+    const pathPrimary = (ROUTING_PATHS[ev.campaign]?.primary) || ev.primary_skill || '—';
+    body = `<div style="font-size:11px;color:#5a7888;font-weight:600;margin-bottom:6px">Pool: ${pathPrimary} · ${tier.length} agent${tier.length===1?'':'s'} · snapshot at ${new Date(ts).toLocaleString('en-US',{timeZone:'America/Chicago'})}</div>
+      <div class="wf-state-grid">${chips}</div>`;
+  }
+  const detail = document.createElement('tr');
+  detail.className = 'wf-detail-row';
+  detail.innerHTML = `<td colspan="8">${body}</td>`;
+  row.classList.add('expanded');
+  row.parentNode.insertBefore(detail, row.nextSibling);
 }
 
 loadData();
