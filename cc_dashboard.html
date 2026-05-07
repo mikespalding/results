@@ -420,7 +420,8 @@ tbody tr:last-child td{border-bottom:none;}
   font-size:13px;font-weight:800;color:var(--navy);
   text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;
 }
-.wf-tier-sub{font-size:11px;color:#5a7888;font-weight:600;margin-bottom:12px;line-height:1.4;}
+.wf-tier-sub{font-size:11px;color:#5a7888;font-weight:600;margin-bottom:6px;line-height:1.4;}
+.wf-tier-cover{font-size:11px;color:#7a5f10;font-weight:600;margin-bottom:12px;background:rgba(245,200,66,0.18);padding:6px 10px;border-radius:5px;line-height:1.4;}
 .wf-tier-empty{font-size:12px;color:#7a8a94;font-style:italic;padding:6px 0;}
 .wf-tier-empty code{background:rgba(31,53,64,0.06);padding:1px 5px;border-radius:3px;font-size:11px;}
 .wf-event-line{
@@ -2850,9 +2851,37 @@ function wfRenderTierSection(primarySkill, events) {
     .join(' &nbsp;|&nbsp; ');
 
   const names = tierAgents.map(a => wfAgentLabel(a)).join(', ');
+
+  // Coverage diagnostic: of the agents listed for this tier, how many had
+  // ANY non-Login activity on the dates the events occurred? Distinguishes
+  // "tier list is stale (post-routing-change)" from "agents were truly off
+  // shift at exactly these moments".
+  const eventDates = [...new Set(events.map(ev => {
+    const ts = wfParseTs(ev.call_time);
+    return ts ? new Date(ts).toLocaleDateString('en-CA', {timeZone:'America/Chicago'}) : '';
+  }).filter(Boolean))];
+  let agentsActiveOnDates = 0;
+  for (const a of tierAgents) {
+    const arr = agentStateIntervals[a];
+    if (!arr) continue;
+    const active = arr.some(r => {
+      if (!r.startMs) return false;
+      const d = new Date(r.startMs).toLocaleDateString('en-CA', {timeZone:'America/Chicago'});
+      return eventDates.includes(d);
+    });
+    if (active) agentsActiveOnDates++;
+  }
+  const coverNote = eventDates.length
+    ? `${agentsActiveOnDates}/${tierAgents.length} of these agents have any state activity on ${eventDates.join(', ')}` +
+      (agentsActiveOnDates === 0
+        ? ' — likely the tier list is stale (these agents may have been re-skilled after the 5/5 routing change).'
+        : '')
+    : '';
+
   return `<div class="wf-tier-card">
     <div class="wf-tier-title">${tierShort} — ${events.length} waterfall event${events.length===1?'':'s'}</div>
     <div class="wf-tier-sub">${tierAgents.length} agent${tierAgents.length===1?'':'s'} assigned to ${primarySkill}: ${names}</div>
+    ${coverNote ? `<div class="wf-tier-cover">${coverNote}</div>` : ''}
     ${eventLines}
     <div class="wf-tier-tally"><strong>Tally (${moments} agent-moments):</strong> ${tally || '—'}</div>
   </div>`;
