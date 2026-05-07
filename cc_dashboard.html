@@ -188,13 +188,16 @@ tbody tr:last-child td{border-bottom:none;}
 .bad{color:var(--red)!important;font-weight:700;}
 
 /* Freeze the Hour column on the Campaign Calls Hourly Detail table.
-   Scoped tightly so the other tables keep their existing scroll behavior. */
-#campaign-hourly-table th:first-child,
-#campaign-hourly-table td:first-child{
+   Scoped tightly so the other tables keep their existing scroll behavior.
+   Note: the Hour TH has rowspan=2, so only the first thead row's first
+   child should be sticky — the second thead row's first child is the
+   "Ttl" sub-header of campaign #1, which must NOT be pinned. */
+#campaign-hourly-table thead tr:first-child th:first-child,
+#campaign-hourly-table tbody td:first-child{
   position:sticky;left:0;z-index:2;
   border-right:2px solid rgba(31,53,64,0.15);
 }
-#campaign-hourly-table thead th:first-child{background:#eef0f1;}
+#campaign-hourly-table thead tr:first-child th:first-child{background:#eef0f1;}
 #campaign-hourly-table tbody td:first-child{background:#ffffff;}
 #campaign-hourly-table tbody tr:hover td:first-child{background:#f1f3f4;}
 #campaign-hourly-table tbody tr.camp-total td:first-child{background:#e9ebec;}
