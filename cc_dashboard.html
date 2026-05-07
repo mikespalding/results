@@ -2431,6 +2431,7 @@ const WF_STATE_COLORS = {
   'after call work':'wrap','acw':'wrap','wrap':'wrap','wrap-up':'wrap','wrapping up':'wrap',
   'not ready':'away','unavailable':'away','aux':'away','break':'away','lunch':'away','meeting':'away',
   'logged out':'offline','offline':'offline','logout':'offline','signed out':'offline',
+  'off shift':'offline','not logged in':'offline',
 };
 function wfStateClass(state) {
   if (!state) return 'unknown';
@@ -2631,6 +2632,10 @@ function wfBuildIntervals(rows) {
   return byAgent;
 }
 
+// Returns the state interval covering tsMs, or a synthetic {state:'Off shift'}
+// when the agent has rows in the log but no interval covers this moment
+// (gap between sessions / not yet logged in / already logged out). Returns
+// null only when the agent is missing from the state log entirely.
 function wfStateAt(agentEmail, tsMs) {
   if (!agentStateIntervals || !tsMs) return null;
   const arr = agentStateIntervals[String(agentEmail||'').toLowerCase().trim()];
@@ -2638,7 +2643,7 @@ function wfStateAt(agentEmail, tsMs) {
   for (const r of arr) {
     if (tsMs >= r.startMs && tsMs < r.endMs) return r;
   }
-  return null;
+  return { state: 'Off shift', reason: '', _virtual: true };
 }
 
 // Which agents belong to the primary tier? Pulled from the SKILL
