@@ -187,6 +187,19 @@ tbody tr:last-child td{border-bottom:none;}
 .warn{color:var(--yellow)!important;font-weight:700;}
 .bad{color:var(--red)!important;font-weight:700;}
 
+/* Freeze the Hour column on the Campaign Calls Hourly Detail table.
+   Scoped tightly so the other tables keep their existing scroll behavior. */
+#campaign-hourly-table th:first-child,
+#campaign-hourly-table td:first-child{
+  position:sticky;left:0;z-index:2;
+  border-right:2px solid rgba(31,53,64,0.15);
+}
+#campaign-hourly-table thead th:first-child{background:#eef0f1;}
+#campaign-hourly-table tbody td:first-child{background:#ffffff;}
+#campaign-hourly-table tbody tr:hover td:first-child{background:#f1f3f4;}
+#campaign-hourly-table tbody tr.camp-total td:first-child{background:#e9ebec;}
+#campaign-hourly-table tbody tr.camp-total td{background:rgba(31,53,64,0.04);font-weight:800;border-top:2px solid rgba(31,53,64,0.15);}
+
 /* ── HEATMAP ── */
 .tool-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
 .tool-bar label{font-size:10px;font-weight:700;color:#7a8a94;text-transform:uppercase;letter-spacing:.9px;}
@@ -1404,7 +1417,7 @@ function buildCampaignHourlyHead() {
   row1 += '</tr>';
   let row2 = '<tr>';
   CAMPAIGN_HOURLY_COLS.forEach(() => {
-    row2 += '<th class="sect-start">Total</th><th>Offered</th><th>FTIBC</th><th>Conv</th>';
+    row2 += '<th class="sect-start" title="Total">Ttl</th><th title="Offered">Off</th><th>FTIBC</th><th>Conv</th>';
   });
   row2 += '</tr>';
   thead.innerHTML = row1 + row2;
@@ -1483,15 +1496,15 @@ function renderCampaignHourly(dateInput) {
       grand[camp].ib_conv        += v.ib_conv;
     }
   }
-  let totalCells = `<td style="font-weight:800">Total</td>`;
+  let totalCells = `<td>Total</td>`;
   CAMPAIGN_HOURLY_COLS.forEach(camp => {
     const v = grand[camp];
-    totalCells += `<td class="sect-start" style="font-weight:800">${fmt.num(v.ib_total_calls)}</td>`;
-    totalCells += `<td style="font-weight:800">${fmt.num(v.ib_offered)}</td>`;
-    totalCells += `<td style="font-weight:800">${fmt.num(v.ib_ftibc)}</td>`;
-    totalCells += `<td style="font-weight:800">${fmt.num(v.ib_conv)}</td>`;
+    totalCells += `<td class="sect-start">${fmt.num(v.ib_total_calls)}</td>`;
+    totalCells += `<td>${fmt.num(v.ib_offered)}</td>`;
+    totalCells += `<td>${fmt.num(v.ib_ftibc)}</td>`;
+    totalCells += `<td>${fmt.num(v.ib_conv)}</td>`;
   });
-  html.push(`<tr style="background:rgba(31,53,64,0.04);border-top:2px solid rgba(31,53,64,0.15)">${totalCells}</tr>`);
+  html.push(`<tr class="camp-total">${totalCells}</tr>`);
 
   tbody.innerHTML = html.join('') || placeholder('No campaign data for this date');
 }
