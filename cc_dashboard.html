@@ -537,6 +537,15 @@ tbody tr:last-child td{border-bottom:none;}
           <tbody id="hourly-compare-tbody"></tbody>
         </table>
       </div>
+
+      <!-- Campaign Calls Hourly Detail -->
+      <div class="sec-head"><h2>Campaign Calls Hourly Detail</h2><div class="sec-line"></div></div>
+      <div class="table-wrap">
+        <table id="campaign-hourly-table">
+          <thead id="campaign-hourly-thead"></thead>
+          <tbody id="campaign-hourly-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -897,6 +906,19 @@ const HM_STOPS = [
 const T = { ans:{good:95,warn:92}, adj:{good:97,warn:93}, conv:{good:8,warn:5} };
 
 let rawRows = [], charts = {};
+let campaignHourlyRows = null;     // parsed rows from campaign_hourly feed
+let campaignHourlyLoaded = false;  // true once fetch (success or fail) completes
+let campaignHourlyError  = null;   // last fetch error message, if any
+
+// Campaign columns for the Campaign Calls Hourly Detail table.
+// Anything not listed here rolls up into the trailing "Other" bucket.
+const CAMPAIGN_HOURLY_COLS = [
+  'IB_Acq_Tier-A','IB_Acq_Tier-B','IB_Acq_Tier-C',
+  'IB_Acq_KY-A','IB_Acq_KY-B','IB_Acq_KY-C',
+  'IB_Acq_Offerpad-Leads','IB_Acq_Follow-Up','IB_Acq_Return-Call',
+  'IB_Contact-Center_Main','IB_Contact-Center_Scheduling',
+  'Other'
+];
 
 // ── Helpers ──
 const n   = v  => parseFloat(String(v||0).replace(/,/g,''))||0;
@@ -1079,6 +1101,15 @@ async function loadData() {
     document.getElementById(`${v}-loading`).style.display='flex';
     document.getElementById(`${v}-content`).style.display='none';
   });
+  // Campaign hourly feed runs in parallel — re-render the campaign table on
+  // the Hourly tab once it arrives so it doesn't block the main view.
+  campaignHourlyLoaded = false;
+  campaignHourlyRows = null;
+  campaignHourlyError = null;
+  loadCampaignHourly().then(() => {
+    const dateInput = document.getElementById('hourly-date').value;
+    if (dateInput) renderCampaignHourly(dateInput);
+  });
   try {
     const res=await fetch(PROXY_URL);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1112,6 +1143,7 @@ function renderHourly() {
   if (rows.length===0) {
     document.getElementById('hourly-tbody').innerHTML='<tr><td colspan="21" style="text-align:center;color:var(--text-dim);padding:24px">No data for this date</td></tr>';
     document.getElementById('hourly-kpis').innerHTML='';
+    renderCampaignHourly(dateInput);
     document.getElementById('hourly-loading').style.display='none';
     document.getElementById('hourly-content').style.display='block';
     return;
@@ -1232,6 +1264,10 @@ function renderHourly() {
   // Hour-over-Hour Comparison Table
   renderHourlyComparison(dateInput, hours);
 
+  // Campaign Calls Hourly Detail (independent feed; renders placeholder
+  // until campaign_hourly fetch resolves)
+  renderCampaignHourly(dateInput);
+
   document.getElementById('hourly-loading').style.display='none';
   document.getElementById('hourly-content').style.display='block';
 }
@@ -1307,6 +1343,157 @@ function renderHourlyComparison(dateStr, hours) {
   }).filter(Boolean).join('');
 
   tbody.innerHTML = rows || '<tr><td colspan="16" style="text-align:center;color:var(--text-dim);padding:24px">No hourly data</td></tr>';
+}
+
+// ════════════════════════════════════════════════════════════
+// CAMPAIGN CALLS HOURLY DETAIL
+// ════════════════════════════════════════════════════════════
+//
+// Pivots a (date × hour × campaign) feed into a wide table:
+//   row = hour (CT), col group = campaign, sub-cols = Total / Offered / FTIBC / Conv.
+// Definitions match the existing Hourly Detail table:
+//   Total   = ib_total_calls   (call_type='Inbound')
+//   Offered = ib_offered       (skill ILIKE 'IB%')
+//   FTIBC   = ib_ftibc         (skill ILIKE 'IB%' AND inbound_call_counter=1)
+//   Conv    = ib_appt_set + ib_opportunity   (positive dispositions on IB skills)
+//
+// Source feed: PROXY_URL + '?feed=campaign_hourly'. SQL for the Metabase
+// question backing the feed lives at the bottom of this file (search for
+// "Campaign · Hourly Detail").
+const CAMPAIGN_HOURLY_FEED_URL = PROXY_URL + '?feed=campaign_hourly';
+
+async function loadCampaignHourly() {
+  try {
+    const res = await fetch(CAMPAIGN_HOURLY_FEED_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text();
+    const parsed = Papa.parse(txt, { header:true, skipEmptyLines:true }).data;
+    // Defensive: if the proxy returned a JSON error blob (unknown feed,
+    // misconfigured), Papa will parse it as a single-cell row. Detect that.
+    if (parsed.length === 1 && parsed[0].error) {
+      throw new Error(parsed[0].error);
+    }
+    campaignHourlyRows = parsed.map(r => ({
+      call_date:      r.call_date,
+      call_hour:      parseInt(r.call_hour),
+      campaign:       r.campaign || r.campaign_name || '(Unknown)',
+      ib_total_calls: n(r.ib_total_calls),
+      ib_offered:     n(r.ib_offered),
+      ib_ftibc:       n(r.ib_ftibc),
+      ib_conv:        n(r.ib_conv),
+    }));
+    campaignHourlyError = null;
+  } catch (err) {
+    console.error('campaign_hourly feed:', err);
+    campaignHourlyRows = [];
+    campaignHourlyError = err.message || String(err);
+  } finally {
+    campaignHourlyLoaded = true;
+  }
+}
+
+function buildCampaignHourlyHead() {
+  const thead = document.getElementById('campaign-hourly-thead');
+  if (!thead || thead.dataset.built === '1') return;
+  const colCount = CAMPAIGN_HOURLY_COLS.length;
+  let row1 = '<tr><th rowspan="2" style="text-align:left;vertical-align:bottom">Hour (CT)</th>';
+  CAMPAIGN_HOURLY_COLS.forEach(camp => {
+    const label = camp === 'Other' ? 'Other' : camp.replace(/^IB_/, '');
+    row1 += `<th colspan="4" class="g-ib sect-start" title="${camp}">${label}</th>`;
+  });
+  row1 += '</tr>';
+  let row2 = '<tr>';
+  CAMPAIGN_HOURLY_COLS.forEach(() => {
+    row2 += '<th class="sect-start">Total</th><th>Offered</th><th>FTIBC</th><th>Conv</th>';
+  });
+  row2 += '</tr>';
+  thead.innerHTML = row1 + row2;
+  thead.dataset.built = '1';
+  thead.dataset.colspan = String(1 + colCount * 4);
+}
+
+function renderCampaignHourly(dateInput) {
+  buildCampaignHourlyHead();
+  const tbody = document.getElementById('campaign-hourly-tbody');
+  const thead = document.getElementById('campaign-hourly-thead');
+  if (!tbody) return;
+  const colspan = thead.dataset.colspan || '49';
+
+  const placeholder = (msg) =>
+    `<tr><td colspan="${colspan}" style="text-align:center;color:var(--text-dim);padding:24px">${msg}</td></tr>`;
+
+  if (!campaignHourlyLoaded) {
+    tbody.innerHTML = placeholder('Loading campaign data…');
+    return;
+  }
+  if (campaignHourlyError) {
+    tbody.innerHTML = placeholder(`Failed to load campaign feed: ${campaignHourlyError}. Confirm the <code>campaign_hourly</code> entry in the GAS proxy is set.`);
+    return;
+  }
+  if (!campaignHourlyRows || !campaignHourlyRows.length) {
+    tbody.innerHTML = placeholder('No campaign data available.');
+    return;
+  }
+
+  const rows = campaignHourlyRows.filter(r => r.call_date === dateInput);
+  if (!rows.length) {
+    tbody.innerHTML = placeholder('No campaign data for this date');
+    return;
+  }
+
+  // pivot[hour][campaignBucket] = aggregated metrics
+  const pivot = {};
+  for (let h = 0; h < 24; h++) pivot[h] = {};
+  for (const r of rows) {
+    const h = r.call_hour;
+    if (isNaN(h)) continue;
+    const camp = CAMPAIGN_HOURLY_COLS.includes(r.campaign) ? r.campaign : 'Other';
+    if (!pivot[h][camp]) pivot[h][camp] = { ib_total_calls:0, ib_offered:0, ib_ftibc:0, ib_conv:0 };
+    pivot[h][camp].ib_total_calls += r.ib_total_calls;
+    pivot[h][camp].ib_offered     += r.ib_offered;
+    pivot[h][camp].ib_ftibc       += r.ib_ftibc;
+    pivot[h][camp].ib_conv        += r.ib_conv;
+  }
+
+  const html = [];
+  for (let h = 0; h < 24; h++) {
+    const hourData = pivot[h];
+    const hourTotal = Object.values(hourData).reduce((s,v)=>s+v.ib_total_calls, 0);
+    if (hourTotal === 0) continue;
+    let cells = `<td>${fmt.hour(h)}</td>`;
+    CAMPAIGN_HOURLY_COLS.forEach(camp => {
+      const v = hourData[camp] || { ib_total_calls:0, ib_offered:0, ib_ftibc:0, ib_conv:0 };
+      cells += `<td class="sect-start">${fmt.num(v.ib_total_calls)}</td>`;
+      cells += `<td>${fmt.num(v.ib_offered)}</td>`;
+      cells += `<td>${fmt.num(v.ib_ftibc)}</td>`;
+      cells += `<td>${fmt.num(v.ib_conv)}</td>`;
+    });
+    html.push(`<tr>${cells}</tr>`);
+  }
+
+  // Total row
+  const grand = {};
+  CAMPAIGN_HOURLY_COLS.forEach(c => grand[c] = { ib_total_calls:0, ib_offered:0, ib_ftibc:0, ib_conv:0 });
+  for (let h = 0; h < 24; h++) {
+    for (const camp of Object.keys(pivot[h])) {
+      const v = pivot[h][camp];
+      grand[camp].ib_total_calls += v.ib_total_calls;
+      grand[camp].ib_offered     += v.ib_offered;
+      grand[camp].ib_ftibc       += v.ib_ftibc;
+      grand[camp].ib_conv        += v.ib_conv;
+    }
+  }
+  let totalCells = `<td style="font-weight:800">Total</td>`;
+  CAMPAIGN_HOURLY_COLS.forEach(camp => {
+    const v = grand[camp];
+    totalCells += `<td class="sect-start" style="font-weight:800">${fmt.num(v.ib_total_calls)}</td>`;
+    totalCells += `<td style="font-weight:800">${fmt.num(v.ib_offered)}</td>`;
+    totalCells += `<td style="font-weight:800">${fmt.num(v.ib_ftibc)}</td>`;
+    totalCells += `<td style="font-weight:800">${fmt.num(v.ib_conv)}</td>`;
+  });
+  html.push(`<tr style="background:rgba(31,53,64,0.04);border-top:2px solid rgba(31,53,64,0.15)">${totalCells}</tr>`);
+
+  tbody.innerHTML = html.join('') || placeholder('No campaign data for this date');
 }
 
 // ── Render Daily ──
@@ -2614,6 +2801,60 @@ function wfToggleEvent(idx) {
 }
 
 loadData();
+
+/* ============================================================
+   SQL · Campaign · Hourly Detail
+   Backs the `campaign_hourly` proxy feed used by the Campaign
+   Calls Hourly Detail table on the Hourly tab. Create a public
+   Metabase question with this query and add its CSV URL to the
+   FEEDS map in apps_script/cc_proxy.gs as `campaign_hourly`.
+
+   Source: salmar.five9_call_data
+   Timezone: call_timestamp is stored in CT — no conversion.
+   Grain: one row per (call_date, call_hour, campaign).
+
+   ------------------------------------------------------------
+   SELECT
+       call_timestamp::date                                     AS call_date,
+       EXTRACT(HOUR FROM call_timestamp)::int                   AS call_hour,
+       campaign,
+
+       SUM(CASE WHEN call_type = 'Inbound'
+                THEN calls ELSE 0 END)                          AS ib_total_calls,
+
+       SUM(CASE WHEN skill ILIKE 'IB%'
+                THEN calls ELSE 0 END)                          AS ib_offered,
+
+       SUM(CASE WHEN skill ILIKE 'IB%'
+                 AND inbound_call_counter = 1
+                THEN calls ELSE 0 END)                          AS ib_ftibc,
+
+       SUM(CASE WHEN skill ILIKE 'IB%'
+                 AND (   disposition ILIKE '%appointment set%'
+                      OR disposition ILIKE '%opportunity%')
+                THEN calls ELSE 0 END)                          AS ib_conv
+
+   FROM salmar.five9_call_data
+   WHERE call_timestamp >= CURRENT_DATE - INTERVAL '60 days'
+     AND disposition NOT ILIKE '%test%'
+     AND ani  <> '6787879902'
+     AND dnis <> '6787879902'
+     AND call_type IN ('Inbound', 'Queue Callback')
+   GROUP BY 1, 2, 3
+   ORDER BY 1 DESC, 2 ASC, 3 ASC;
+   ------------------------------------------------------------
+
+   Column expectations (parsed in loadCampaignHourly):
+     call_date        — YYYY-MM-DD
+     call_hour        — 0..23 integer
+     campaign         — full campaign name (e.g. IB_Acq_Tier-A).
+                        Anything not in CAMPAIGN_HOURLY_COLS rolls
+                        up into the trailing "Other" bucket.
+     ib_total_calls   — Total inbound calls
+     ib_offered       — Calls offered to an IB skill
+     ib_ftibc         — First-time inbound callers on IB skills
+     ib_conv          — Appointment Set + Opportunity dispositions
+   ============================================================ */
 </script>
 </body>
 </html>

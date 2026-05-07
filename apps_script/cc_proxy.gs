@@ -18,6 +18,13 @@ const FEEDS = {
   // Waterfall Root Cause — one row per inbound call that did not land on its
   // primary skill, last 1y. Drives the Waterfall Root Cause tab.
   waterfall_events: 'https://rebuilt.metabaseapp.com/public/question/a26c897b-90ff-4524-8536-ac45e86e0628.csv',
+
+  // Campaign Calls Hourly Detail — one row per (call_date, call_hour, campaign),
+  // last 60 days. Drives the Campaign Calls Hourly Detail table on the Hourly
+  // tab. SQL for the Metabase question lives in cc_dashboard.html (search for
+  // "SQL · Campaign · Hourly Detail"). Paste the public CSV URL here after
+  // publishing the question.
+  campaign_hourly: '',
 };
 
 function doGet(e) {
@@ -27,7 +34,7 @@ function doGet(e) {
 
     if (!url) {
       return ContentService
-        .createTextOutput(JSON.stringify({ error: 'Unknown feed: ' + feed, available: Object.keys(FEEDS) }))
+        .createTextOutput(JSON.stringify({ error: 'Unknown or unconfigured feed: ' + feed, available: Object.keys(FEEDS) }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
