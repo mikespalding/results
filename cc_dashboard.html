@@ -2426,6 +2426,11 @@ function renderWaterfall() {
     if (!r.call_date) return false;
     if (fromVal && r.call_date < fromVal) return false;
     if (toVal   && r.call_date > toVal)   return false;
+    // Drop events where the answering skill is a historical primary for the
+    // campaign — these were the legitimate primary at the time the call was
+    // answered, just under a now-retired skill name.
+    const path = ROUTING_PATHS[r.campaign];
+    if (path && path.historical_primary && path.historical_primary.includes(r.skill)) return false;
     return true;
   });
 
