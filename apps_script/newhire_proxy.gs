@@ -20,9 +20,6 @@ const FEEDS = {
 
   // ── QUALITY ──
   prospect_creation_rate: 'https://rebuilt.metabaseapp.com/public/question/3a722788-60fe-4e13-aa5c-82637b6135d1.csv',
-
-  // ── CC DASHBOARD: WATERFALL ROOT CAUSE ──
-  waterfall_events:       'https://rebuilt.metabaseapp.com/public/question/a26c897b-90ff-4524-8536-ac45e86e0628.csv',
 };
 
 // ── ACCESS LOGGING ── (shared with pacesetter)
